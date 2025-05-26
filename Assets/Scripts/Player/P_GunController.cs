@@ -26,7 +26,7 @@ public class P_GunController : MonoBehaviour
         // 총을 발사하는 로직
         if (InputManager.Instance.FireHeld && currentFireRate <= 0)
         {
-
+            
             Fire();
         }
     }

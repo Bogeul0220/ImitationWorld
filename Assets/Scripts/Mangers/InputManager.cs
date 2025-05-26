@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,12 +10,14 @@ public class InputManager : MonoBehaviour
     public Vector2 LookInput { get; private set; }
     public bool JumpPressed { get; private set; }
     public bool SprintHeld { get; private set; }
+    public bool FireClicked { get; private set; }
     public bool FireHeld { get; private set; }
+    public bool ZoomInHeld { get; private set; }
     public bool PausePressed { get; private set; }
 
     [SerializeField] private InputActionAsset inputActions;
 
-    private InputAction m_moveAction, m_lookAction, m_jumpAction, m_sprintAction, m_pauseActionPlayer, m_fireAction;
+    private InputAction m_moveAction, m_lookAction, m_jumpAction, m_sprintAction, m_pauseActionPlayer, m_fireAction, m_zoomInAction;
     private InputAction m_pauseActionUI;
 
     private void Awake()
@@ -41,20 +44,12 @@ public class InputManager : MonoBehaviour
         m_sprintAction = playerMap.FindAction("Sprint");
         m_pauseActionPlayer = playerMap.FindAction("Pause");
         m_fireAction = playerMap.FindAction("Fire");
+        m_pauseActionPlayer = playerMap.FindAction("Pause");
+        m_zoomInAction = playerMap.FindAction("ZoomIn");
 
         m_pauseActionUI = uiMap.FindAction("Pause");
 
         playerMap.Enable();
-    }
-
-    public void EnableInput()
-    {
-        inputActions.FindActionMap("Player").Enable();
-    }
-
-    public void DisableInput()
-    {
-        inputActions.FindActionMap("Player").Disable();
     }
 
     private void Update()
@@ -64,6 +59,18 @@ public class InputManager : MonoBehaviour
         JumpPressed = m_jumpAction.WasPressedThisFrame();
         SprintHeld = m_sprintAction.IsPressed();
         PausePressed = m_pauseActionPlayer.WasPressedThisFrame();
+        FireClicked = m_fireAction.WasPressedThisFrame();
+        FireHeld = m_fireAction.IsPressed();
+        //ZoomInHeld = m_zoomInAction.IsPressed();
+        if (m_zoomInAction.WasPressedThisFrame())
+            ZoomInHeld = true;
+        else if (m_zoomInAction.WasReleasedThisFrame())
+            ZoomInHeld = false;
+    }
+
+    private void LateUpdate()
+    {
+        InputPause();
     }
 
     private void InputPause()
