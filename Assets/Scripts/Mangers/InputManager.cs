@@ -1,4 +1,4 @@
-using Unity.VisualScripting;
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,12 +13,14 @@ public class InputManager : MonoBehaviour
     public bool FireClicked { get; private set; }
     public bool FireHeld { get; private set; }
     public bool ZoomInHeld { get; private set; }
-    public bool PausePressed { get; private set; }
+    public Action PausePressed { get; set; }
+    public Action InventoryPressed { get; set; }
+    public Action EscapeDisplayPressed { get; set; }
 
     [SerializeField] private InputActionAsset inputActions;
 
-    private InputAction m_moveAction, m_lookAction, m_jumpAction, m_sprintAction, m_pauseActionPlayer, m_fireAction, m_zoomInAction;
-    private InputAction m_pauseActionUI;
+    private InputAction m_moveAction, m_lookAction, m_jumpAction, m_sprintAction, m_pauseActionPlayer, m_fireAction, m_zoomInAction, m_inventoryActionPlayer;
+    private InputAction m_pauseActionUI, m_inventoryActionUI, m_escapeActionUI;
 
     private void Awake()
     {
@@ -46,10 +48,20 @@ public class InputManager : MonoBehaviour
         m_fireAction = playerMap.FindAction("Fire");
         m_pauseActionPlayer = playerMap.FindAction("Pause");
         m_zoomInAction = playerMap.FindAction("ZoomIn");
+        m_inventoryActionPlayer = playerMap.FindAction("Inventory");
 
         m_pauseActionUI = uiMap.FindAction("Pause");
+        m_inventoryActionUI = uiMap.FindAction("Inventory");
+        m_escapeActionUI = uiMap.FindAction("EscapeDisplay");
 
         playerMap.Enable();
+    }
+
+    void Start()
+    {
+        PausePressed += InputPause;
+        InventoryPressed += InputInventory;
+        EscapeDisplayPressed += InputEscapeDisplay;
     }
 
     private void Update()
@@ -58,7 +70,6 @@ public class InputManager : MonoBehaviour
         LookInput = m_lookAction.ReadValue<Vector2>();
         JumpPressed = m_jumpAction.WasPressedThisFrame();
         SprintHeld = m_sprintAction.IsPressed();
-        PausePressed = m_pauseActionPlayer.WasPressedThisFrame();
         FireClicked = m_fireAction.WasPressedThisFrame();
         FireHeld = m_fireAction.IsPressed();
         //ZoomInHeld = m_zoomInAction.IsPressed();
@@ -66,27 +77,72 @@ public class InputManager : MonoBehaviour
             ZoomInHeld = true;
         else if (m_zoomInAction.WasReleasedThisFrame())
             ZoomInHeld = false;
+
+        if (m_pauseActionPlayer.WasPressedThisFrame() || m_pauseActionUI.WasPressedThisFrame())
+            PausePressed?.Invoke();
+
+        if (m_inventoryActionPlayer.WasPressedThisFrame() || m_inventoryActionUI.WasPressedThisFrame())
+            InventoryPressed?.Invoke();
+
+        if (m_escapeActionUI.WasPressedThisFrame())
+            EscapeDisplayPressed?.Invoke();
     }
 
     private void LateUpdate()
     {
-        InputPause();
+        SetCursorState();
+    }
+
+    private void SetCursorState()
+    {
+        if (UIManager.Instance.DisplayOpened)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
     }
 
     private void InputPause()
     {
-        if (PausePressed)
+        var currentMap = inputActions.FindActionMap("Player").enabled ? "Player" : "UI";
+
+        if (currentMap == "Player")
         {
-            if (inputActions.FindActionMap("Player").enabled)
-            {
-                inputActions.FindActionMap("Player").Disable();
-                inputActions.FindActionMap("UI").Enable();
-            }
-            else
-            {
-                inputActions.FindActionMap("UI").Disable();
-                inputActions.FindActionMap("Player").Enable();
-            }
+            inputActions.FindActionMap("Player").Disable();
+            inputActions.FindActionMap("UI").Enable();
+        }
+        else
+        {
+            inputActions.FindActionMap("UI").Disable();
+            inputActions.FindActionMap("Player").Enable();
+        }
+    }
+
+    private void InputInventory()
+    {
+        if (inputActions.FindActionMap("Player").enabled)
+        {
+            inputActions.FindActionMap("Player").Disable();
+            inputActions.FindActionMap("UI").Enable();
+        }
+        else
+        {
+            inputActions.FindActionMap("UI").Disable();
+            inputActions.FindActionMap("Player").Enable();
+        }
+    }
+
+    private void InputEscapeDisplay()
+    {
+        if (inputActions.FindActionMap("UI").enabled)
+        {
+            inputActions.FindActionMap("UI").Disable();
+            inputActions.FindActionMap("Player").Enable();
         }
     }
 }

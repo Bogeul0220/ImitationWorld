@@ -41,8 +41,6 @@ public class P_MovementController : MonoBehaviour
     public float RotateSpeed = 5;
     public float JumpSpeed = 5;
 
-    public GameObject PauseDisplay;
-
     private void Awake()
     {
         m_animator = GetComponent<Animator>();
@@ -184,18 +182,6 @@ public class P_MovementController : MonoBehaviour
 
         CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cinemachineTargetPitch + CameraAngleOverride,
             _cinemachineTargetYaw, 0.0f);
-    }
-
-    private void DisplayPause()
-    {
-        if (InputManager.Instance.PausePressed)
-        {
-            PauseDisplay.SetActive(true);
-        }
-        else if (InputManager.Instance.PausePressed)
-        {
-            PauseDisplay.SetActive(false);
-        }
     }
 
     private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
