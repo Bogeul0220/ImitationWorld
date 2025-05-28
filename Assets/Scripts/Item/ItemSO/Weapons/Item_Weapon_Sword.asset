@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ec55bb21546a2704481dd8dbd941c82d, type: 3}
-  m_Name: Item_Weapon
+  m_Name: Item_Weapon_Sword
   m_EditorClassIdentifier: 
-  itemName: 
-  itemType: 0
-  description: 
-  itemID: 0
-  itemIcon: {fileID: 0}
+  itemName: "\uCE7C"
+  itemType: 1
+  description: "\uB0A0\uCE74\uB85C\uC6B4 \uCE7C"
+  itemID: 1
+  itemIcon: {fileID: 21300000, guid: 5fd50594014b70e48bd6993443d46b32, type: 3}
   maxDurability: 100
-  damage: 1
+  damage: 15
