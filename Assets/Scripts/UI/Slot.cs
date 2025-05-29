@@ -38,6 +38,7 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
             }
         }
     }
+    
     [SerializeField] private ItemBase currentItem;
 
     public bool isEmpty => CurrentItem == null; // 슬롯이 비어있는지 여부

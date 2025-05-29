@@ -130,6 +130,21 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
+    public bool HasEnoughMaterials(CraftingMaterialItem materialItem)
+    {
+        foreach (var pair in InvenItemDict)
+        {
+            if (pair.Value.ItemData.ItemID == materialItem.ItemData.ItemID &&
+                pair.Value is CountableItem countableItem &&
+                countableItem.Amount >= materialItem.Amount)
+            {
+                return true; // 충분한 재료가 있음
+            }
+        }
+        
+        return false; // 충분한 재료가 없음
+    }
+
     [ContextMenu("Debug : 인벤토리 내용 출력")]
     public void DebugPrintInventory()
     {

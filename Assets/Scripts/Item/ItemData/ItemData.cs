@@ -3,9 +3,9 @@ using UnityEngine;
 public enum ItemType
 {
     None,
-    Weapon,
-    Armor,
+    Equipment,
     Consumable,
+    CraftingMaterial,
     QuestItem
 }
 

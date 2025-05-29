@@ -17,11 +17,17 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private GameObject inventoryDisplay;
 
+    [Header("Sub Canvas")]
+    [SerializeField]
+    private Canvas subCanvas;
+    [SerializeField]
+    private GameObject craftingPanelDisplay;
+
     public bool DisplayOpened
     {
         get
         {
-            return pauseDisplay.activeSelf || inventoryDisplay.activeSelf;
+            return pauseDisplay.activeSelf || inventoryDisplay.activeSelf || craftingPanelDisplay.activeSelf;
         }
     }
 
@@ -37,6 +43,7 @@ public class UIManager : MonoBehaviour
 
         InputManager.Instance.PausePressed += DisplayPause;
         InputManager.Instance.InventoryPressed += DisplayInventory;
+        InputManager.Instance.CraftingPressed += DisplayCrafting;
         InputManager.Instance.EscapeDisplayPressed += EscapeDisplay;
     }
 
@@ -48,6 +55,11 @@ public class UIManager : MonoBehaviour
     private void DisplayInventory()
     {
         inventoryDisplay.SetActive(!inventoryDisplay.activeSelf);
+    }
+
+    private void DisplayCrafting()
+    {
+        craftingPanelDisplay.SetActive(!craftingPanelDisplay.activeSelf);
     }
 
     private void EscapeDisplay()

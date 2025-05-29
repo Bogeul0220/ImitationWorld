@@ -4,21 +4,17 @@ using UnityEngine;
 
 public class GetItemTextCube : MonoBehaviour
 {
-    public PortionItemData testItemData;
-    public WeaponItemData testWeaponData;
+    public List<ItemData> itemDatas;
 
     void OnTriggerEnter(Collider other)
     {
         if (other.tag == "Player")
         {
-            // 플레이어가 아이템을 획득했음을 알리는 메시지 출력
-            Debug.Log("아이템을 획득했습니다!");
-
-            var item = testItemData.CreateItem();
-            InventoryManager.Instance.AddItem(item);
-
-            var item2 = testWeaponData.CreateItem();
-            InventoryManager.Instance.AddItem(item2);
+            foreach (var itemData in itemDatas)
+            {
+                var newItem = itemData.CreateItem();
+                InventoryManager.Instance.AddItem(newItem);
+            }
         }
     }
 }

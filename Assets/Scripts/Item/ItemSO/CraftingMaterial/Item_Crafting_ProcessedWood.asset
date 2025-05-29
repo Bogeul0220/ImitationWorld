@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd8cd554d8ac4cb4ea04cd0cc390b94c, type: 3}
+  m_Name: Item_Crafting_ProcessedWood
+  m_EditorClassIdentifier: 
+  itemName: "\uAC00\uACF5\uB41C \uB098\uBB34"
+  itemType: 3
+  description: "\uB2E4\uB4EC\uC5B4\uC9C4 \uB098\uBB34.<br>\uC0AC\uC6A9\uD560 \uACF3\uC774
+    \uB9CE\uB2E4."
+  itemID: 202
+  itemIcon: {fileID: 21300000, guid: 985522aa310769847adff8a288ac92ca, type: 3}
+  maxAmount: 99
