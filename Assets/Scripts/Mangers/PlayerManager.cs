@@ -6,7 +6,12 @@ public class PlayerManager : MonoBehaviour
 {
     public static PlayerManager instance; // 싱글톤 인스턴스
 
-    public GameObject player; // 플레이어 오브젝트
+    public GameObject Player; // 플레이어 오브젝트
+
+    public InteractionObjectBase InteractionObject; // 상호작용 오브젝트
+    public List<InteractionObjectBase> InteractionObjectLists = new List<InteractionObjectBase>(); // 상호작용 가능한 오브젝트 목록
+    [SerializeField]
+    private float interactionRange; // 상호작용 가능한 거리
 
     void Awake()
     {
@@ -15,5 +20,50 @@ public class PlayerManager : MonoBehaviour
             instance = this;
     }
 
-    
+    void Update()
+    {
+        InteractWithClosestObject();
+    }
+
+    private void InteractWithClosestObject()
+    {
+        // 플레이어와 가장 가까운 상호작용 가능한 오브젝트를 찾는 로직
+        if (InteractionObjectLists.Count == 0)
+        {
+            InteractionObject = null;
+            return;
+        }
+
+        float closestDistance = float.MaxValue;
+        InteractionObjectBase closestObject = null;
+
+        foreach (var interactionObject in InteractionObjectLists)
+        {
+            float distance = Vector3.Distance(Player.transform.position, interactionObject.transform.position);
+            if (distance < closestDistance && distance <= interactionRange)
+            {
+                closestDistance = distance;
+                closestObject = interactionObject;
+            }
+        }
+
+        InteractionObject = closestObject;
+    }
+
+    public void AddInteractionObject(InteractionObjectBase interactionObject)
+    {
+        if (!InteractionObjectLists.Contains(interactionObject))
+        {
+            InteractionObjectLists.Add(interactionObject);
+            interactionObject.InitInteractObject();
+        }
+    }
+
+    public void RemoveInteractionObject(InteractionObjectBase interactionObject)
+    {
+        if (InteractionObjectLists.Contains(interactionObject))
+        {
+            InteractionObjectLists.Remove(interactionObject);
+        }
+    }
 }

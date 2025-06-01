@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class UIManager : MonoBehaviour
 {
@@ -16,12 +18,13 @@ public class UIManager : MonoBehaviour
     private GameObject pauseDisplay;
     [SerializeField]
     private GameObject inventoryDisplay;
+    [SerializeField]
+    private TMP_Text interactionText;
 
     [Header("Sub Canvas")]
     [SerializeField]
     private Canvas subCanvas;
-    [SerializeField]
-    private GameObject craftingPanelDisplay;
+    public GameObject craftingPanelDisplay;
 
     public bool DisplayOpened
     {
@@ -43,8 +46,25 @@ public class UIManager : MonoBehaviour
 
         InputManager.Instance.PausePressed += DisplayPause;
         InputManager.Instance.InventoryPressed += DisplayInventory;
-        InputManager.Instance.CraftingPressed += DisplayCrafting;
+        InputManager.Instance.InteractPressed += DisplayInteract;
         InputManager.Instance.EscapeDisplayPressed += EscapeDisplay;
+    }
+
+    void LateUpdate()
+    {
+        SetInteractionText();
+    }
+
+    public void SetInteractionText()
+    {
+        if (PlayerManager.instance.InteractionObject != null && DisplayOpened == false)
+        {
+            interactionText.text = $"[E] {PlayerManager.instance.InteractionObject.InteractionObjectName}";
+        }
+        else
+        {
+            interactionText.text = "";
+        }
     }
 
     private void DisplayPause()
@@ -57,8 +77,12 @@ public class UIManager : MonoBehaviour
         inventoryDisplay.SetActive(!inventoryDisplay.activeSelf);
     }
 
-    private void DisplayCrafting()
+    private void DisplayInteract()
     {
+        if(PlayerManager.instance.InteractionObject == null)
+            return;
+
+        Debug.Log("DisplayInteract called");
         craftingPanelDisplay.SetActive(!craftingPanelDisplay.activeSelf);
     }
 

@@ -16,12 +16,12 @@ public class InputManager : MonoBehaviour
     public Action PausePressed { get; set; }
     public Action InventoryPressed { get; set; }
     public Action EscapeDisplayPressed { get; set; }
-    public Action CraftingPressed { get; set; }
+    public Action InteractPressed { get; set; }
 
     [SerializeField] private InputActionAsset inputActions;
 
-    private InputAction m_moveAction, m_lookAction, m_jumpAction, m_sprintAction, m_pauseActionPlayer, m_fireAction, m_zoomInAction, m_inventoryActionPlayer, m_craftingAction;
-    private InputAction m_pauseActionUI, m_inventoryActionUI, m_escapeActionUI, m_craftingActionUI;
+    private InputAction m_moveAction, m_lookAction, m_jumpAction, m_sprintAction, m_pauseActionPlayer, m_fireAction, m_zoomInAction, m_inventoryActionPlayer, m_interactAction;
+    private InputAction m_pauseActionUI, m_inventoryActionUI, m_escapeActionUI;
 
     private void Awake()
     {
@@ -50,12 +50,11 @@ public class InputManager : MonoBehaviour
         m_pauseActionPlayer = playerMap.FindAction("Pause");
         m_zoomInAction = playerMap.FindAction("ZoomIn");
         m_inventoryActionPlayer = playerMap.FindAction("Inventory");
-        m_craftingAction = playerMap.FindAction("Crafting");
+        m_interactAction = playerMap.FindAction("Crafting");
 
         m_pauseActionUI = uiMap.FindAction("Pause");
         m_inventoryActionUI = uiMap.FindAction("Inventory");
         m_escapeActionUI = uiMap.FindAction("EscapeDisplay");
-        m_craftingActionUI = uiMap.FindAction("Crafting");
 
         playerMap.Enable();
     }
@@ -64,7 +63,7 @@ public class InputManager : MonoBehaviour
     {
         PausePressed += InputPause;
         InventoryPressed += InputInventory;
-        CraftingPressed += InputCrafting;
+        InteractPressed += InputInteract;
         EscapeDisplayPressed += InputEscapeDisplay;
     }
 
@@ -87,9 +86,6 @@ public class InputManager : MonoBehaviour
 
         if (m_inventoryActionPlayer.WasPressedThisFrame() || m_inventoryActionUI.WasPressedThisFrame())
             InventoryPressed?.Invoke();
-
-        if (m_craftingAction.WasPressedThisFrame() || m_craftingActionUI.WasPressedThisFrame())
-            CraftingPressed?.Invoke();
 
         if (m_escapeActionUI.WasPressedThisFrame())
                 EscapeDisplayPressed?.Invoke();
@@ -144,8 +140,13 @@ public class InputManager : MonoBehaviour
         }
     }
 
-    private void InputCrafting()
+    private void InputInteract()
     {
+        if(PlayerManager.instance.InteractionObject == null)
+            return;
+
+        Debug.Log("InputInteract called");
+        
         if (inputActions.FindActionMap("Player").enabled)
         {
             inputActions.FindActionMap("Player").Disable();
