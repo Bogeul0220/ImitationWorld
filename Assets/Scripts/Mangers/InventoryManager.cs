@@ -101,13 +101,13 @@ public class InventoryManager : MonoBehaviour
                 }
                 else
                 {
-                    remaing -= countableItem.Amount;
-                    keysToRemove.Add(pair.Key); // 나중에 제거
+                    remaing -= countableItem.Amount;    // 수량 감소
+                    keysToRemove.Add(pair.Key);         // 이후 제거 예약
                 }
             }
             else
             {
-                keysToRemove.Add(pair.Key); // CountableItem이 아닌 경우 바로 제거
+                keysToRemove.Add(pair.Key); // CountableItem이 아닌 제거 예약
                 remaing -= 1; // 수량 감소
             }
 
@@ -119,7 +119,7 @@ public class InventoryManager : MonoBehaviour
 
         foreach (var key in keysToRemove)
         {
-            InvenItemDict.Remove(key);
+            InvenItemDict.Remove(key); // 예약된 키 제거
         }
 
         OnInventoryChanged?.Invoke();
@@ -136,7 +136,7 @@ public class InventoryManager : MonoBehaviour
         {
             if (pair.Value.ItemData.ItemID == materialItem.ItemData.ItemID &&
                 pair.Value is CountableItem countableItem &&
-                countableItem.Amount >= materialItem.Amount)
+                countableItem.Amount >= materialItem.NeedCraftCount)
             {
                 return true; // 충분한 재료가 있음
             }

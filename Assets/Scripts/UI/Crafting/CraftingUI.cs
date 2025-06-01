@@ -120,7 +120,10 @@ public class CraftingUI : MonoBehaviour
                 {
                     // 재료 아이템이 충분한지 확인
                     if (!InventoryManager.Instance.HasEnoughMaterials(material))
-                        return;
+                    {
+                        Debug.LogWarning($"제작에 필요한 재료가 부족합니다: {material.ItemData.ItemName}");
+                        return; // 재료가 부족하면 제작 중단
+                    }
                 }
 
                 // 모든 재료 아이템이 충분하다면 제작 진행
@@ -133,6 +136,8 @@ public class CraftingUI : MonoBehaviour
                 // 제작 완료 후 결과 아이템 추가
                 var craftedItem = targetItem.CreateItem();
                 InventoryManager.Instance.AddItem(craftedItem);
+
+                return; // 제작 완료 후 종료
             }
         }
     }
