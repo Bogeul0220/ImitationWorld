@@ -6,9 +6,10 @@ public class PlayerManager : MonoBehaviour
 {
     public static PlayerManager instance; // 싱글톤 인스턴스
 
+    [Header("플레이어 설정")]
     public GameObject Player; // 플레이어 오브젝트
-
-    public InteractionObjectBase InteractionObject; // 상호작용 오브젝트
+    
+    public InteractionObjectBase NearInteractionObject; // 가장 가까운 상호작용 오브젝트
     public List<InteractionObjectBase> InteractionObjectLists = new List<InteractionObjectBase>(); // 상호작용 가능한 오브젝트 목록
     [SerializeField]
     private float interactionRange; // 상호작용 가능한 거리
@@ -30,7 +31,7 @@ public class PlayerManager : MonoBehaviour
         // 플레이어와 가장 가까운 상호작용 가능한 오브젝트를 찾는 로직
         if (InteractionObjectLists.Count == 0)
         {
-            InteractionObject = null;
+            NearInteractionObject = null;
             return;
         }
 
@@ -47,7 +48,7 @@ public class PlayerManager : MonoBehaviour
             }
         }
 
-        InteractionObject = closestObject;
+        NearInteractionObject = closestObject;
     }
 
     public void AddInteractionObject(InteractionObjectBase interactionObject)
@@ -55,7 +56,6 @@ public class PlayerManager : MonoBehaviour
         if (!InteractionObjectLists.Contains(interactionObject))
         {
             InteractionObjectLists.Add(interactionObject);
-            interactionObject.InitInteractObject();
         }
     }
 

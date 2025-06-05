@@ -17,7 +17,7 @@ public abstract class CountableItem : ItemBase
         SetAmount(amount);
     }
 
-    // 갯수 범위 제한
+    // 갯수 범위 제한 및 설정
     public void SetAmount(int amount)
     {
         Amount = Mathf.Clamp(amount, 0, MaxAmount);

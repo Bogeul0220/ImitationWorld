@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Interact_Craft : InteractionObjectBase
 {
-    public override void InitInteractObject()
+    public override void OnInteract()
     {
-        interactionObject = UIManager.Instance.craftingPanelDisplay;
+        UIManager.Instance.DisplayInteractCraft();
     }
 }

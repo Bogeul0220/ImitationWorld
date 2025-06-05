@@ -7,8 +7,9 @@ using UnityEngine;
 public class InventoryManager : MonoBehaviour
 {
     public static InventoryManager Instance { get; private set; }
-
-    public Dictionary<int, ItemBase> InvenItemDict = new Dictionary<int, ItemBase>(); // 아이템 데이터베이스
+    public Dictionary<int, ItemBase> InvenItemDict = new Dictionary<int, ItemBase>(); // 인벤토리 아이템 데이터베이스
+    public Dictionary<int, WeaponItem> WeaponEquipDict = new Dictionary<int, WeaponItem>(); // 무기 장착 아이템 데이터베이스
+    public Dictionary<EquipmentType, EquipmentItem> DefensiveEquipmentDict = new Dictionary<EquipmentType, EquipmentItem>(); // 무기 외 장착 아이템 데이터베이스
 
     public event Action OnInventoryChanged;
 
@@ -41,6 +42,12 @@ public class InventoryManager : MonoBehaviour
 
     public void AddItem(ItemBase item)
     {
+        if(item == null)
+        {
+            Debug.LogWarning("아이템이 null입니다. 아이템을 추가할 수 없습니다.");
+            return; // 아이템이 null인 경우 종료
+        }
+
         foreach (var pair in InvenItemDict)
         {
             if (pair.Value.ItemData.ItemID == item.ItemData.ItemID &&
@@ -141,8 +148,104 @@ public class InventoryManager : MonoBehaviour
                 return true; // 충분한 재료가 있음
             }
         }
-        
+
         return false; // 충분한 재료가 없음
+    }
+
+    public void SwapItems(int giveSlotIndex, int takeSlotIndex)
+    {
+        if(giveSlotIndex == takeSlotIndex)
+            return;
+
+        ItemBase giveItem = InvenItemDict.ContainsKey(giveSlotIndex) ? InvenItemDict[giveSlotIndex] : null;
+        ItemBase takeItem = InvenItemDict.ContainsKey(takeSlotIndex) ? InvenItemDict[takeSlotIndex] : null;
+
+        if (giveItem == null)
+            return;
+
+        if (takeItem == null)
+        {
+            InvenItemDict[takeSlotIndex] = giveItem; // 빈 슬롯에 아이템 이동
+            InvenItemDict.Remove(giveSlotIndex); // 원래 슬롯에서 아이템 제거
+        }
+        else if (giveItem is CountableItem giveCountable &&
+                 takeItem is CountableItem takeCountable &&
+                 giveCountable.ItemData.ItemID == takeCountable.ItemData.ItemID)
+        {
+            int excess = takeCountable.AddAmountAndGetExcess(giveCountable.Amount);
+            if (excess > 0)
+            {
+                giveCountable.SetAmount(excess); // 기존 아이템의 수량을 초과량만큼 감소
+            }
+            else
+            {
+                InvenItemDict.Remove(giveSlotIndex); // 기존 아이템 제거
+            }
+        }
+        else
+        {
+            InvenItemDict[takeSlotIndex] = giveItem; // 빈 슬롯에 아이템 이동
+            InvenItemDict[giveSlotIndex] = takeItem; // 기존 아이템을 원래 슬롯으로 이동
+        }
+
+        Debug.Log($"아이템 스왑: 슬롯 {giveSlotIndex}의 {giveItem.ItemData.ItemName}과 슬롯 {takeSlotIndex}의 {takeItem?.ItemData.ItemName ?? "빈 슬롯"}을(를) 교환했습니다.");
+
+        OnInventoryChanged?.Invoke();
+    }
+
+    public void EquipedWeapon(int giveSlotIndex, int equipSlotIndex)
+    {
+        if (InvenItemDict.ContainsKey(giveSlotIndex))
+            Debug.Log($"{InvenItemDict[giveSlotIndex]} 는 존재합니다.");
+        else
+            Debug.Log($"{InvenItemDict[giveSlotIndex]} 는 비었습니다");
+        ItemBase giveItem = InvenItemDict.ContainsKey(giveSlotIndex) ? InvenItemDict[giveSlotIndex] : null;
+        WeaponItem takeItem = WeaponEquipDict.ContainsKey(equipSlotIndex) ? WeaponEquipDict[equipSlotIndex] : null;
+
+        if (giveItem == null || !(giveItem is WeaponItem))
+            return;
+
+        if (takeItem == null)
+        {
+            WeaponEquipDict[equipSlotIndex] = giveItem as WeaponItem; // 빈 슬롯에 아이템 이동
+            InvenItemDict.Remove(giveSlotIndex); // 원래 슬롯에서 아이템 제거
+        }
+        else
+        {
+            WeaponEquipDict[equipSlotIndex] = giveItem as WeaponItem; // 빈 슬롯에 아이템 이동
+            InvenItemDict[giveSlotIndex] = takeItem; // 기존 아이템을 원래 슬롯으로 이동
+        }
+
+        Debug.Log($"무기 장착: 슬롯 {giveSlotIndex}의 {giveItem.ItemData.ItemName}을 {equipSlotIndex}번 무기 슬롯의 {takeItem?.ItemData.ItemName ?? "빈 슬롯"}와(과) 교환했습니다.");
+
+        OnInventoryChanged?.Invoke();
+    }
+
+    public void EquipedDefensive(int giveSlotIndex)
+    {
+        ItemBase giveItem = InvenItemDict.ContainsKey(giveSlotIndex) ? InvenItemDict[giveSlotIndex] : null;
+
+        EquipmentItem asGiveItem = giveItem as EquipmentItem;
+
+        if (giveItem == null || asGiveItem.EquipmentType == EquipmentType.Weapon)
+            return;
+
+        EquipmentItem takeItem = DefensiveEquipmentDict.ContainsKey(asGiveItem.EquipmentType) ? DefensiveEquipmentDict[asGiveItem.EquipmentType] : null;
+
+        if (takeItem == null)
+        {
+            DefensiveEquipmentDict[asGiveItem.EquipmentType] = asGiveItem;
+            InvenItemDict.Remove(giveSlotIndex);
+        }
+        else
+        {
+            DefensiveEquipmentDict[asGiveItem.EquipmentType] = asGiveItem;
+            InvenItemDict[giveSlotIndex] = takeItem;
+        }
+
+        Debug.Log($"방어구 장착: 슬롯 {giveSlotIndex}의 {giveItem.ItemData.ItemName}을 {asGiveItem.EquipmentType.ToString()} 슬롯의 {takeItem?.ItemData.ItemName ?? "빈 슬롯"}와(과) 교환했습니다.");
+
+        OnInventoryChanged?.Invoke();
     }
 
     [ContextMenu("Debug : 인벤토리 내용 출력")]

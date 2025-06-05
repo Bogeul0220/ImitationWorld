@@ -10,10 +10,13 @@ public class GetItemTextCube : MonoBehaviour
     {
         if (other.tag == "Player")
         {
-            foreach (var itemData in itemDatas)
+            for (int i = 0; i < 50; i++)
             {
-                var newItem = itemData.CreateItem();
-                InventoryManager.Instance.AddItem(newItem);
+                foreach (var itemData in itemDatas)
+                {
+                    var newItem = itemData.CreateItem();
+                    InventoryManager.Instance.AddItem(newItem);
+                }
             }
         }
     }

@@ -50,7 +50,7 @@ public class InputManager : MonoBehaviour
         m_pauseActionPlayer = playerMap.FindAction("Pause");
         m_zoomInAction = playerMap.FindAction("ZoomIn");
         m_inventoryActionPlayer = playerMap.FindAction("Inventory");
-        m_interactAction = playerMap.FindAction("Crafting");
+        m_interactAction = playerMap.FindAction("Interact");
 
         m_pauseActionUI = uiMap.FindAction("Pause");
         m_inventoryActionUI = uiMap.FindAction("Inventory");
@@ -61,8 +61,6 @@ public class InputManager : MonoBehaviour
 
     void Start()
     {
-        PausePressed += InputPause;
-        InventoryPressed += InputInventory;
         InteractPressed += InputInteract;
         EscapeDisplayPressed += InputEscapeDisplay;
     }
@@ -86,55 +84,34 @@ public class InputManager : MonoBehaviour
 
         if (m_inventoryActionPlayer.WasPressedThisFrame() || m_inventoryActionUI.WasPressedThisFrame())
             InventoryPressed?.Invoke();
+            
+        if (m_interactAction.WasPressedThisFrame())
+            InteractPressed?.Invoke();
 
         if (m_escapeActionUI.WasPressedThisFrame())
-                EscapeDisplayPressed?.Invoke();
+            EscapeDisplayPressed?.Invoke();
     }
 
     private void LateUpdate()
     {
-        SetCursorState();
+        SetCursorAndActionMapState();
     }
 
-    private void SetCursorState()
+    private void SetCursorAndActionMapState()
     {
         if (UIManager.Instance.DisplayOpened)
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+
+            inputActions.FindActionMap("Player").Disable();
+            inputActions.FindActionMap("UI").Enable();
         }
         else
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
-        }
-    }
 
-    private void InputPause()
-    {
-        var currentMap = inputActions.FindActionMap("Player").enabled ? "Player" : "UI";
-
-        if (currentMap == "Player")
-        {
-            inputActions.FindActionMap("Player").Disable();
-            inputActions.FindActionMap("UI").Enable();
-        }
-        else
-        {
-            inputActions.FindActionMap("UI").Disable();
-            inputActions.FindActionMap("Player").Enable();
-        }
-    }
-
-    private void InputInventory()
-    {
-        if (inputActions.FindActionMap("Player").enabled)
-        {
-            inputActions.FindActionMap("Player").Disable();
-            inputActions.FindActionMap("UI").Enable();
-        }
-        else
-        {
             inputActions.FindActionMap("UI").Disable();
             inputActions.FindActionMap("Player").Enable();
         }
@@ -142,21 +119,12 @@ public class InputManager : MonoBehaviour
 
     private void InputInteract()
     {
-        if(PlayerManager.instance.InteractionObject == null)
+        Debug.Log("InputInteract");
+
+        if (PlayerManager.instance.NearInteractionObject == null)
             return;
 
-        Debug.Log("InputInteract called");
-        
-        if (inputActions.FindActionMap("Player").enabled)
-        {
-            inputActions.FindActionMap("Player").Disable();
-            inputActions.FindActionMap("UI").Enable();
-        }
-        else
-        {
-            inputActions.FindActionMap("UI").Disable();
-            inputActions.FindActionMap("Player").Enable();
-        }
+        PlayerManager.instance.NearInteractionObject.OnInteract();
     }
 
     private void InputEscapeDisplay()

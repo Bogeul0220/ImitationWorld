@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CraftingUI : MonoBehaviour
+public class CraftingUI : UIBase
 {
     [Header("Slot Settings")]
     [SerializeField]
@@ -135,6 +135,11 @@ public class CraftingUI : MonoBehaviour
 
                 // 제작 완료 후 결과 아이템 추가
                 var craftedItem = targetItem.CreateItem();
+                if(craftedItem == null)
+                {
+                    Debug.LogError("제작된 아이템이 null입니다. 아이템 데이터가 올바른지 확인하세요.");
+                    return; // 제작된 아이템이 null인 경우 중단
+                }
                 InventoryManager.Instance.AddItem(craftedItem);
 
                 return; // 제작 완료 후 종료

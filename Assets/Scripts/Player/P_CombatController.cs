@@ -1,18 +1,21 @@
 using System.Collections;
+using System.Collections.Generic;
 using Cinemachine;
 using StarterAssets;
 using UnityEngine;
 
 public class P_CombatController : MonoBehaviour
 {
+    [Header("애니메이션")]
     [SerializeField]
     private Animator animator;
 
+    [Header("카메라")]
     public CinemachineVirtualCamera virtualCamera;
-    [SerializeField]
-    private bool prevZoomInHeld;
+    [SerializeField] private bool prevZoomInHeld;
     private Coroutine cameraLerpCoroutine;
 
+    [Header("무기")]
     private Weapon currentWeapon;
     public Weapon CurrentWeapon
     {
@@ -33,11 +36,22 @@ public class P_CombatController : MonoBehaviour
             }
         }
     }
-
-    [SerializeField]
-    private float currentFireRate;
-
+    [SerializeField] private List<Weapon> weaponList;
+    [SerializeField] private float currentFireRate;
     private bool prevFireHeld;
+
+    [Header("상태")]
+    public UnitStats unitStats;
+
+    void Start()
+    {
+        if (unitStats == null)
+            unitStats = GetComponent<UnitStats>();
+
+        unitStats.Init();
+
+        CurrentWeapon = weaponList[0];
+    }
 
     void Update()
     {
@@ -85,7 +99,7 @@ public class P_CombatController : MonoBehaviour
     private void CamZoomIn()
     {
         bool currentZoomInHeld = InputManager.Instance.ZoomInHeld;
-        
+
         if (currentZoomInHeld != prevZoomInHeld)
         {
             if (cameraLerpCoroutine != null)
@@ -160,8 +174,7 @@ public class P_CombatController : MonoBehaviour
         AudioSource.PlayClipAtPoint(currentGun.fireSound, transform.position); // 발사 소리 재생
     }
 
-    private void SetWeapon(Weapon weapon)
-    {
-
-    }
+    // 공격 애니메이션 실행 시 무기 Collider를 켜고 꺼서 공격 로직 실행
+    public void EnableMeleeWeaponCollider() => (currentWeapon as MeleeWeapon).weaponCollider.enabled = true;
+    public void DisableMeleeWeaponCollider() => (currentWeapon as MeleeWeapon).weaponCollider.enabled = false;
 }

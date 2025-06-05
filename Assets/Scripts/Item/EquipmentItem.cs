@@ -2,9 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum EquipmentType
+{
+    Weapon,
+    Helm,
+    Armor,
+    Shield,
+}
+
 public class EquipmentItem : ItemBase
 {
     public EquipmentItemData EquipmentData { get; private set; }
+
+    // 장비 타입
+    public EquipmentType EquipmentType;
 
     public int Durability
     {

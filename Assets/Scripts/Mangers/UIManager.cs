@@ -46,7 +46,6 @@ public class UIManager : MonoBehaviour
 
         InputManager.Instance.PausePressed += DisplayPause;
         InputManager.Instance.InventoryPressed += DisplayInventory;
-        InputManager.Instance.InteractPressed += DisplayInteract;
         InputManager.Instance.EscapeDisplayPressed += EscapeDisplay;
     }
 
@@ -57,9 +56,9 @@ public class UIManager : MonoBehaviour
 
     public void SetInteractionText()
     {
-        if (PlayerManager.instance.InteractionObject != null && DisplayOpened == false)
+        if (PlayerManager.instance.NearInteractionObject != null && DisplayOpened == false)
         {
-            interactionText.text = $"[E] {PlayerManager.instance.InteractionObject.InteractionObjectName}";
+            interactionText.text = $"[E] {PlayerManager.instance.NearInteractionObject.InteractionObjectName}";
         }
         else
         {
@@ -77,9 +76,9 @@ public class UIManager : MonoBehaviour
         inventoryDisplay.SetActive(!inventoryDisplay.activeSelf);
     }
 
-    private void DisplayInteract()
+    public void DisplayInteractCraft()
     {
-        if(PlayerManager.instance.InteractionObject == null)
+        if (PlayerManager.instance.NearInteractionObject == null)
             return;
 
         Debug.Log("DisplayInteract called");
@@ -90,5 +89,6 @@ public class UIManager : MonoBehaviour
     {
         pauseDisplay.SetActive(false);
         inventoryDisplay.SetActive(false);
+        craftingPanelDisplay.SetActive(false);
     }
 }
