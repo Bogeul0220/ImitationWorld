@@ -119,8 +119,6 @@ public class InputManager : MonoBehaviour
 
     private void InputInteract()
     {
-        Debug.Log("InputInteract");
-
         if (PlayerManager.instance.NearInteractionObject == null)
             return;
 

@@ -11,5 +11,7 @@ public class Interact_Pickup : InteractionObjectBase
         var newItem = itemData.CreateItem();
 
         InventoryManager.Instance.AddItem(newItem);
+
+        ObjectPoolManager.Return(this.gameObject);
     }
 }

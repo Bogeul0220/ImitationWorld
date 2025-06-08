@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd8cd554d8ac4cb4ea04cd0cc390b94c, type: 3}
   m_Name: Item_Crafting_Wood
   m_EditorClassIdentifier: 
-  itemName: "\uB098\uBB34"
+  itemName: "\uB098\uBB47\uAC00\uC9C0"
   itemType: 3
   description: "\uAC00\uACF5\uB418\uC9C0 \uC54A\uC740 \uB098\uBB34 \uD1A0\uB9C9\uC774\uB2E4.<br>\uB9CC\uB4E4\uAE30\uC5D0
     \uC720\uC6A9\uD560\uAC83 \uAC19\uB2E4."

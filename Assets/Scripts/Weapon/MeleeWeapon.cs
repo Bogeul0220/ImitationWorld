@@ -13,7 +13,7 @@ public enum UsePurpose
 
 public class MeleeWeapon : Weapon
 {
-    private UsePurpose usePurpose;
+    [SerializeField] private UsePurpose usePurpose;
     public LayerMask hitLayer;
     public BoxCollider weaponCollider;   // 무기 충돌체
 
@@ -67,19 +67,24 @@ public class MeleeWeapon : Weapon
             var health = hit.GetComponent<UnitStats>();
             if (health != null && !damagedTargets.Contains(hit))
             {
+                var envObj = hit.GetComponent<EnvironmentObject>();
+
                 switch (usePurpose)
                 {
                     case UsePurpose.None:
                         health.TakeDamage(damage);
                         break;
                     case UsePurpose.FellingWood:
-                        if (hit.GetComponent<Wood>())
+                        if (envObj != null && envObj.usePurpose == UsePurpose.FellingWood)
                             health.TakeDamage(damage * 2);
                         else
                             health.TakeDamage(damage);
                         break;
                     case UsePurpose.MiningStone:
-                        health.TakeDamage(damage);
+                        if (envObj != null && envObj.usePurpose == UsePurpose.MiningStone)
+                            health.TakeDamage(damage * 2);
+                        else
+                            health.TakeDamage(damage);
                         break;
                 }
 

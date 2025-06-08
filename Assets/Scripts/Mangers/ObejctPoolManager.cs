@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class ObejctPoolManager
+public static class ObjectPoolManager
 {
     // 각 프리팹에 대한 풀 정보 클래스
     private class PoolData

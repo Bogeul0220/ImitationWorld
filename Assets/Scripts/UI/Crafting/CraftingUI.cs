@@ -53,12 +53,12 @@ public class CraftingUI : UIBase
         }
 
         // 오브젝트 풀링으로 슬롯 생성
-        ObejctPoolManager.CreatePool(slotPrefab.gameObject, 1);
+        ObjectPoolManager.CreatePool(slotPrefab.gameObject, 1);
 
         for (int i = 0; i < craftingRecipes.Count; i++)
         {
             // 오브젝트 풀에서 슬롯을 가져와서 리스트에 추가
-            CraftingSlot slot = ObejctPoolManager.Get<CraftingSlot>(slotPrefab.gameObject);
+            CraftingSlot slot = ObjectPoolManager.Get<CraftingSlot>(slotPrefab.gameObject);
             slot.transform.SetParent(slotParent, false);
             slot.gameObject.name = $"CraftingSlot_{i}"; // 슬롯 이름 설정
             slot.InitSlot(this); // 슬롯 초기화

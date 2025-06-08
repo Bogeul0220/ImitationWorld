@@ -10,7 +10,7 @@ public class StatusSO : ScriptableObject
 
     public StatusSO DeepCopy()
     {
-        StatusSO newStatusSO = new StatusSO();
+        StatusSO newStatusSO = ScriptableObject.CreateInstance<StatusSO>();
         newStatusSO.MaxHp = this.MaxHp;
         newStatusSO.MaxStamina = this.MaxStamina;
 

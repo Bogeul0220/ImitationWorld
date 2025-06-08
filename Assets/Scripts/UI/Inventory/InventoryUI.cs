@@ -50,12 +50,12 @@ public class InventoryUI : UIBase
         else
         {
             // 오브젝트 풀링으로 슬롯 생성
-            ObejctPoolManager.CreatePool(slotPrefab.gameObject, 1);
+            ObjectPoolManager.CreatePool(slotPrefab.gameObject, 1);
 
             for (int i = 0; i < InventoryManager.Instance.MaxInventorySize; i++)
             {
                 // 오브젝트 풀에서 슬롯을 가져와서 리스트에 추가
-                Slot slot = ObejctPoolManager.Get<Slot>(slotPrefab.gameObject);
+                Slot slot = ObjectPoolManager.Get<Slot>(slotPrefab.gameObject);
                 slot.transform.SetParent(slotParent, false);
                 slot.gameObject.name = $"Slot_{i}"; // 슬롯 이름 설정
                 slotList.Add(slot);

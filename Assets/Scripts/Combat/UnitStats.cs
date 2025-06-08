@@ -11,6 +11,7 @@ public class UnitStats : MonoBehaviour
     public int currentStamina;
     public int maxStamina;
 
+    public event Action OnDamaged;
     public event Action OnDied;
 
     public void Init()
@@ -32,6 +33,9 @@ public class UnitStats : MonoBehaviour
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
+
+        OnDamaged?.Invoke();
+
         if (currentHealth <= 0)
         {
             currentHealth = 0;
