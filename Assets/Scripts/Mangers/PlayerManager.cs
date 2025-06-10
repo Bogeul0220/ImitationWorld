@@ -6,8 +6,12 @@ public class PlayerManager : MonoBehaviour
 {
     public static PlayerManager instance; // 싱글톤 인스턴스
 
-    [Header("플레이어 설정")]
+    [Header("플레이어 설정", order = 1)]
     public GameObject Player; // 플레이어 오브젝트
+    public P_CombatController PlayerCombatController;
+    public P_GunController PlayerGunController;
+
+    public UnitStats PlayerStat;
     
     public InteractionObjectBase NearInteractionObject; // 가장 가까운 상호작용 오브젝트
     public List<InteractionObjectBase> InteractionObjectLists = new List<InteractionObjectBase>(); // 상호작용 가능한 오브젝트 목록
@@ -21,9 +25,28 @@ public class PlayerManager : MonoBehaviour
             instance = this;
     }
 
+    void Start()
+    {
+        PlayerCombatController = Player.GetComponent<P_CombatController>();
+        PlayerGunController = Player.GetComponent<P_GunController>();
+    }
+
     void Update()
     {
         InteractWithClosestObject();
+    }
+
+    void LateUpdate()
+    {
+        PlayerHealthUpdate();
+    }
+
+    private void PlayerHealthUpdate()
+    {
+        if (Player != null)
+        {
+            PlayerStat = Player.GetComponent<UnitStats>();
+        }
     }
 
     private void InteractWithClosestObject()

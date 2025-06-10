@@ -18,15 +18,11 @@ public class UnitStats : MonoBehaviour
     {
         if (statusSO != null)
         {
-            StatusSO newStatusSO = statusSO.DeepCopy();
-
             maxHealth = statusSO.MaxHp;
             maxStamina = statusSO.MaxStamina;
 
             currentHealth = maxHealth;
             currentStamina = maxStamina;
-
-            Debug.Log("UnitStats initialized with Max Health: " + maxHealth + " and Max Stamina: " + maxStamina);
         }
     }
 

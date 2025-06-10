@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using AYellowpaper.SerializedCollections;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class InventoryManager : MonoBehaviour
 {
@@ -42,7 +44,7 @@ public class InventoryManager : MonoBehaviour
 
     public void AddItem(ItemBase item)
     {
-        if(item == null)
+        if (item == null)
         {
             Debug.LogWarning("아이템이 null입니다. 아이템을 추가할 수 없습니다.");
             return; // 아이템이 null인 경우 종료
@@ -154,7 +156,7 @@ public class InventoryManager : MonoBehaviour
 
     public void SwapItems(int giveSlotIndex, int takeSlotIndex)
     {
-        if(giveSlotIndex == takeSlotIndex)
+        if (giveSlotIndex == takeSlotIndex)
             return;
 
         ItemBase giveItem = InvenItemDict.ContainsKey(giveSlotIndex) ? InvenItemDict[giveSlotIndex] : null;
@@ -193,27 +195,55 @@ public class InventoryManager : MonoBehaviour
         OnInventoryChanged?.Invoke();
     }
 
-    public void EquipedWeapon(int giveSlotIndex, int equipSlotIndex)
+    public void EquipedWeapon(int giveSlotIndex, int equipSlotIndex, Slot dragSlot)
     {
         if (InvenItemDict.ContainsKey(giveSlotIndex))
             Debug.Log($"{InvenItemDict[giveSlotIndex]} 는 존재합니다.");
         else
             Debug.Log($"{InvenItemDict[giveSlotIndex]} 는 비었습니다");
-        ItemBase giveItem = InvenItemDict.ContainsKey(giveSlotIndex) ? InvenItemDict[giveSlotIndex] : null;
-        WeaponItem takeItem = WeaponEquipDict.ContainsKey(equipSlotIndex) ? WeaponEquipDict[equipSlotIndex] : null;
+
+        ItemBase giveItem;
+        WeaponItem takeItem;
+
+        if (dragSlot.GetComponent<EquipmentSlot>())
+        {
+            giveItem = WeaponEquipDict.ContainsKey(giveSlotIndex) ? WeaponEquipDict[giveSlotIndex] : null;
+            takeItem = WeaponEquipDict.ContainsKey(equipSlotIndex) ? WeaponEquipDict[equipSlotIndex] : null;
+        }
+        else
+        {
+            giveItem = InvenItemDict.ContainsKey(giveSlotIndex) ? InvenItemDict[giveSlotIndex] : null;
+            takeItem = WeaponEquipDict.ContainsKey(equipSlotIndex) ? WeaponEquipDict[equipSlotIndex] : null;
+        }
 
         if (giveItem == null || !(giveItem is WeaponItem))
             return;
 
-        if (takeItem == null)
+        if (dragSlot.GetComponent<EquipmentSlot>())
         {
-            WeaponEquipDict[equipSlotIndex] = giveItem as WeaponItem; // 빈 슬롯에 아이템 이동
-            InvenItemDict.Remove(giveSlotIndex); // 원래 슬롯에서 아이템 제거
+            if (takeItem == null)
+            {
+                WeaponEquipDict[equipSlotIndex] = giveItem as WeaponItem; // 빈 슬롯에 아이템 이동
+                WeaponEquipDict.Remove(giveSlotIndex); // 원래 슬롯에서 아이템 제거
+            }
+            else
+            {
+                WeaponEquipDict[equipSlotIndex] = giveItem as WeaponItem; // 빈 슬롯에 아이템 이동
+                WeaponEquipDict[giveSlotIndex] = takeItem; // 기존 아이템을 원래 슬롯으로 이동
+            }
         }
         else
         {
-            WeaponEquipDict[equipSlotIndex] = giveItem as WeaponItem; // 빈 슬롯에 아이템 이동
-            InvenItemDict[giveSlotIndex] = takeItem; // 기존 아이템을 원래 슬롯으로 이동
+            if (takeItem == null)
+            {
+                WeaponEquipDict[equipSlotIndex] = giveItem as WeaponItem; // 빈 슬롯에 아이템 이동
+                InvenItemDict.Remove(giveSlotIndex); // 원래 슬롯에서 아이템 제거
+            }
+            else
+            {
+                WeaponEquipDict[equipSlotIndex] = giveItem as WeaponItem; // 빈 슬롯에 아이템 이동
+                InvenItemDict[giveSlotIndex] = takeItem; // 기존 아이템을 원래 슬롯으로 이동
+            }
         }
 
         Debug.Log($"무기 장착: 슬롯 {giveSlotIndex}의 {giveItem.ItemData.ItemName}을 {equipSlotIndex}번 무기 슬롯의 {takeItem?.ItemData.ItemName ?? "빈 슬롯"}와(과) 교환했습니다.");
@@ -244,6 +274,36 @@ public class InventoryManager : MonoBehaviour
         }
 
         Debug.Log($"방어구 장착: 슬롯 {giveSlotIndex}의 {giveItem.ItemData.ItemName}을 {asGiveItem.EquipmentType.ToString()} 슬롯의 {takeItem?.ItemData.ItemName ?? "빈 슬롯"}와(과) 교환했습니다.");
+
+        OnInventoryChanged?.Invoke();
+    }
+
+    public void UnEquipedWeapon(int unequipSlotIndex, int takeSlotIndex)
+    {
+        WeaponItem unequipItem = WeaponEquipDict.ContainsKey(unequipSlotIndex) ? WeaponEquipDict[unequipSlotIndex] : null;
+        ItemBase takeItem = InvenItemDict.ContainsKey(takeSlotIndex) ? InvenItemDict[takeSlotIndex] : null;
+
+        if (unequipItem == null)
+            return;
+
+        if (takeItem == null)   // 빈 슬롯으로 이동 시
+        {
+            InvenItemDict[takeSlotIndex] = unequipItem as WeaponItem; // 빈 슬롯에 아이템 이동
+            WeaponEquipDict.Remove(unequipSlotIndex); // 원래 슬롯에서 아이템 제거
+            Debug.Log($"무기 해체: 무기 슬롯 {unequipSlotIndex}의 {unequipItem.ItemData.ItemName}을 {takeSlotIndex}번 슬롯의 {takeItem?.ItemData.ItemName ?? "빈 슬롯"}와(과) 교환했습니다.");
+        }
+        else if (takeItem != null && takeItem is WeaponItem)
+        {
+            InvenItemDict[takeSlotIndex] = unequipItem as WeaponItem; // 슬롯에 아이템 이동
+            WeaponEquipDict[unequipSlotIndex] = takeItem as WeaponItem; // 장비 교체
+            Debug.Log($"무기 해체: 무기 슬롯 {unequipSlotIndex}의 {unequipItem.ItemData.ItemName}을 {takeSlotIndex}번 슬롯의 {takeItem?.ItemData.ItemName ?? "빈 슬롯"}와(과) 교환했습니다.");
+        }
+        else
+        {
+            InvenItemDict[GetFirstEmptySlotIndex()] = unequipItem as WeaponItem;   // 인벤토리 빈 슬롯을 찾아 아이템 이동
+            WeaponEquipDict.Remove(unequipSlotIndex); // 원래 슬롯에서 아이템 제거
+            Debug.Log($"무기 해체: 무기 슬롯 {unequipSlotIndex}의 {unequipItem.ItemData.ItemName}을 {GetFirstEmptySlotIndex()}번 슬롯의 {takeItem?.ItemData.ItemName ?? "빈 슬롯"}와(과) 교환했습니다.");
+        }
 
         OnInventoryChanged?.Invoke();
     }

@@ -21,7 +21,6 @@ public class EnvironmentObject : BreakableObjects
 
     private void HandleDamage()
     {
-        // 10 단위 체력 감소마다 목재 드랍
         while (_status.currentHealth <= nextDropThreshhold && _status.currentHealth > 0)
         {
             BranchPool(1);

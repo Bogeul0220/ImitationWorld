@@ -121,7 +121,9 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IB
     {
         if (draggedSlot == null || draggedSlot == this || draggedSlot.isEmpty)
             return; // 드래그 중인 슬롯이 없으면 무시
-
-        InventoryManager.Instance.SwapItems(draggedSlot.SlotIndex, this.SlotIndex); // 인벤토리 변경 알림
+        if (draggedSlot.GetComponent<EquipmentSlot>())
+            InventoryManager.Instance.UnEquipedWeapon(draggedSlot.SlotIndex, this.SlotIndex); // 인벤토리 변경 알림
+        else
+            InventoryManager.Instance.SwapItems(draggedSlot.SlotIndex, this.SlotIndex); // 인벤토리 변경 알림
     }
 }

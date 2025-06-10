@@ -39,12 +39,11 @@ public class EquipmentSlot : Slot
     {
         if (draggedSlot == null || draggedSlot == this || draggedSlot.isEmpty || !(draggedSlot.CurrentItem is EquipmentItem))
             return;
-        // 드래그 중인 슬롯이 없으면 무시, 장착 아이템이 아니면 무시
 
         // 인벤토리 아이템 장착 후 딕셔너리 업데이트
         if (EquipmentType == EquipmentType.Weapon)
         {
-            InventoryManager.Instance.EquipedWeapon(draggedSlot.SlotIndex, this.SlotIndex);
+            InventoryManager.Instance.EquipedWeapon(draggedSlot.SlotIndex, this.SlotIndex, draggedSlot);
         }
         else
         {
