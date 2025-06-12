@@ -3,7 +3,7 @@ using Microsoft.Unity.VisualStudio.Editor;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "NewSkillSO", menuName = "Creature/CreateSkill")]
-public class SkillSOBase : ScriptableObject
+public abstract class SkillBaseSO : ScriptableObject
 {
     [SerializeField] string skillName;
     [SerializeField] Sprite skillIcon;
@@ -23,7 +23,10 @@ public class SkillSOBase : ScriptableObject
         }
     }
 
-    public SkillBase setSkill;
+    public virtual IEnumerator ActivateSkill()
+    {
+        yield return null;
+    }
 
     public IEnumerator StartCoolDown()
     {
@@ -35,11 +38,10 @@ public class SkillSOBase : ScriptableObject
             yield return null;
         }
 
-        currentCooldown = 0f;   // 음수 시 보정
+        currentCooldown = 0f;   // 음수 시 리셋
     }
 
-    public float SkillCooldownPercent()
-    {
-        return currentCooldown / setSkillCooldown;
-    }
+    public float SkillCooldownPercent() => currentCooldown / setSkillCooldown;
+
+    public abstract IEnumerator ActivateSkill(GameObject caster, GameObject target);
 }

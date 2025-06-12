@@ -16,8 +16,8 @@ TagManager:
   - Enemy
   - NPC
   - Environment
-  - 
-  - 
+  - EnvironmentDetails
+  - BuildObjects
   - 
   - 
   - 
