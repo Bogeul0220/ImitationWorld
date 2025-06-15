@@ -5,10 +5,18 @@ using UnityEngine.UIElements;
 
 public class EnvironmentManager : MonoBehaviour
 {
-    [SerializeField] private Terrain[] terrains;
+    public static EnvironmentManager Instance { get; private set; }
+
+    public Terrain[] terrains;
     [SerializeField] private EnvironmentObject treePrefab;
     [SerializeField] private EnvironmentObject rockPrefab;
     [SerializeField] private int spawnCount;
+
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+    }
 
     private void Start()
     {

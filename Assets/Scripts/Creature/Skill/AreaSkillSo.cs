@@ -1,14 +1,16 @@
 using System.Collections;
 using UnityEngine;
 
+[CreateAssetMenu(fileName = "AreaSkill", menuName = "ScriptableObjects/Skills/AreaSkill")]
 public abstract class AreaSkillSO : SkillBaseSO
 {
     [SerializeField] float radius;
     [SerializeField] LayerMask targetLayer;
     [SerializeField] GameObject areaEffectPrefab;
 
-    public override IEnumerator ActivateSkill(GameObject caster, GameObject target)
+    public override IEnumerator ActivateSkill(Creature caster, UnitStats target)
     {
+        caster.IsUsingSkill = true;
         // 이펙트 표시
         /*
         GameObject effect = Instantiate(areaEffectPrefab, target.transform.position, Quaternion.identity);

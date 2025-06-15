@@ -119,10 +119,10 @@ public class InputManager : MonoBehaviour
 
     private void InputInteract()
     {
-        if (PlayerManager.instance.NearInteractionObject == null)
+        if (PlayerManager.Instance.NearInteractionObject == null)
             return;
 
-        PlayerManager.instance.NearInteractionObject.OnInteract();
+        PlayerManager.Instance.NearInteractionObject.OnInteract();
     }
 
     private void InputEscapeDisplay()

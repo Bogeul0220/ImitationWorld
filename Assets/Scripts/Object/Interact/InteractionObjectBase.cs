@@ -8,12 +8,12 @@ public abstract class InteractionObjectBase : MonoBehaviour
     void Start()
     {
         // 플레이어 매니저에 상호작용 오브젝트를 추가
-        PlayerManager.instance.AddInteractionObject(this);
+        PlayerManager.Instance.AddInteractionObject(this);
     }
 
     void OnDisable()
     {
-        PlayerManager.instance.RemoveInteractionObject(this);
+        PlayerManager.Instance.RemoveInteractionObject(this);
     }
 
     public abstract void OnInteract();

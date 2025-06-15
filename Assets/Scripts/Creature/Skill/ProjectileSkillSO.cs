@@ -2,16 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[CreateAssetMenu(fileName = "ProjectileSkill", menuName = "Creature/CreateSkill/ProjectileSkill")]
 public class ProjectileSkillSO : SkillBaseSO
 {
-    // 평타 모션도 여기 넣을 생각중..
     [SerializeField] GameObject projectilePrefab;
     [SerializeField] float projectileSpeed;
     [SerializeField] float startUpDelay;
+    [SerializeField] int damage;
+    [SerializeField] float CastTime;
+    [SerializeField] float projectileRange;
+    [SerializeField] float projectileHeight;
+    [SerializeField] float projectileGravity;
+    [SerializeField] float projectileLifeTime;
+    [SerializeField] bool isHoming;
 
-    public override IEnumerator ActivateSkill(GameObject caster, GameObject target)
+    public override IEnumerator ActivateSkill(Creature caster, UnitStats target)
     {
         // 캐스트 애니메이션 실행
+        caster.IsUsingSkill = true;
         yield return new WaitForSeconds(startUpDelay);
         // 캐스트 애니메이션 종료 후 발사 모션 트리거
 
@@ -31,5 +39,6 @@ public class ProjectileSkillSO : SkillBaseSO
         */
 
         yield return new WaitForSeconds(1f);
+        caster.AttackIsDone();
     }
 }

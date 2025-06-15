@@ -17,12 +17,12 @@ public class PlayerStatusUI : MonoBehaviour
 
     private void HealthStatusUpdate()
     {
-        if (hpSlider == null || PlayerManager.instance.PlayerStat == null)
+        if (hpSlider == null || PlayerManager.Instance.PlayerStat == null)
             return;
 
-        float hpValue = (float)PlayerManager.instance.PlayerStat.currentHealth / (float)PlayerManager.instance.PlayerStat.maxHealth;
+        float hpValue = (float)PlayerManager.Instance.PlayerStat.currentHealth / (float)PlayerManager.Instance.PlayerStat.maxHealth;
 
         hpSlider.value = hpValue;
-        hpText.text = $"{PlayerManager.instance.PlayerStat.currentHealth} / {PlayerManager.instance.PlayerStat.maxHealth}";
+        hpText.text = $"{PlayerManager.Instance.PlayerStat.currentHealth} / {PlayerManager.Instance.PlayerStat.maxHealth}";
     }
 }

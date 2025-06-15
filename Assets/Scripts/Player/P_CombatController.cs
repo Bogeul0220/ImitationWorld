@@ -42,7 +42,7 @@ public class P_CombatController : MonoBehaviour
 
     [Header("상태")]
     public UnitStats unitStats;
-    public bool InDied;
+    public bool IsDied;
     public bool InBattle;
 
     void Start()

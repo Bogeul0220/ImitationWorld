@@ -2,7 +2,6 @@ using System.Collections;
 using Microsoft.Unity.VisualStudio.Editor;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "NewSkillSO", menuName = "Creature/CreateSkill")]
 public abstract class SkillBaseSO : ScriptableObject
 {
     [SerializeField] string skillName;
@@ -43,5 +42,5 @@ public abstract class SkillBaseSO : ScriptableObject
 
     public float SkillCooldownPercent() => currentCooldown / setSkillCooldown;
 
-    public abstract IEnumerator ActivateSkill(GameObject caster, GameObject target);
+    public abstract IEnumerator ActivateSkill(Creature caster, UnitStats target);
 }

@@ -10,6 +10,7 @@ public class UnitStats : MonoBehaviour
     public int maxHealth;
     public int currentStamina;
     public int maxStamina;
+    public bool isDead;
 
     public event Action OnDamaged;
     public event Action OnDied;

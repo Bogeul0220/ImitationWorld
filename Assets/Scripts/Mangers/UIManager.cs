@@ -56,9 +56,9 @@ public class UIManager : MonoBehaviour
 
     public void SetInteractionText()
     {
-        if (PlayerManager.instance.NearInteractionObject != null && DisplayOpened == false)
+        if (PlayerManager.Instance.NearInteractionObject != null && DisplayOpened == false)
         {
-            interactionText.text = $"[E] {PlayerManager.instance.NearInteractionObject.InteractionObjectName}";
+            interactionText.text = $"[E] {PlayerManager.Instance.NearInteractionObject.InteractionObjectName}";
         }
         else
         {
@@ -78,7 +78,7 @@ public class UIManager : MonoBehaviour
 
     public void DisplayInteractCraft()
     {
-        if (PlayerManager.instance.NearInteractionObject == null)
+        if (PlayerManager.Instance.NearInteractionObject == null)
             return;
 
         Debug.Log("DisplayInteract called");

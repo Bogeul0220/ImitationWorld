@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
-    public static PlayerManager instance; // 싱글톤 인스턴스
+    public static PlayerManager Instance; // 싱글톤 인스턴스
 
     [Header("플레이어 설정", order = 1)]
     public GameObject Player; // 플레이어 오브젝트
@@ -21,8 +21,8 @@ public class PlayerManager : MonoBehaviour
     void Awake()
     {
         // 싱글톤 인스턴스 설정
-        if (instance == null)
-            instance = this;
+        if (Instance == null)
+            Instance = this;
     }
 
     void Start()
