@@ -1,9 +1,11 @@
 using UnityEngine;
 
+
 [CreateAssetMenu(fileName = "Item_Weapon", menuName = "Inventory System/Item Data/Weapon", order = 1)]
 public class WeaponItemData : EquipmentItemData
 {
     private int Damage => damage;
+    public MeleeWeaponType meleeWeaponType;
     
     [SerializeField] private int damage = 1;
 

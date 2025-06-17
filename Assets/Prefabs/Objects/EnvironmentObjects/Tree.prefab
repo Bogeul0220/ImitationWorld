@@ -11,8 +11,10 @@ GameObject:
   - component: {fileID: 5401830620762402279}
   - component: {fileID: 6408606894330828954}
   - component: {fileID: 5941199471170981644}
+  - component: {fileID: 498288194450357946}
   - component: {fileID: 6177316386696650531}
-  m_Layer: 0
+  - component: {fileID: 1521099141611423315}
+  m_Layer: 11
   m_Name: Tree
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -52,7 +54,7 @@ MonoBehaviour:
   showPrefab: {fileID: 375581337904741350}
   _collider: {fileID: 6177316386696650531}
   dropObject: {fileID: 4047971914381688877, guid: 38a3f48cc904e2649bb445aa9f54e5ee, type: 3}
-  usePurpose: 1
+  nextDropThreshhold: 0
 --- !u!114 &5941199471170981644
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -70,6 +72,21 @@ MonoBehaviour:
   maxHealth: 0
   currentStamina: 0
   maxStamina: 0
+  isDead: 0
+  usePurpose: 0
+--- !u!114 &498288194450357946
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1307085833378171393}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29c37bf6ce86378428905ff8299959c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitStats: {fileID: 5941199471170981644}
 --- !u!136 &6177316386696650531
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -93,6 +110,22 @@ CapsuleCollider:
   m_Height: 3.3093977
   m_Direction: 1
   m_Center: {x: -0.15, y: 0, z: 2.856595e-10}
+--- !u!208 &1521099141611423315
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1307085833378171393}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.25, y: 1.654699, z: 0.25}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: -0.15, y: 0, z: 2.856595e-10}
+  m_TimeToStationary: 0.5
 --- !u!1001 &6298298751217108125
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -101,9 +134,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5401830620762402279}
     m_Modifications:
+    - target: {fileID: 163004174657376329, guid: e05ae677c7b3bc546bd36b488586fb0c, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 4396159832342145111, guid: e05ae677c7b3bc546bd36b488586fb0c, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 5935278547815300987, guid: e05ae677c7b3bc546bd36b488586fb0c, type: 3}
       propertyPath: m_Name
       value: PT_Fruit_Tree_01_apples
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935278547815300987, guid: e05ae677c7b3bc546bd36b488586fb0c, type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 6419187236850804161, guid: e05ae677c7b3bc546bd36b488586fb0c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -144,6 +189,10 @@ PrefabInstance:
     - target: {fileID: 6419187236850804161, guid: e05ae677c7b3bc546bd36b488586fb0c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7513603357302551873, guid: e05ae677c7b3bc546bd36b488586fb0c, type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

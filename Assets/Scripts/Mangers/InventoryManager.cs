@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using AYellowpaper.SerializedCollections;
+using Unity.PlasticSCM.Editor.WebApi;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -11,7 +12,9 @@ public class InventoryManager : MonoBehaviour
     public static InventoryManager Instance { get; private set; }
     public Dictionary<int, ItemBase> InvenItemDict = new Dictionary<int, ItemBase>(); // 인벤토리 아이템 데이터베이스
     public Dictionary<int, WeaponItem> WeaponEquipDict = new Dictionary<int, WeaponItem>(); // 무기 장착 아이템 데이터베이스
+    public WeaponItem CurrentWeapon;
     public Dictionary<EquipmentType, EquipmentItem> DefensiveEquipmentDict = new Dictionary<EquipmentType, EquipmentItem>(); // 무기 외 장착 아이템 데이터베이스
+    public BallItem[] CurrentBallCheck;
 
     public event Action OnInventoryChanged;
 
@@ -152,6 +155,22 @@ public class InventoryManager : MonoBehaviour
         }
 
         return false; // 충분한 재료가 없음
+    }
+
+    public bool HasEnoughBall()
+    {
+        BallItem targetBall = CurrentBallCheck[InputManager.Instance.SelectedBallIndex];
+        foreach (var pair in InvenItemDict)
+        {
+            if (pair.Value.ItemData.ItemID == targetBall.ItemData.ItemID &&
+                pair.Value is CountableItem countableItem &&
+                countableItem.Amount >= 1)
+            {
+                return true; // 볼이 1개 이상 있음
+            }
+        }
+
+        return false; // 볼이 없음
     }
 
     public void SwapItems(int giveSlotIndex, int takeSlotIndex)
@@ -304,6 +323,23 @@ public class InventoryManager : MonoBehaviour
             WeaponEquipDict.Remove(unequipSlotIndex); // 원래 슬롯에서 아이템 제거
             Debug.Log($"무기 해체: 무기 슬롯 {unequipSlotIndex}의 {unequipItem.ItemData.ItemName}을 {GetFirstEmptySlotIndex()}번 슬롯의 {takeItem?.ItemData.ItemName ?? "빈 슬롯"}와(과) 교환했습니다.");
         }
+
+        OnInventoryChanged?.Invoke();
+    }
+
+    public void SelectedCurrentWeapon(int value)
+    {
+        Debug.Log($"{value}번이 입력되었습니다.");
+        if (!WeaponEquipDict.TryGetValue(value, out var currentWeapon) || currentWeapon == null)
+        {
+            Debug.Log($"무기 슬롯 {value}번에 장착된 무기가 없습니다.");
+            CurrentWeapon = null;
+            OnInventoryChanged?.Invoke();
+            return;
+        }
+
+        CurrentWeapon = currentWeapon;
+        Debug.Log($"{CurrentWeapon.ItemData.name}을 착용하였습니다.");
 
         OnInventoryChanged?.Invoke();
     }

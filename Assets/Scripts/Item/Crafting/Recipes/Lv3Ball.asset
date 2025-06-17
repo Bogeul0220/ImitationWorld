@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5ad69cd46d277548aacbbb59cd3c54e, type: 3}
+  m_Name: Lv3Ball
+  m_EditorClassIdentifier: 
+  recipeName: MasterBall
+  description: "\uAD81\uADF9\uC758 \uBCFC \uC81C\uC791"
+  requiredMaterials:
+  - ItemData: {fileID: 11400000, guid: e014d48be0ce59d4eb995c10c53eb662, type: 2}
+    NeedCraftCount: 1
+  - ItemData: {fileID: 11400000, guid: 8476d1e23fdf68149aca0a3ec03f2a48, type: 2}
+    NeedCraftCount: 3
+  - ItemData: {fileID: 11400000, guid: b549606785d34d34b84ce622e49a21b6, type: 2}
+    NeedCraftCount: 3
+  resultItem: {fileID: 11400000, guid: 48771c58089f626468cf65adbe42aa78, type: 2}

@@ -15,6 +15,8 @@ public class UnitStats : MonoBehaviour
     public event Action OnDamaged;
     public event Action OnDied;
 
+    public UsePurpose usePurpose;
+
     public void Init()
     {
         if (statusSO != null)
@@ -27,8 +29,11 @@ public class UnitStats : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damage, UsePurpose usePurpose = UsePurpose.None)
     {
+        if (this.usePurpose == usePurpose)
+            damage *= 2;
+        
         currentHealth -= damage;
 
         OnDamaged?.Invoke();

@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "AreaSkill", menuName = "ScriptableObjects/Skills/AreaSkill")]
+[CreateAssetMenu(fileName = "AreaSkill", menuName = "Creature/CreateSkill/AreaSkill")]
 public abstract class AreaSkillSO : SkillBaseSO
 {
     [SerializeField] float radius;

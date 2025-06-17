@@ -1,12 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
+using System.Linq;
 using Unity.VisualScripting;
-using UnityEditor.EditorTools;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Experimental.AI;
-using UnityEngine.Rendering;
 
 public enum CreatureState   // 상태
 {
@@ -26,7 +23,7 @@ public enum Belligerent // 호전성(싸움을 적극적으로 하는가에 대�
     Aggressive,     // 선공(시야에 들어올 시 바로 전투 시작)
 }
 
-public abstract class Creature : MonoBehaviour
+public class Creature : MonoBehaviour
 {
     [Header("크리쳐 기본 정보")]
     public string CreatureName;
@@ -38,29 +35,14 @@ public abstract class Creature : MonoBehaviour
 
     [Header("크리쳐 이동 세팅")]
     public float MoveSpeed; // 이동 속도
-    public float ObstacleAvoidanceDistance; // 장애물 회피 거리
-    public float AvoidStrength; // 장애물 회피 강도
-    public LayerMask ObstacleLayer; // 장애물 레이어
-    public CharacterController characterController; // 캐릭터 컨트롤러
-    private float gravity = -9.81f; // 중력 값
+    public NavMeshAgent navMeshAgent; // 네비메시 에이전트
     public float DistanceToTarget;  // 타겟과의 거리
     public float DetectionRange = 10f; // 타겟 탐지 범위(적군과 아군 모두 적용)
     private Vector3? escapePoint; // 도망 시 타겟의 반대 방향으로 이동할 위치
 
-    [Header("크리쳐 중력 세팅")]
-    public bool Grounded = true;
-    public float GroundedOffset = -0.14f;
-    public float GroundedRadius = 0.28f;
-    public LayerMask GroundLayers;
-    public float Gravity = -15.0f;
-    public float FallTimeout = 0.15f;
-    private float _fallTimeoutDelta;
-    private float _verticalVelocity;
-    private float _terminalVelocity = 53.0f;
-
     [Header("크리쳐 스탯 세팅")]
-    [SerializeField] UnitStats unitstat;
-    public float AttackRange = 1f; // 공격 범위
+    public UnitStats Unitstat;
+    public float AttackRange; // 공격 범위
     public float AttackSpeed = 1f; // 공격 속도
     public float AttackBaseDamage = 1f; // 공격력
     public float BaseDefecse = 1f; // 방어력
@@ -72,18 +54,18 @@ public abstract class Creature : MonoBehaviour
     private SkinnedMeshRenderer skinnedMeshRenderer;
     public List<Collider> hitColliderList = new List<Collider>();
 
-    [Header("크리쳐 컴포넌트 세팅")]
-
     [Header("크리쳐 전투 세팅")]
-    public List<SkillBaseSO> CurrentSkillList = new List<SkillBaseSO>(4);
-    public Dictionary<string, SkillBaseSO> SkillDict = new Dictionary<string, SkillBaseSO>();
-    public float AttackCooldown;
+    public List<SkillBaseSO> SkillList = new List<SkillBaseSO>();
+    private Dictionary<SkillBaseSO, float> SkillsCooldownDict = new Dictionary<SkillBaseSO, float>();
+    // public Dictionary<string, SkillBaseSO> SkillDict = new Dictionary<string, SkillBaseSO>();
     private float attackCooldownTimer = 0f; // 공격 쿨타임 타이머
+    public bool IsAttacking = false; // 공격 중 여부
     public bool IsUsingSkill = false; // 스킬 캐스팅 중 여부
     public IEnumerator SkillCastCoroutine; // 스킬 캐스팅 코루틴
+    private bool BeingCaptured = false;
     private bool IsDead = false; // 사망 여부
 
-    [Header("크리쳐 대기/순찰")]
+    // 크리쳐 대기 / 순찰
     private float idlePatrolSwitchTimer = 0f;
     private float switchInterval = 3f;
     private float patrolDuration = 5f;
@@ -92,41 +74,75 @@ public abstract class Creature : MonoBehaviour
 
     void Start()
     {
-        InitCreatrue(true); // 기본적으로 아군으로 초기화
+        //InitCreature(true);
+        //AddedSkillInList(); // 스킬 리스트에 추가
     }
 
     // 크리쳐 초기화 메소드 (Belligerent는 기본적으로 NonAggressive로 설정)
-    public virtual void InitCreatrue(bool isAlly, Belligerent belligerent = Belligerent.NonAggressive)
+    public virtual void InitCreature(bool isAlly, Belligerent belligerent = Belligerent.NonAggressive)
     {
+        navMeshAgent = GetComponent<NavMeshAgent>();
+
+        if (Unitstat == null)
+            Unitstat = GetComponent<UnitStats>();
+
         if (creaturePrefab != null)
         {
             animator = creaturePrefab.GetComponent<Animator>();
             skinnedMeshRenderer = creaturePrefab.GetComponentInChildren<SkinnedMeshRenderer>();
             foreach (Collider col in creaturePrefab.GetComponentsInChildren<Collider>())
                 if (col != null)
+                {
+                    if (!col.GetComponent<Damageable>())
+                        col.AddComponent<Damageable>().InitDamageable(Unitstat);
+                    else
+                        col.GetComponent<Damageable>()?.InitDamageable(Unitstat);
+
+                    if (!col.GetComponent<Catchable>())
+                        col.AddComponent<Catchable>().InitCatchable(this);
+                    else
+                        col.GetComponent<Catchable>()?.InitCatchable(this);
+
                     hitColliderList.Add(col);
+                }
         }
 
-        characterController = GetComponent<CharacterController>();
-        if (unitstat == null)
-            unitstat = GetComponent<UnitStats>();
-
-        currentState = CreatureState.Idle;
         AllyEnemyConversion = isAlly;
+        if (AllyEnemyConversion == true)
+            ChangeTagInChildren(this.transform, "Ally");
+        else
+            ChangeTagInChildren(this.transform, "Enemy");
+
         BattleBegin = false;
         IsDead = false;
 
-        unitstat.OnDamaged += ConversionBattleBegin;
+        currentState = CreatureState.Idle;
+        AddedSkillInList();
+        Unitstat.OnDamaged += ConversionBattleBegin;
+    }
+
+    public void ChangeTagInChildren(Transform parent, string newTag)
+    {
+        foreach (Transform child in parent)
+        {
+            child.gameObject.tag = newTag;
+            ChangeTagInChildren(child, newTag);
+        }
     }
 
     // 현재 스킬 리스트에 추가하기 (TODO)
-    public void InitSkill(string skillName)
+    public void AddedSkillInList()
     {
-
+        foreach (var skill in SkillList)
+        {
+            SkillsCooldownDict.Add(skill, 0f);
+        }
     }
 
     void Update()
     {
+        if (BeingCaptured) return;
+
         switch (currentState)
         {
             case CreatureState.Idle:
@@ -151,19 +167,8 @@ public abstract class Creature : MonoBehaviour
                 DiedState();
                 break;
         }
-    }
 
-    void LateUpdate()
-    {
-
-    }
-    void FixedUpdate()
-    {
-        // 바닥에 닿아 있는지 확인
-        GroundedCheck();
-        
-        // 중력 적용
-        ApplyGravity();
+        UpdateCooldownDict();
     }
 
     protected virtual void IdleState()
@@ -176,58 +181,32 @@ public abstract class Creature : MonoBehaviour
                 {
                     // 평화 상태일 때의 행동
                     // 공격하지 않음
-                    var player = PlayerManager.Instance.Player;
-                    float distance = Vector3.Distance(transform.position, player.transform.position);
-                    DistanceToTarget = distance;
-                    if (player != null)
-                    {
-                        if (distance < 7f)
-                            animator.SetFloat("MoveSpeed", 0f);
-                        else
-                        {
-                            MoveToPoint(player.transform.position, distance);
-                        }
-                    }
+                    FollowPlayer(); // 플레이어를 따라감
                 }
                 else if (Belligerent == Belligerent.NonAggressive)
                 {
                     // 후공 상태일 때의 행동
                     // 플레이어가 데미지를 입거나 공격하면 StandOff 상태로 전환
-                    animator.SetFloat("MoveSpeed", 0f);
                     var player = PlayerManager.Instance.Player;
-                    float distance = Vector3.Distance(transform.position, player.transform.position);
-                    if (player != null)
-                    {
-                        if (player.GetComponent<P_CombatController>().InBattle)
-                            currentState = CreatureState.StandOff;
+                    if (player != null && player.GetComponent<P_CombatController>().InBattle)
+                        currentState = CreatureState.StandOff;
 
-                        if (distance < 7f)
-                            animator.SetFloat("MoveSpeed", 0f);
-                        else
-                        {
-                            MoveToPoint(player.transform.position, distance);
-                        }
-                    }
+                    FollowPlayer(); // 플레이어를 따라감
                 }
                 else if (Belligerent == Belligerent.Aggressive)
                 {
                     // 선공 상태일 때의 행동 (CreatureManager를 만들고 현재 크리쳐와 적군을 관리하는 방식으로 변경 필요)
                     // 범위에 들어오면 StandOff 상태로 전환
-                    animator.SetFloat("MoveSpeed", 0f);
                     var player = PlayerManager.Instance.Player;
-                    float distance = Vector3.Distance(transform.position, player.transform.position);
                     if (player != null)
                     {
                         if (player.GetComponent<P_CombatController>().InBattle)
+                            currentState = CreatureState.StandOff; // 플레이어가 전투 중이면 StandOff 상태로 전환
+                        else if (IsDetection()) // 플레이어가 범위에 들어오면 StandOff 상태로 전환
                             currentState = CreatureState.StandOff;
-
-                        if (distance < 7f)
-                            animator.SetFloat("MoveSpeed", 0f);
-                        else
-                        {
-                            MoveToPoint(player.transform.position, distance);
-                        }
                     }
+
+                    FollowPlayer(); // 플레이어를 따라감
                 }
                 break;
             case false:
@@ -240,7 +219,7 @@ public abstract class Creature : MonoBehaviour
                 else if (Belligerent == Belligerent.NonAggressive)
                 {
                     // 후공 상태일 때의 행동
-                    
+
                     if (IsDetection())  // 플레이어가 범위에 들어오면 Escape 상태로 전환
                         currentState = CreatureState.Escape;
                     else if (BattleBegin)   // 데미지를 입으면 StandOff 상태로 전환
@@ -255,7 +234,9 @@ public abstract class Creature : MonoBehaviour
                 }
 
                 idlePatrolSwitchTimer += Time.deltaTime;
-                animator.SetFloat("MoveSpeed", 0f);
+
+                animator.SetFloat("MoveSpeed", navMeshAgent.velocity.magnitude);
+
                 if (idlePatrolSwitchTimer >= switchInterval)
                 {
                     // 일정 시간마다 Patrol 상태로 전환
@@ -295,18 +276,20 @@ public abstract class Creature : MonoBehaviour
             patrolTimer += Time.deltaTime;
             if (patrolTimer == Time.deltaTime)
             {
-                Vector2 randomCircle = Random.insideUnitCircle * 5f;
+                Vector2 randomCircle = Random.insideUnitCircle * 20f;
                 float targetX = transform.position.x + randomCircle.x;
                 float targetZ = transform.position.z + randomCircle.y;
 
                 float heigth = FindTerrainContainingPoint(new Vector3(targetX, 0f, targetZ))?.SampleHeight(new Vector3(targetX, 0f, targetZ)) ?? 0f;
 
-                patrolTarget = new Vector3(randomCircle.x, heigth, randomCircle.y);
+                patrolTarget = new Vector3(targetX, heigth, targetZ); // 순찰 타겟 위치 설정
             }
+            animator.SetFloat("MoveSpeed", navMeshAgent.velocity.magnitude, 0.1f, Time.deltaTime);
 
+            if (navMeshAgent.isStopped)
+                navMeshAgent.isStopped = false; // 네비메시 에이전트 활성화
 
-            animator.SetFloat("MoveSpeed", Random.Range(0.5f, 1f), 0.1f, Time.deltaTime);
-            MoveToPoint(patrolTarget, distance);
+            navMeshAgent.SetDestination(patrolTarget); // 순찰 타겟 위치로 이동
         }
     }
 
@@ -326,7 +309,7 @@ public abstract class Creature : MonoBehaviour
         float distance = Vector3.Distance(transform.position, Target.transform.position);
         DistanceToTarget = distance;
 
-        if (distance >= DetectionRange * 5f)
+        if (distance >= DetectionRange * 3f)
         {
             // 타겟과의 거리가 탐지 범위의 두 배 이상이면 Idle 상태로 전환
             Target = null; // 타겟을 null로 설정
@@ -338,10 +321,13 @@ public abstract class Creature : MonoBehaviour
             // 타겟과의 거리가 탐지 범위 이내이면 도망
             Vector3 escapeDirection = (transform.position - Target.transform.position).normalized; // 타겟의 반대 방향
 
+            // 도망 위치를 계산
+            escapePoint = transform.position + escapeDirection * DetectionRange * 3f; // 탐지 범위의 세 배 거리로 도망 위치 설정
+
+            if (navMeshAgent.isStopped)
+                navMeshAgent.isStopped = false; // 네비메시 에이전트 활성화
             animator.SetFloat("MoveSpeed", 1f, 0.1f, Time.deltaTime);
-            Quaternion lookRotation = Quaternion.LookRotation(escapeDirection);
-            characterController.Move(escapeDirection * MoveSpeed * 3f * Time.deltaTime);
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
+            navMeshAgent.SetDestination(escapePoint.Value); // 도망 위치로 이동
         }
     }
 
@@ -349,29 +335,49 @@ public abstract class Creature : MonoBehaviour
     {
         if (Target != null)
         {
-            if (Target.GetComponent<Creature>().IsDead || Target.GetComponent<P_CombatController>().IsDied)
+            float distance = Vector3.Distance(transform.position, Target.transform.position);
+            DistanceToTarget = distance;
+
+            if (Target.GetComponent<UnitStats>()?.isDead ?? true)
             {
-                // 타겟이 죽었을 경우 Idle 상태로 전환
+                // 타겟이 죽을 경우 Idle 상태로 전환
                 currentState = CreatureState.Idle;
                 Target = null;
                 return;
             }
 
-            float distance = Vector3.Distance(transform.position, Target.transform.position);
-            DistanceToTarget = distance;
             if (distance > AttackRange)
             {
+                if (distance > 25f)
+                {
+                    // 타겟이 멀어지면 Idle 상태로 전환
+                    currentState = CreatureState.Idle;
+                    Target = null;
+                    return;
+                }
+
                 // 타겟과의 거리가 공격 범위보다 멀면 타겟에게 이동
-                MoveToPoint(Target.transform.position, distance);
+                if (navMeshAgent.isStopped)
+                    navMeshAgent.isStopped = false; // 네비메시 에이전트 활성화
+
+                Vector3 directionToTarget = (Target.transform.position - transform.position).normalized; // 타겟 방향 계산
+                Vector3 destination = Target.transform.position - directionToTarget * (AttackRange - 0.2f); // 타겟에게 공격이 닿는 거리까지 이동할 위치 계산
+
+                animator.SetFloat("MoveSpeed", navMeshAgent.velocity.magnitude); // 이동 애니메이션 재생
+                navMeshAgent.speed = MoveSpeed;
+                navMeshAgent.SetDestination(destination); // 타겟에게 공격이 닿는 거리까지 이동
             }
             else
             {
                 if (attackCooldownTimer > 0f)
                 {
-                    // 대치 상태일때 왼쪽으로 천천히 이동
-                    Vector3 leftMove = -transform.right * MoveSpeed * 0.5f * Time.deltaTime;
-                    characterController.Move(leftMove);
-                    animator.SetFloat("MoveSpeed", 0.5f, 0.1f, Time.deltaTime);
+                    Quaternion targetRotation = Quaternion.LookRotation(Target.transform.position - transform.position); // 타겟을 바라보고 회전
+                    transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, 360f * Time.deltaTime); // 타겟 방향으로 회전
+
+                    if (navMeshAgent.isStopped)
+                        navMeshAgent.isStopped = false; // 네비메시 에이전트 활성화
+
+                    animator.SetFloat("MoveSpeed", 0);
                     attackCooldownTimer -= Time.deltaTime; // 공격 쿨타임 감소
                 }
                 else
@@ -391,41 +397,62 @@ public abstract class Creature : MonoBehaviour
     {
         if (Target != null && Target.GetComponent<UnitStats>() != null)
         {
-            if (Target.GetComponent<Creature>().IsDead || Target.GetComponent<P_CombatController>().IsDied)
+            float distance = Vector3.Distance(transform.position, Target.transform.position);
+            DistanceToTarget = distance;
+
+            if (Target.GetComponent<UnitStats>()?.isDead ?? true)
             {
-                // 타겟이 죽었을 경우 Idle 상태로 전환
+                // 타겟이 죽거나 멀어질 경우 Idle 상태로 전환
                 currentState = CreatureState.Idle;
                 Target = null;
                 return;
             }
 
-            float distance = Vector3.Distance(transform.position, Target.transform.position);
-            DistanceToTarget = distance;
-
             if (distance > AttackRange)
             {
+                if (distance > 25f)
+                {
+                    // 타겟이 멀어지면 Idle 상태로 전환
+                    currentState = CreatureState.Idle;
+                    Target = null;
+                    return;
+                }
+
                 // 타겟과의 거리가 공격 범위보다 멀면 타겟에게 이동
-                MoveToPoint(Target.transform.position, distance);
+                if (navMeshAgent.isStopped)
+                    navMeshAgent.isStopped = false; // 네비메시 에이전트 활성화
+
+                Vector3 directionToTarget = (Target.transform.position - transform.position).normalized; // 타겟 방향 계산
+                Vector3 destination = Target.transform.position - directionToTarget * (AttackRange - 0.1f); // 타겟에게 공격이 닿는 거리까지 이동할 위치 계산
+
+                animator.SetFloat("MoveSpeed", navMeshAgent.velocity.magnitude); // 이동 애니메이션 재생
+                navMeshAgent.SetDestination(destination); // 타겟에게 공격이 닿는 거리까지 이동
             }
             else
             {
                 // 스킬 사용 또는 기본 공격
                 // 현재 등록되어 있는 스킬이 있다면 해당 스킬 사용
-                if (SkillCastCoroutine != null)
-                    StopCoroutine(SkillCastCoroutine);
 
-                if (SelletedSkill() != null && !IsUsingSkill)
+                if (!IsAttacking)
                 {
+                    if (SkillCastCoroutine != null)
+                        StopCoroutine(SkillCastCoroutine);
+
                     SkillBaseSO skill = SelletedSkill();
-                    SkillCastCoroutine = skill.ActivateSkill(this, Target.GetComponent<UnitStats>());
-                    StartCoroutine(SkillCastCoroutine);
-                    StartCoroutine(skill.StartCoolDown());
+
+                    if (skill != null && !IsUsingSkill)
+                    {
+                        IsAttacking = true;
+                        SkillCastCoroutine = skill.ActivateSkill(this, Target.GetComponent<UnitStats>());
+                        StartCoroutine(SkillCastCoroutine);
+                        animator.SetFloat("MoveSpeed", 0f); // 이동 애니메이션 재생
+                        animator.SetTrigger("BaseAttack");
+                        SkillsCooldownDict[skill] = skill.setSkillCooldown;
+                    }
                 }
                 else
                 {
-                    // 기본 공격 애니메이션 재생
-                    animator.SetTrigger("Attack");
-                    // 공격력 계산 및 타겟에게 데미지 적용
+                    currentState = CreatureState.StandOff; // 공격 준비가 되지 않았으면 StandOff 상태로 전환
                 }
             }
         }
@@ -459,82 +486,17 @@ public abstract class Creature : MonoBehaviour
         }
 
         animator.SetTrigger("Die");
-        characterController.enabled = false; // 캐릭터 컨트롤러 비활성화
+        navMeshAgent.isStopped = true; // 네비메시 에이전트 정지
         skinnedMeshRenderer.enabled = false; // 메쉬 렌더러 비활성화
         gameObject.layer = LayerMask.NameToLayer("Dead"); // 레이어 변경
     }
 
-    protected void MoveToPoint(Vector3 targetPos, float distance)
-    {
-        if (characterController == null)
-            return;
-
-        Vector3 finalDir = (targetPos - transform.position).normalized;
-        float moveToTargetSpeed = (distance > 15f) ? 1f : 0.5f; // 타겟과의 거리에 따라 이동 속도 조절
-
-        // 장애물 탐지 (앞으로 Ray 발사)
-        if (Physics.Raycast(transform.position + Vector3.up * 0.5f, transform.forward, out RaycastHit hit, ObstacleAvoidanceDistance, ObstacleLayer))
-        {
-            // 회피 방향: hit.normal과 transform.right를 이용해 벗어나는 방향 계산
-            Vector3 obstacleNormal = hit.normal;
-            Vector3 avoidDir = Vector3.Cross(obstacleNormal, Vector3.up).normalized;
-
-            // 회피 강도 적용
-            finalDir += avoidDir * AvoidStrength;
-        }
-
-        animator.SetFloat("MoveSpeed", moveToTargetSpeed, 0.1f, Time.deltaTime);
-
-        // 회전
-        if (finalDir != Vector3.zero)
-        {
-            Quaternion lookRotation = Quaternion.LookRotation(finalDir);
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
-        }
-
-        Vector3 horizontalVelocity = distance > 15f ? finalDir.normalized * MoveSpeed * moveToTargetSpeed : finalDir.normalized * MoveSpeed * 3f * moveToTargetSpeed;
-        Vector3 move = horizontalVelocity * Time.deltaTime;
-
-        characterController.Move(move);
-    }
-
-    private void ApplyGravity()
-    {
-        if (Grounded)
-        {
-            _fallTimeoutDelta = FallTimeout;
-
-            if (_verticalVelocity < 0.0f)
-            {
-                _verticalVelocity = -2f;
-            }
-        }
-        else
-        {
-            _verticalVelocity += Gravity * Time.deltaTime;
-
-            if (_verticalVelocity < -_terminalVelocity)
-                _verticalVelocity = -_terminalVelocity; // 최대 낙하 속도 제한
-        }
-
-        characterController.Move(new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
-    }
-
-    private void GroundedCheck()
-    {
-        // 바닥에 닿아 있는지 확인하기 위해 CheckSphere를 사용하여 구를 생성합니다.
-        Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset,
-            transform.position.z);
-        Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers,
-            QueryTriggerInteraction.Ignore);
-    }
-
     private Terrain FindTerrainContainingPoint(Vector3 point)
     {
-        if (EnvironmentManager.Instance?.terrains == null || EnvironmentManager.Instance.terrains.Length == 0)
+        if (EnvironmentManager.Instance?.Terrains == null || EnvironmentManager.Instance.Terrains.Length == 0)
             return null; // Terrain이 없으면 null 반환
 
-        foreach (var terrain in EnvironmentManager.Instance.terrains)
+        foreach (var terrain in EnvironmentManager.Instance.Terrains)
         {
             Vector3 terrainPos = terrain.transform.position;
             TerrainData terrainData = terrain.terrainData;
@@ -547,12 +509,67 @@ public abstract class Creature : MonoBehaviour
         return null; // 해당하는 Terrain이 없으면 null 반환
     }
 
+    private void FollowPlayer()
+    {
+        if (navMeshAgent.isStopped)
+            navMeshAgent.isStopped = false; // 네비메시 에이전트 활성화
+
+        if (PlayerManager.Instance?.Player == null) return;
+
+        Vector3 playerPos = PlayerManager.Instance.Player.transform.position;
+        float distance = Vector3.Distance(transform.position, playerPos);
+
+        if (PlayerManager.Instance.Player != null)
+        {
+            if (distance < 7f)
+            {
+                navMeshAgent.ResetPath();
+                animator.SetFloat("MoveSpeed", 0f);
+                return;
+            }
+
+            if (distance < 20f)
+            {
+                Vector3 dir = (playerPos - transform.position).normalized;
+                Vector3 followTarget = playerPos - dir * 5f;
+
+                float t = Mathf.InverseLerp(7f, 20f, distance); // t = 0 ~ 1
+                float _speed = Mathf.Lerp(1f, 5f, t);    // 거리에 따라(t) 이동속도 변경
+
+                navMeshAgent.speed = MoveSpeed * _speed; // 기본 이동 속도 설정
+                navMeshAgent.SetDestination(followTarget); // 플레이어에게 이동
+                animator.SetFloat("MoveSpeed", navMeshAgent.velocity.magnitude);
+                return;
+            }
+
+            if (distance >= 20f)
+            {
+                Vector3 direction = (playerPos - transform.position).normalized;
+                Vector3 teleportPos = playerPos - direction * 3f;   // 플레이어 뒤로 3m
+
+                // NavMash 위에 위치하도록 조정
+                NavMeshHit hit;
+                if (NavMesh.SamplePosition(teleportPos, out hit, 5f, NavMesh.AllAreas))
+                {
+                    navMeshAgent.Warp(hit.position);
+                }
+                else
+                {
+                    navMeshAgent.Warp(playerPos);
+                }
+
+                animator.SetFloat("MoveSpeed", 0f);
+                return;
+            }
+        }
+    }
+
     private bool IsDetection()
     {
         if (AllyEnemyConversion)
         {
             // 아군일 때의 탐지 로직
-            foreach (var enemy in CreatureManager.Instance.spawnedWildCreatures)
+            foreach (var enemy in CreatureManager.Instance.SpawnedWildCreatures)
             {
                 if (enemy != null && enemy.gameObject.activeInHierarchy)
                 {
@@ -588,12 +605,12 @@ public abstract class Creature : MonoBehaviour
         List<SkillBaseSO> usableSkills = new List<SkillBaseSO>();
 
         // 현재 선택된 스킬을 반환하는 메소드
-        if (CurrentSkillList.Count <= 0)
+        if (SkillList.Count <= 0)
             return null;
 
         // 현재 스킬 리스트에서 사용 가능한 스킬을 찾음
-        foreach (var skill in CurrentSkillList)
-            if (skill.Useable)
+        foreach (var skill in SkillList)
+            if (SkillsCooldownDict[skill] <= 0f)
                 usableSkills.Add(skill);
 
         // 사용 가능한 스킬이 있다면 랜덤으로 선택
@@ -603,23 +620,59 @@ public abstract class Creature : MonoBehaviour
             return usableSkills[randomIndex];
         }
         else
+        {
             return null; // 사용 가능한 스킬이 없으면 null 반환
+        }
     }
+
+    public void UpdateCooldownDict()
+    {
+        foreach (var skill in SkillsCooldownDict.ToList()) // 복사본 순회
+        {
+            if (skill.Value > 0f)
+            {
+                SkillsCooldownDict[skill.Key] = skill.Value - Time.deltaTime;
+            }
+        }
+    }
+
+    public IEnumerator CatchCreature()
+    {
+        Vector3 prevScale = this.transform.localScale;
+        Vector3 targetScale = Vector3.zero;
+        float duration = 1f;
+        float elapsed = 0f;
+        BeingCaptured = true;
+        while (elapsed < duration)
+        {
+            transform.localScale = Vector3.Lerp(prevScale, targetScale, elapsed / duration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        transform.localScale = targetScale;
+    }
+
+    public IEnumerator CapturedFail()
+    {
+        Vector3 prevScale = transform.localScale;
+        Vector3 targetScale = Vector3.one;
+        float duration = 0.5f;
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            transform.localScale = Vector3.Lerp(prevScale, targetScale, elapsed / duration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        transform.localScale = targetScale;
+        BeingCaptured = false;
+    }
+
 
     public void AttackIsDone()
     {
-        // 공격이 완료되었을 때 호출되는 메소드
-        // 공격 쿨타임 초기화
-        attackCooldownTimer = AttackCooldown;
-
-        // 애니메이션 상태 초기화
-        animator.ResetTrigger("Attack");
-        animator.SetFloat("MoveSpeed", 0f, 0.1f, Time.deltaTime);
-
-        // 현재 상태를 StandOff로 전환
-        currentState = CreatureState.StandOff;
-
-        IsUsingSkill = false; // 스킬 캐스팅 상태 변경
+        IsAttacking = false;
+        IsUsingSkill = false;
     }
 
     private void ConversionBattleBegin() => BattleBegin = true;

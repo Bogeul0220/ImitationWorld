@@ -7,8 +7,6 @@ public class EnvironmentObject : BreakableObjects
 {
     [SerializeField] private Interact_Pickup dropObject;
 
-    public UsePurpose usePurpose;
-
     [SerializeField]private int nextDropThreshhold;
 
     public override void OnInit()

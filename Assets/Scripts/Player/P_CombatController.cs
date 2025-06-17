@@ -16,29 +16,14 @@ public class P_CombatController : MonoBehaviour
     private Coroutine cameraLerpCoroutine;
 
     [Header("무기")]
-    private Weapon currentWeapon;
-    public Weapon CurrentWeapon
-    {
-        get { return currentWeapon; }
-        set
-        {
-            switch (value.weaponType)
-            {
-                case WeaponType.GunWeapon:
-                    currentWeapon = value;
-                    break;
-                case WeaponType.MeleeWeapon:
-                    currentWeapon = value;
-                    break;
-                default:
-                    currentWeapon = null;
-                    break;
-            }
-        }
-    }
+    public Weapon CurrentWeapon;
     [SerializeField] private List<Weapon> weaponList;
     [SerializeField] private float currentFireRate;
     private bool prevFireHeld;
+    public GameObject WeaponParent;
+    private bool prevThrowBallHeld;
+    public GameObject BallParent;
+    public BallObject[] BallObjects;
 
     [Header("상태")]
     public UnitStats unitStats;
@@ -51,13 +36,12 @@ public class P_CombatController : MonoBehaviour
             unitStats = GetComponent<UnitStats>();
 
         unitStats.Init();
-
-        CurrentWeapon = weaponList[0];
     }
 
     void Update()
     {
         bool fireHeld = InputManager.Instance.FireHeld;
+        bool throwBallHeld = InputManager.Instance.ThrowBallHeld;
 
         //FireRateCalc();
         //TryFire();
@@ -71,6 +55,24 @@ public class P_CombatController : MonoBehaviour
             }
             animator.SetBool("FireHeld", fireHeld);
             prevFireHeld = fireHeld;
+        }
+        if (throwBallHeld != prevThrowBallHeld)
+        {
+            if (throwBallHeld == true)
+            {
+                WeaponParent.SetActive(false);
+                BallParent.SetActive(true);
+            }
+            animator.SetBool("ThrowHeld", throwBallHeld);
+
+            for (int i = 0; i < BallParent.transform.childCount; i++)
+            {
+                if (i == InputManager.Instance.SelectedBallIndex)
+                    BallParent.transform.GetChild(i).gameObject.SetActive(true);
+                else
+                    BallParent.transform.GetChild(i).gameObject.SetActive(false);
+            }
+            prevThrowBallHeld = throwBallHeld;
         }
 
         CamZoomIn();
@@ -134,12 +136,12 @@ public class P_CombatController : MonoBehaviour
     private void FireRateCalc()
     {
         // 연사 속도 계산
-        if (currentWeapon == null)
+        if (CurrentWeapon == null)
         {
 
         }
 
-        if (currentWeapon.fireRate > 0)
+        if (CurrentWeapon.fireRate > 0)
             currentFireRate -= Time.deltaTime;
     }
 
@@ -155,10 +157,10 @@ public class P_CombatController : MonoBehaviour
 
     private void Fire()
     {
-        currentFireRate = currentWeapon.fireRate;
-        if (currentWeapon.weaponType == WeaponType.GunWeapon)
+        currentFireRate = CurrentWeapon.fireRate;
+        if (CurrentWeapon.weaponType == WeaponType.GunWeapon)
         {
-            Shoot(currentWeapon as Gun);
+            Shoot(CurrentWeapon as Gun);
         }
         else
         {
@@ -177,6 +179,27 @@ public class P_CombatController : MonoBehaviour
     }
 
     // 공격 애니메이션 실행 시 무기 Collider를 켜고 꺼서 공격 로직 실행
-    public void EnableMeleeWeaponCollider() => (currentWeapon as MeleeWeapon).weaponCollider.enabled = true;
-    public void DisableMeleeWeaponCollider() => (currentWeapon as MeleeWeapon).weaponCollider.enabled = false;
+    public void EnableMeleeWeaponCollider()
+    {
+        if (CurrentWeapon == null) return;
+
+        (CurrentWeapon as MeleeWeapon).weaponCollider.enabled = true;
+    }
+
+    public void DisableMeleeWeaponCollider()
+    {
+        if (CurrentWeapon == null) return;
+
+        (CurrentWeapon as MeleeWeapon).weaponCollider.enabled = false;
+    }
+
+    public void ThrowBallPooling()
+    {
+        WeaponParent.SetActive(true);
+        BallParent.SetActive(false);
+        InventoryManager.Instance.RemoveItem(InventoryManager.Instance.CurrentBallCheck[InputManager.Instance.SelectedBallIndex]);
+        var setBall = ObjectPoolManager.Get<BallObject>(BallObjects[InputManager.Instance.SelectedBallIndex].gameObject);
+        setBall.transform.position = BallParent.transform.position;
+        setBall.Init(Camera.main.transform);
+    }
 }

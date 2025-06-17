@@ -13,14 +13,22 @@ public class InputManager : MonoBehaviour
     public bool FireClicked { get; private set; }
     public bool FireHeld { get; private set; }
     public bool ZoomInHeld { get; private set; }
+    public bool ThrowBallHeld { get; private set; }
     public Action PausePressed { get; set; }
     public Action InventoryPressed { get; set; }
     public Action EscapeDisplayPressed { get; set; }
     public Action InteractPressed { get; set; }
+    public int SelectedWeaponNum { get; set; }
+    public int SelectedBallIndex { get; set; }
+    public bool SpawnedTamedCreature { get; set; }
+    public int SelectedAllyCreature { get; set; }
 
     [SerializeField] private InputActionAsset inputActions;
 
-    private InputAction m_moveAction, m_lookAction, m_jumpAction, m_sprintAction, m_pauseActionPlayer, m_fireAction, m_zoomInAction, m_inventoryActionPlayer, m_interactAction;
+    private InputAction m_moveAction, m_lookAction, m_jumpAction, m_sprintAction, m_pauseActionPlayer,
+        m_fireAction, m_zoomInAction, m_inventoryActionPlayer, m_interactAction, m_selectedWeaponInput,
+        m_throwBallAction, m_changeBallAction, m_selectAlly, m_spawnAlly;
+
     private InputAction m_pauseActionUI, m_inventoryActionUI, m_escapeActionUI;
 
     private void Awake()
@@ -51,6 +59,11 @@ public class InputManager : MonoBehaviour
         m_zoomInAction = playerMap.FindAction("ZoomIn");
         m_inventoryActionPlayer = playerMap.FindAction("Inventory");
         m_interactAction = playerMap.FindAction("Interact");
+        m_selectedWeaponInput = playerMap.FindAction("SelectedWeapon");
+        m_throwBallAction = playerMap.FindAction("ThrowBall");
+        m_changeBallAction = playerMap.FindAction("ChangeBallScroll");
+        m_selectAlly = playerMap.FindAction("SelectAlly");
+        m_spawnAlly = playerMap.FindAction("SpawnAlly");
 
         m_pauseActionUI = uiMap.FindAction("Pause");
         m_inventoryActionUI = uiMap.FindAction("Inventory");
@@ -73,7 +86,36 @@ public class InputManager : MonoBehaviour
         SprintHeld = m_sprintAction.IsPressed();
         FireClicked = m_fireAction.WasPressedThisFrame();
         FireHeld = m_fireAction.IsPressed();
+
+        if (InventoryManager.Instance.HasEnoughBall())
+            ThrowBallHeld = m_throwBallAction.IsPressed();
+
+        if (CreatureManager.Instance.SpawnedTamedCreatures.Count > 0 && m_selectAlly.WasPerformedThisFrame())
+        {
+            float allySelectValue = m_selectAlly.ReadValue<float>();
+
+            if (allySelectValue > 0f)  // C키 입력
+            {
+                SelectedAllyCreature++;
+                if (SelectedAllyCreature >= CreatureManager.Instance.SpawnedTamedCreatures.Count)
+                    SelectedAllyCreature = 0;
+
+                Debug.Log("C키 입력");
+            }
+            else if (allySelectValue < 0f) // Z키 입력
+            {
+                SelectedAllyCreature--;
+                if (SelectedAllyCreature < 0)
+                    SelectedAllyCreature = CreatureManager.Instance.SpawnedTamedCreatures.Count - 1;
+
+                Debug.Log("Z키 입력");
+            }
+        }
+
+
+
         //ZoomInHeld = m_zoomInAction.IsPressed();
+
         if (m_zoomInAction.WasPressedThisFrame())
             ZoomInHeld = true;
         else if (m_zoomInAction.WasReleasedThisFrame())
@@ -84,9 +126,47 @@ public class InputManager : MonoBehaviour
 
         if (m_inventoryActionPlayer.WasPressedThisFrame() || m_inventoryActionUI.WasPressedThisFrame())
             InventoryPressed?.Invoke();
-            
+
         if (m_interactAction.WasPressedThisFrame())
             InteractPressed?.Invoke();
+
+        Vector2 scrollValue = m_changeBallAction.ReadValue<Vector2>();
+        if (scrollValue.y > 0f)
+        {
+            SelectedBallIndex = (SelectedBallIndex + 1) % 3;
+            UIManager.Instance.BallTargetUpdate(SelectedBallIndex);
+        }
+        else if (scrollValue.y < 0f)
+        {
+            SelectedBallIndex = (SelectedBallIndex + 2) % 3;
+            UIManager.Instance.BallTargetUpdate(SelectedBallIndex);
+        }
+
+        if (m_selectedWeaponInput.triggered)
+        {
+            var control = m_selectedWeaponInput.activeControl;
+
+            if (control == Keyboard.current.digit1Key && SelectedWeaponNum != 1)
+            {
+                SelectedWeaponNum = 0;
+                InventoryManager.Instance.SelectedCurrentWeapon(SelectedWeaponNum);
+            }
+            else if (control == Keyboard.current.digit2Key && SelectedWeaponNum != 2)
+            {
+                SelectedWeaponNum = 1;
+                InventoryManager.Instance.SelectedCurrentWeapon(SelectedWeaponNum);
+            }
+            else if (control == Keyboard.current.digit3Key && SelectedWeaponNum != 3)
+            {
+                SelectedWeaponNum = 2;
+                InventoryManager.Instance.SelectedCurrentWeapon(SelectedWeaponNum);
+            }
+            else if (control == Keyboard.current.digit4Key && SelectedWeaponNum != 4)
+            {
+                SelectedWeaponNum = 3;
+                InventoryManager.Instance.SelectedCurrentWeapon(SelectedWeaponNum);
+            }
+        }
 
         if (m_escapeActionUI.WasPressedThisFrame())
             EscapeDisplayPressed?.Invoke();

@@ -8,11 +8,12 @@ public class PlayerManager : MonoBehaviour
 
     [Header("플레이어 설정", order = 1)]
     public GameObject Player; // 플레이어 오브젝트
+    public List<MeleeWeapon> MeleeWeaponPrefabs;
     public P_CombatController PlayerCombatController;
     public P_GunController PlayerGunController;
 
     public UnitStats PlayerStat;
-    
+
     public InteractionObjectBase NearInteractionObject; // 가장 가까운 상호작용 오브젝트
     public List<InteractionObjectBase> InteractionObjectLists = new List<InteractionObjectBase>(); // 상호작용 가능한 오브젝트 목록
     [SerializeField]
@@ -29,6 +30,8 @@ public class PlayerManager : MonoBehaviour
     {
         PlayerCombatController = Player.GetComponent<P_CombatController>();
         PlayerGunController = Player.GetComponent<P_GunController>();
+
+        InventoryManager.Instance.OnInventoryChanged += ChangeCurrentWeaponPrefab;
     }
 
     void Update()
@@ -87,6 +90,35 @@ public class PlayerManager : MonoBehaviour
         if (InteractionObjectLists.Contains(interactionObject))
         {
             InteractionObjectLists.Remove(interactionObject);
+        }
+    }
+
+    private void ChangeCurrentWeaponPrefab()
+    {
+        if (InventoryManager.Instance.CurrentWeapon == null || InventoryManager.Instance.CurrentWeapon.ItemData is WeaponItemData == false)
+        {
+            foreach (var prefab in MeleeWeaponPrefabs)
+            {
+                if (prefab.gameObject.activeInHierarchy)
+                    prefab.gameObject.SetActive(false);
+            }
+            return;
+        }
+
+        var itemData = InventoryManager.Instance.CurrentWeapon.ItemData as WeaponItemData;
+        var meleeType = itemData.meleeWeaponType;
+        foreach (var prefab in MeleeWeaponPrefabs)
+        {
+            if (prefab.meleeWeaponType == meleeType)
+            {
+                Player.GetComponent<P_CombatController>().CurrentWeapon = prefab;
+                prefab.gameObject.SetActive(true);
+            }
+            else
+            {
+                Player.GetComponent<P_CombatController>().CurrentWeapon = null;
+                prefab.gameObject.SetActive(false);
+            }
         }
     }
 }

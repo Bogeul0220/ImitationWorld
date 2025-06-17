@@ -11,9 +11,17 @@ public enum UsePurpose
     MiningStone,
 }
 
+public enum MeleeWeaponType
+{
+    None,
+    Sword,
+    Axe,
+}
+
 public class MeleeWeapon : Weapon
 {
-    [SerializeField] private UsePurpose usePurpose;
+    public UsePurpose usePurpose;
+    public MeleeWeaponType meleeWeaponType;
     public LayerMask hitLayer;
     public BoxCollider weaponCollider;   // 무기 충돌체
 
@@ -64,29 +72,11 @@ public class MeleeWeapon : Weapon
 
         foreach (Collider hit in hits)
         {
-            var health = hit.GetComponent<UnitStats>();
-            if (health != null && !damagedTargets.Contains(hit))
-            {
-                var envObj = hit.GetComponent<EnvironmentObject>();
+            var damageable = hit.GetComponent<Damageable>();
 
-                switch (usePurpose)
-                {
-                    case UsePurpose.None:
-                        health.TakeDamage(damage);
-                        break;
-                    case UsePurpose.FellingWood:
-                        if (envObj != null && envObj.usePurpose == UsePurpose.FellingWood)
-                            health.TakeDamage(damage * 2);
-                        else
-                            health.TakeDamage(damage);
-                        break;
-                    case UsePurpose.MiningStone:
-                        if (envObj != null && envObj.usePurpose == UsePurpose.MiningStone)
-                            health.TakeDamage(damage * 2);
-                        else
-                            health.TakeDamage(damage);
-                        break;
-                }
+            if (damageable != null && !damagedTargets.Contains(hit))
+            {
+                damageable.TakeDamage(damage, usePurpose);
 
                 damagedTargets.Add(hit);
                 _ = StartCoroutine(RemoveFromDamagedTargetAfterDelay(hit, 1f));

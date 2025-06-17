@@ -7,7 +7,7 @@ public class EnvironmentManager : MonoBehaviour
 {
     public static EnvironmentManager Instance { get; private set; }
 
-    public Terrain[] terrains;
+    public Terrain[] Terrains;
     [SerializeField] private EnvironmentObject treePrefab;
     [SerializeField] private EnvironmentObject rockPrefab;
     [SerializeField] private int spawnCount;
@@ -32,8 +32,8 @@ public class EnvironmentManager : MonoBehaviour
 
         for (int i = 0; i < spawnCount; i++)
         {
-            int terrainIndex = Random.Range(0, terrains.Length);
-            Terrain selected = terrains[terrainIndex];
+            int terrainIndex = Random.Range(0, Terrains.Length);
+            Terrain selected = Terrains[terrainIndex];
 
             Vector3 pos = GetRandomPositionTerrains(selected);
             var newObject = ObjectPoolManager.Get<EnvironmentObject>(obj.gameObject);
@@ -44,7 +44,7 @@ public class EnvironmentManager : MonoBehaviour
         }
     }
 
-    private Vector3 GetRandomPositionTerrains(Terrain selected)
+    public Vector3 GetRandomPositionTerrains(Terrain selected)
     {
         // Terrain 선택
         TerrainData data = selected.terrainData;
@@ -64,7 +64,7 @@ public class EnvironmentManager : MonoBehaviour
         return new Vector3(worldX, worldY, worldZ);
     }
 
-    private void SetObjectOnTerrain(Terrain terrain, GameObject obj, Vector3 _position)
+    public void SetObjectOnTerrain(Terrain terrain, GameObject obj, Vector3 _position)
     {
         // 높이 맞추기
         float height = terrain.SampleHeight(_position) + terrain.GetPosition().y;

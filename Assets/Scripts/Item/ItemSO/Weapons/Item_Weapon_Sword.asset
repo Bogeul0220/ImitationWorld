@@ -18,4 +18,5 @@ MonoBehaviour:
   itemID: 20001
   itemIcon: {fileID: 21300000, guid: 5fd50594014b70e48bd6993443d46b32, type: 3}
   maxDurability: 100
+  meleeWeaponType: 1
   damage: 15

@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections.Generic;
+using System.Linq;
 
 public class UIManager : MonoBehaviour
 {
@@ -14,12 +16,19 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public Sprite currentBallBackground;
+    public Sprite otherBallBackground;
+
+    public BallQuickSlot[] ballQuickSlots = new BallQuickSlot[3];
+
     [SerializeField]
     private GameObject pauseDisplay;
     [SerializeField]
     private GameObject inventoryDisplay;
     [SerializeField]
     private TMP_Text interactionText;
+    [SerializeField]
+    private PlayerStatusUI playerStatusUI;
 
     [Header("Sub Canvas")]
     [SerializeField]
@@ -43,6 +52,7 @@ public class UIManager : MonoBehaviour
         }
         pauseDisplay.SetActive(false);
         inventoryDisplay.SetActive(false);
+        BallTargetUpdate(InputManager.Instance.SelectedBallIndex);
 
         InputManager.Instance.PausePressed += DisplayPause;
         InputManager.Instance.InventoryPressed += DisplayInventory;
@@ -69,11 +79,13 @@ public class UIManager : MonoBehaviour
     private void DisplayPause()
     {
         pauseDisplay.SetActive(!pauseDisplay.activeSelf);
+        playerStatusUI.gameObject.SetActive(!playerStatusUI.gameObject.activeSelf);
     }
 
     private void DisplayInventory()
     {
         inventoryDisplay.SetActive(!inventoryDisplay.activeSelf);
+        playerStatusUI.gameObject.SetActive(!playerStatusUI.gameObject.activeSelf);
     }
 
     public void DisplayInteractCraft()
@@ -83,6 +95,7 @@ public class UIManager : MonoBehaviour
 
         Debug.Log("DisplayInteract called");
         craftingPanelDisplay.SetActive(!craftingPanelDisplay.activeSelf);
+        playerStatusUI.gameObject.SetActive(!playerStatusUI.gameObject.activeSelf);
     }
 
     private void EscapeDisplay()
@@ -90,5 +103,22 @@ public class UIManager : MonoBehaviour
         pauseDisplay.SetActive(false);
         inventoryDisplay.SetActive(false);
         craftingPanelDisplay.SetActive(false);
+    }
+
+    public void BallTargetUpdate(int currentNum)
+    {
+        for (int i = 0; i < ballQuickSlots.Length; i++)
+        {
+            if (i == currentNum)
+            {
+                ballQuickSlots[i].Border.gameObject.SetActive(true);
+                ballQuickSlots[i].BackgroundImage.sprite = currentBallBackground;
+            }
+            else
+            {
+                ballQuickSlots[i].Border.gameObject.SetActive(false);
+                ballQuickSlots[i].BackgroundImage.sprite = otherBallBackground;
+            }
+        }
     }
 }

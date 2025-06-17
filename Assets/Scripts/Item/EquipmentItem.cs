@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum EquipmentType
@@ -10,6 +12,7 @@ public enum EquipmentType
     Shield,
 }
 
+[Serializable]
 public class EquipmentItem : ItemBase
 {
     public EquipmentItemData EquipmentData { get; private set; }
