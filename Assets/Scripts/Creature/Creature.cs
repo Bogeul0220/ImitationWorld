@@ -89,33 +89,43 @@ public class Creature : MonoBehaviour
 
         if (Unitstat == null)
             Unitstat = GetComponent<UnitStats>();
+        
+        Unitstat?.Init();
 
         if (creaturePrefab != null)
         {
             animator = creaturePrefab.GetComponent<Animator>();
             skinnedMeshRenderer = creaturePrefab.GetComponentInChildren<SkinnedMeshRenderer>();
-            foreach (Collider col in creaturePrefab.GetComponentsInChildren<Collider>())
-                if (col != null)
-                {
-                    if (!col.GetComponent<Damageable>())
-                        col.AddComponent<Damageable>().InitDamageable(Unitstat);
-                    else
-                        col.GetComponent<Damageable>()?.InitDamageable(Unitstat);
+        }
 
-                    if (!col.GetComponent<Catchable>())
-                        col.AddComponent<Catchable>().InitCatchable(this);
-                    else
-                        col.GetComponent<Catchable>()?.InitCatchable(this);
+        // 실제 게임 오브젝트의 콜라이더에 Damageable 추가
+        foreach (Collider col in GetComponentsInChildren<Collider>())
+        {
+            if (col != null)
+            {
+                if (!col.GetComponent<Damageable>())
+                    col.AddComponent<Damageable>().InitDamageable(Unitstat);
+                else
+                    col.GetComponent<Damageable>()?.InitDamageable(Unitstat);
 
-                    hitColliderList.Add(col);
-                }
+                if (!col.GetComponent<Catchable>())
+                    col.AddComponent<Catchable>().InitCatchable(this);
+                else
+                    col.GetComponent<Catchable>()?.InitCatchable(this);
+
+                hitColliderList.Add(col);
+            }
         }
 
         AllyEnemyConversion = isAlly;
         if (AllyEnemyConversion == true)
+        {
             ChangeTagInChildren(this.transform, "Ally");
+        }
         else
+        {
             ChangeTagInChildren(this.transform, "Enemy");
+        }
 
         BattleBegin = false;
         IsDead = false;
@@ -127,9 +137,14 @@ public class Creature : MonoBehaviour
 
     public void ChangeTagInChildren(Transform parent, string newTag)
     {
-        foreach (Transform child in parent)
+        // 현재 오브젝트의 태그와 레이어 변경
+        parent.gameObject.tag = newTag;
+        parent.gameObject.layer = LayerMask.NameToLayer(newTag);
+
+        // 모든 자식 오브젝트에 대해 재귀적으로 처리
+        for (int i = 0; i < parent.childCount; i++)
         {
-            child.gameObject.tag = newTag;
+            Transform child = parent.GetChild(i);
             ChangeTagInChildren(child, newTag);
         }
     }
@@ -306,6 +321,14 @@ public class Creature : MonoBehaviour
             Target = null; // 타겟을 null로 설정
             escapePoint = null; // 도망 위치 초기화
             currentState = CreatureState.Idle;
+            return;
+        }
+
+        if(BattleBegin)
+        {
+            Target = PlayerManager.Instance.Player;
+            escapePoint = null;
+            currentState = CreatureState.StandOff;
             return;
         }
 
