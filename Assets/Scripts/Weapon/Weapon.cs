@@ -2,8 +2,9 @@ using UnityEngine;
 
 public enum WeaponType
 {
+    None,
+    MeleeWeapon,
     GunWeapon,
-    MeleeWeapon
 }
 
 public class Weapon : MonoBehaviour

@@ -119,7 +119,6 @@ public class P_MovementController : MonoBehaviour
             // Jump
             if (InputManager.Instance.JumpPressed && _jumpTimeoutDelta <= 0.0f)
             {
-                Debug.Log("Jump");
                 // 원하는 높이 H에 도달하기 위해 필요한 속도는 √(H × -2 × G)이다.
                 // H : 도달하려는 원하는 높이 (높이 값, 예: 미터 단위)
                 // G : 중력 가속도 (보통 음수 값, 예: -9.81 m/s²)

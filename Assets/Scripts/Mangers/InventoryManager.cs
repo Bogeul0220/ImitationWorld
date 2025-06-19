@@ -299,29 +299,29 @@ public class InventoryManager : MonoBehaviour
 
     public void UnEquipedWeapon(int unequipSlotIndex, int takeSlotIndex)
     {
-        WeaponItem unequipItem = WeaponEquipDict.ContainsKey(unequipSlotIndex) ? WeaponEquipDict[unequipSlotIndex] : null;
-        ItemBase takeItem = InvenItemDict.ContainsKey(takeSlotIndex) ? InvenItemDict[takeSlotIndex] : null;
-
-        if (unequipItem == null)
+        if (!WeaponEquipDict.ContainsKey(unequipSlotIndex))
             return;
 
-        if (takeItem == null)   // 빈 슬롯으로 이동 시
+        var unequipItem = WeaponEquipDict[unequipSlotIndex];
+
+        if (takeSlotIndex >= 0)
         {
-            InvenItemDict[takeSlotIndex] = unequipItem as WeaponItem; // 빈 슬롯에 아이템 이동
-            WeaponEquipDict.Remove(unequipSlotIndex); // 원래 슬롯에서 아이템 제거
-            Debug.Log($"무기 해체: 무기 슬롯 {unequipSlotIndex}의 {unequipItem.ItemData.ItemName}을 {takeSlotIndex}번 슬롯의 {takeItem?.ItemData.ItemName ?? "빈 슬롯"}와(과) 교환했습니다.");
+            if (InvenItemDict.ContainsKey(takeSlotIndex))
+            {
+                // 이미 아이템이 있는 슬롯에는 장착 해제 불가
+                return;
+            }
+
+            InvenItemDict[takeSlotIndex] = unequipItem;
         }
-        else if (takeItem != null && takeItem is WeaponItem)
+
+        WeaponEquipDict.Remove(unequipSlotIndex);
+
+        // 현재 장착 중인 무기를 해제한 경우
+        if (CurrentWeapon == unequipItem)
         {
-            InvenItemDict[takeSlotIndex] = unequipItem as WeaponItem; // 슬롯에 아이템 이동
-            WeaponEquipDict[unequipSlotIndex] = takeItem as WeaponItem; // 장비 교체
-            Debug.Log($"무기 해체: 무기 슬롯 {unequipSlotIndex}의 {unequipItem.ItemData.ItemName}을 {takeSlotIndex}번 슬롯의 {takeItem?.ItemData.ItemName ?? "빈 슬롯"}와(과) 교환했습니다.");
-        }
-        else
-        {
-            InvenItemDict[GetFirstEmptySlotIndex()] = unequipItem as WeaponItem;   // 인벤토리 빈 슬롯을 찾아 아이템 이동
-            WeaponEquipDict.Remove(unequipSlotIndex); // 원래 슬롯에서 아이템 제거
-            Debug.Log($"무기 해체: 무기 슬롯 {unequipSlotIndex}의 {unequipItem.ItemData.ItemName}을 {GetFirstEmptySlotIndex()}번 슬롯의 {takeItem?.ItemData.ItemName ?? "빈 슬롯"}와(과) 교환했습니다.");
+            CurrentWeapon = null;
+            PlayerManager.Instance.DisableAllWeapons();
         }
 
         OnInventoryChanged?.Invoke();
@@ -329,17 +329,14 @@ public class InventoryManager : MonoBehaviour
 
     public void SelectedCurrentWeapon(int value)
     {
-        Debug.Log($"{value}번이 입력되었습니다.");
         if (!WeaponEquipDict.TryGetValue(value, out var currentWeapon) || currentWeapon == null)
         {
-            Debug.Log($"무기 슬롯 {value}번에 장착된 무기가 없습니다.");
             CurrentWeapon = null;
-            OnInventoryChanged?.Invoke();
-            return;
         }
-
-        CurrentWeapon = currentWeapon;
-        Debug.Log($"{CurrentWeapon.ItemData.name}을 착용하였습니다.");
+        else
+        {
+            CurrentWeapon = currentWeapon;
+        }
 
         OnInventoryChanged?.Invoke();
     }

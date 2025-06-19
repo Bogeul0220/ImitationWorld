@@ -145,26 +145,20 @@ public class InputManager : MonoBehaviour
         if (m_selectedWeaponInput.triggered)
         {
             var control = m_selectedWeaponInput.activeControl;
+            int newSelectedWeaponNum = -1;
 
-            if (control == Keyboard.current.digit1Key && SelectedWeaponNum != 1)
+            if (control == Keyboard.current.digit1Key) newSelectedWeaponNum = 0;
+            else if (control == Keyboard.current.digit2Key) newSelectedWeaponNum = 1;
+            else if (control == Keyboard.current.digit3Key) newSelectedWeaponNum = 2;
+            else if (control == Keyboard.current.digit4Key) newSelectedWeaponNum = 3;
+
+            if (newSelectedWeaponNum != -1)
             {
-                SelectedWeaponNum = 0;
-                InventoryManager.Instance.SelectedCurrentWeapon(SelectedWeaponNum);
-            }
-            else if (control == Keyboard.current.digit2Key && SelectedWeaponNum != 2)
-            {
-                SelectedWeaponNum = 1;
-                InventoryManager.Instance.SelectedCurrentWeapon(SelectedWeaponNum);
-            }
-            else if (control == Keyboard.current.digit3Key && SelectedWeaponNum != 3)
-            {
-                SelectedWeaponNum = 2;
-                InventoryManager.Instance.SelectedCurrentWeapon(SelectedWeaponNum);
-            }
-            else if (control == Keyboard.current.digit4Key && SelectedWeaponNum != 4)
-            {
-                SelectedWeaponNum = 3;
-                InventoryManager.Instance.SelectedCurrentWeapon(SelectedWeaponNum);
+                if (newSelectedWeaponNum != SelectedWeaponNum)
+                {
+                    SelectedWeaponNum = newSelectedWeaponNum;
+                }
+                PlayerManager.Instance.ToggleWeapon(newSelectedWeaponNum);
             }
         }
 

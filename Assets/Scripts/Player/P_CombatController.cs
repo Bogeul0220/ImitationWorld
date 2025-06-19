@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Cinemachine;
 using StarterAssets;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class P_CombatController : MonoBehaviour
@@ -16,6 +17,7 @@ public class P_CombatController : MonoBehaviour
     private Coroutine cameraLerpCoroutine;
 
     [Header("무기")]
+    public Weapon[] Hands;
     public Weapon CurrentWeapon;
     [SerializeField] private List<Weapon> weaponList;
     [SerializeField] private float currentFireRate;
@@ -42,6 +44,7 @@ public class P_CombatController : MonoBehaviour
     {
         bool fireHeld = InputManager.Instance.FireHeld;
         bool throwBallHeld = InputManager.Instance.ThrowBallHeld;
+        animator.SetBool("HaveMelee", PlayerManager.Instance.WeaponEquiped);
 
         //FireRateCalc();
         //TryFire();
@@ -176,6 +179,18 @@ public class P_CombatController : MonoBehaviour
         Debug.Log("Fire! " + currentGun.weaponName);
         currentGun.muzzleFlash.Play(); // 총구 화염 재생
         AudioSource.PlayClipAtPoint(currentGun.fireSound, transform.position); // 발사 소리 재생
+    }
+
+    public void EnableHandCollider()
+    {
+        foreach (MeleeWeapon hand in Hands)
+            hand.weaponCollider.enabled = true;
+    }
+
+    public void DisableHandCollider()
+    {
+        foreach (MeleeWeapon hand in Hands)
+            hand.weaponCollider.enabled = false;
     }
 
     // 공격 애니메이션 실행 시 무기 Collider를 켜고 꺼서 공격 로직 실행

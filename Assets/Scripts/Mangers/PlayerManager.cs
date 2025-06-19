@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
@@ -11,6 +12,7 @@ public class PlayerManager : MonoBehaviour
     public List<MeleeWeapon> MeleeWeaponPrefabs;
     public P_CombatController PlayerCombatController;
     public P_GunController PlayerGunController;
+    public bool WeaponEquiped;
 
     public UnitStats PlayerStat;
 
@@ -97,28 +99,64 @@ public class PlayerManager : MonoBehaviour
     {
         if (InventoryManager.Instance.CurrentWeapon == null || InventoryManager.Instance.CurrentWeapon.ItemData is WeaponItemData == false)
         {
-            foreach (var prefab in MeleeWeaponPrefabs)
-            {
-                if (prefab.gameObject.activeInHierarchy)
-                    prefab.gameObject.SetActive(false);
-            }
+            DisableAllWeapons();
             return;
         }
 
-        var itemData = InventoryManager.Instance.CurrentWeapon.ItemData as WeaponItemData;
-        var meleeType = itemData.meleeWeaponType;
+        var meleeType = (InventoryManager.Instance.CurrentWeapon.ItemData as WeaponItemData).meleeWeaponType;
+
         foreach (var prefab in MeleeWeaponPrefabs)
         {
+            PlayerCombatController.CurrentWeapon = null;
+            prefab.gameObject.SetActive(false);
+
+            if (WeaponEquiped == false)
+                break;
+
             if (prefab.meleeWeaponType == meleeType)
             {
-                Player.GetComponent<P_CombatController>().CurrentWeapon = prefab;
+                PlayerCombatController.CurrentWeapon = prefab;
                 prefab.gameObject.SetActive(true);
+            }
+        }
+    }
+
+    public void DisableAllWeapons()
+    {
+        foreach (var prefab in MeleeWeaponPrefabs)
+        {
+            prefab.gameObject.SetActive(false);
+        }
+        PlayerCombatController.CurrentWeapon = null;
+        WeaponEquiped = false;
+    }
+
+    public void ToggleWeapon(int slotIndex)
+    {
+        if (InventoryManager.Instance.WeaponEquipDict.ContainsKey(slotIndex))
+        {
+            var weaponInSlot = InventoryManager.Instance.WeaponEquipDict[slotIndex];
+            
+            // 현재 장착된 무기와 선택한 슬롯의 무기가 같고, 무기가 활성화된 상태라면
+            if (WeaponEquiped && InventoryManager.Instance.CurrentWeapon == weaponInSlot)
+            {
+                // 무기 비활성화
+                WeaponEquiped = false;
+                InventoryManager.Instance.CurrentWeapon = null;
+                ChangeCurrentWeaponPrefab();
             }
             else
             {
-                Player.GetComponent<P_CombatController>().CurrentWeapon = null;
-                prefab.gameObject.SetActive(false);
+                // 무기 활성화
+                WeaponEquiped = true;
+                InventoryManager.Instance.SelectedCurrentWeapon(slotIndex);
+                ChangeCurrentWeaponPrefab();
             }
+        }
+        else
+        {
+            // 장착되지 않은 슬롯이면 모든 무기 비활성화
+            DisableAllWeapons();
         }
     }
 }
