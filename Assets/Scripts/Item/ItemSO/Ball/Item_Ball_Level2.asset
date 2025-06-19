@@ -12,11 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92a356e2957d99843b9c1dd8ef87db17, type: 3}
   m_Name: Item_Ball_Level2
   m_EditorClassIdentifier: 
-  itemName: Lv2 Ball
+  itemName: AdvancedBall
   itemType: 2
   description: "\uC911\uAE09 \uBCFC"
   itemID: 99992
   itemIcon: {fileID: 21300000, guid: 822f966d7ea457b49b45be4027a0ae74, type: 3}
   maxAmount: 9999
   ballType: 1
-  percentValue: 75

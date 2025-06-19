@@ -81,7 +81,11 @@ public class Creature : MonoBehaviour
     // 크리쳐 초기화 메소드 (Belligerent는 기본적으로 NonAggressive로 설정)
     public virtual void InitCreature(bool isAlly, Belligerent belligerent = Belligerent.NonAggressive)
     {
-        navMeshAgent = GetComponent<NavMeshAgent>();
+        if(navMeshAgent == null)
+            navMeshAgent = GetComponent<NavMeshAgent>();
+
+        if (navMeshAgent.isStopped)
+            navMeshAgent.isStopped = false;
 
         if (Unitstat == null)
             Unitstat = GetComponent<UnitStats>();
@@ -638,9 +642,12 @@ public class Creature : MonoBehaviour
 
     public IEnumerator CatchCreature()
     {
+        navMeshAgent.isStopped = true;
+        
+        float duration = 1f;
         Vector3 prevScale = this.transform.localScale;
         Vector3 targetScale = Vector3.zero;
-        float duration = 1f;
+
         float elapsed = 0f;
         BeingCaptured = true;
         while (elapsed < duration)
@@ -652,7 +659,7 @@ public class Creature : MonoBehaviour
         transform.localScale = targetScale;
     }
 
-    public IEnumerator CapturedFail()
+    public IEnumerator CapturedFail(Vector3 capturePosition)
     {
         Vector3 prevScale = transform.localScale;
         Vector3 targetScale = Vector3.one;
@@ -665,7 +672,9 @@ public class Creature : MonoBehaviour
             yield return null;
         }
         transform.localScale = targetScale;
+        transform.position = capturePosition;
         BeingCaptured = false;
+        navMeshAgent.isStopped = false;
     }
 
 

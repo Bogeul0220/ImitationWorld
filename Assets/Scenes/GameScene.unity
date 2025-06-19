@@ -12544,6 +12544,7 @@ MonoBehaviour:
   - {fileID: 1923012269}
   PlayerCombatController: {fileID: 0}
   PlayerGunController: {fileID: 0}
+  WeaponEquiped: 0
   PlayerStat: {fileID: 0}
   NearInteractionObject: {fileID: 0}
   InteractionObjectLists: []
@@ -15521,7 +15522,9 @@ MonoBehaviour:
   animator: {fileID: 2083577799}
   virtualCamera: {fileID: 981010999}
   prevZoomInHeld: 0
-  Hands: []
+  Hands:
+  - {fileID: 804276858}
+  - {fileID: 1961307312}
   CurrentWeapon: {fileID: 0}
   weaponList:
   - {fileID: 1757011783}

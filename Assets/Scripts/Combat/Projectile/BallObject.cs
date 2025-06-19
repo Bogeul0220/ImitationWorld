@@ -5,7 +5,6 @@ using UnityEngine;
 public class BallObject : MonoBehaviour
 {
     public int MaxBounce = 3;
-    public float CatchValue;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private float throwForce;
     [SerializeField] private float upwardForce;
@@ -30,19 +29,6 @@ public class BallObject : MonoBehaviour
         Vector3 force = direction * throwForce + Vector3.up * upwardForce;
 
         rb.velocity = force;
-
-        switch (InputManager.Instance.SelectedBallIndex)
-        {
-            case 0:
-                CatchValue = 50;
-                break;
-            case 1:
-                CatchValue = 75;
-                break;
-            case 2:
-                CatchValue = 100;
-                break;
-        }
 
         hasInitialized = true;
     }
@@ -92,41 +78,90 @@ public class BallObject : MonoBehaviour
 
     private IEnumerator HandleCaptureSequence(Creature target)
     {
+        float totalScore = 0;
+
+        // 1. 기본 점수 (볼 종류별)
+        switch (InputManager.Instance.SelectedBallIndex)
+        {
+            case 0: // 일반 볼
+                totalScore += 30f;
+                break;
+            case 1: // 고급 볼
+                totalScore += 45f;
+                break;
+            case 2: // 마스터 볼
+                totalScore += 60f;
+                break;
+        }
+
+        // 2. 체력 기반 보너스 (최대 30점)
+        float healthPercentage = target.Unitstat.maxHealth > 0 ? 
+            target.Unitstat.currentHealth / target.Unitstat.maxHealth : 1f;
+        float healthBonus = (1f - healthPercentage) * 30f;
+        totalScore += healthBonus;
+
         yield return StartCoroutine(target.CatchCreature());
 
-        float shakeDuration = 1f;
-        float shakeMagnitude = 15f;
-        float elapsed = 0f;
-
-        Quaternion originalRot = transform.rotation;
-
-        while (elapsed < shakeDuration)
+        float initialRand = Random.Range(0f, 100f);
+        if (initialRand <= totalScore)
         {
-            float zAngle = Mathf.Sin(elapsed * 10f) * shakeMagnitude;
-            transform.rotation = originalRot * Quaternion.Euler(0f, 0f, zAngle);
-
-            elapsed += Time.deltaTime;
-            yield return null;
+            CaptureSuccess(target);
+            yield break;
         }
-        transform.rotation = originalRot;
 
-        float rand = Random.Range(0f, 100f);
-        bool isSuccess = rand <= CatchValue;
-
-        if (isSuccess)
+        for (int i = 0; i < 3; i++)
         {
-            if (CreatureManager.Instance.SpawnedWildCreatures.Contains(target))
-                CreatureManager.Instance.SpawnedWildCreatures.Remove(target);
+            float shakeDuration = 1f;
+            float shakeMagnitude = 15f;
+            float elapsed = 0f;
+            Quaternion originalRot = transform.rotation;
 
-            CreatureManager.Instance.SpawnedTamedCreatures.Add(target);
-            target.gameObject.SetActive(false);
-            ReturnObject();
+            while (elapsed < shakeDuration)
+            {
+                float zAngle = Mathf.Sin(elapsed * 10f) * shakeMagnitude;
+                transform.rotation = originalRot * Quaternion.Euler(0f, 0f, zAngle);
+
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            transform.rotation = originalRot;
+
+            if (Random.value <= 0.5f)
+            {
+                float bonus = Random.Range(1f, 20f);
+                totalScore += bonus;
+            }
+
+            if (totalScore >= 100)
+            {
+                CaptureSuccess(target);
+                yield break;
+            }
+
+            yield return new WaitForSeconds(0.5f);
+        }
+
+        if (totalScore >= 100)
+        {
+            CaptureSuccess(target);
+            yield break;
         }
         else
         {
-            yield return target.CapturedFail();
+            yield return target.CapturedFail(transform.position);
             ReturnObject();
         }
+    }
+
+    private void CaptureSuccess(Creature target)
+    {
+        if (CreatureManager.Instance.SpawnedWildCreatures.Contains(target))
+            CreatureManager.Instance.SpawnedWildCreatures.Remove(target);
+
+        CreatureManager.Instance.SpawnedTamedCreatures.Add(target);
+        target.gameObject.SetActive(false);
+        ReturnObject();
     }
 
     void ReturnObject()
