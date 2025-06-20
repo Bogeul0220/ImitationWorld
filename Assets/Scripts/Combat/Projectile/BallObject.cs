@@ -100,7 +100,7 @@ public class BallObject : MonoBehaviour
         float healthBonus = (1f - healthPercentage) * 30f;
         totalScore += healthBonus;
 
-        yield return StartCoroutine(target.CatchCreature());
+        yield return StartCoroutine(target.CreatureSizeDown());
 
         float initialRand = Random.Range(0f, 100f);
         if (initialRand <= totalScore)
@@ -149,7 +149,7 @@ public class BallObject : MonoBehaviour
         }
         else
         {
-            yield return target.CapturedFail(transform.position);
+            yield return target.CreatrueSizeUp(transform.position);
             ReturnObject();
         }
     }

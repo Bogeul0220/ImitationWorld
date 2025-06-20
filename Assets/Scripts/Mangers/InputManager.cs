@@ -22,6 +22,7 @@ public class InputManager : MonoBehaviour
     public int SelectedBallIndex { get; set; }
     public bool SpawnedTamedCreature { get; set; }
     public int SelectedAllyCreature { get; set; }
+    public bool SpawnAllyHeld { get; set; }
 
     [SerializeField] private InputActionAsset inputActions;
 
@@ -76,6 +77,7 @@ public class InputManager : MonoBehaviour
     {
         InteractPressed += InputInteract;
         EscapeDisplayPressed += InputEscapeDisplay;
+        SelectedAllyCreature = -1;
     }
 
     private void Update()
@@ -90,22 +92,28 @@ public class InputManager : MonoBehaviour
         if (InventoryManager.Instance.HasEnoughBall())
             ThrowBallHeld = m_throwBallAction.IsPressed();
 
+        if (CreatureManager.Instance.SpawnedTamedCreatures.Count > 0 && SelectedAllyCreature != -1)
+            SpawnAllyHeld = m_spawnAlly.IsPressed();
+
         if (CreatureManager.Instance.SpawnedTamedCreatures.Count > 0 && m_selectAlly.WasPerformedThisFrame())
         {
             float allySelectValue = m_selectAlly.ReadValue<float>();
+
+            if (CreatureManager.Instance.SpawnedTamedCreatures.Count <= 0)
+                return;
 
             if (allySelectValue > 0f)  // C키 입력
             {
                 SelectedAllyCreature++;
                 if (SelectedAllyCreature >= CreatureManager.Instance.SpawnedTamedCreatures.Count)
-                    SelectedAllyCreature = 0;
+                    SelectedAllyCreature = -1;
 
                 Debug.Log("C키 입력");
             }
             else if (allySelectValue < 0f) // Z키 입력
             {
                 SelectedAllyCreature--;
-                if (SelectedAllyCreature < 0)
+                if (SelectedAllyCreature < -1)
                     SelectedAllyCreature = CreatureManager.Instance.SpawnedTamedCreatures.Count - 1;
 
                 Debug.Log("Z키 입력");

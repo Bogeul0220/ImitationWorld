@@ -663,7 +663,7 @@ public class Creature : MonoBehaviour
         }
     }
 
-    public IEnumerator CatchCreature()
+    public IEnumerator CreatureSizeDown()
     {
         navMeshAgent.isStopped = true;
         
@@ -682,7 +682,7 @@ public class Creature : MonoBehaviour
         transform.localScale = targetScale;
     }
 
-    public IEnumerator CapturedFail(Vector3 capturePosition)
+    public IEnumerator CreatrueSizeUp(Vector3 spawnPosition)
     {
         Vector3 prevScale = transform.localScale;
         Vector3 targetScale = Vector3.one;
@@ -695,7 +695,7 @@ public class Creature : MonoBehaviour
             yield return null;
         }
         transform.localScale = targetScale;
-        transform.position = capturePosition;
+        transform.position = spawnPosition;
         BeingCaptured = false;
         navMeshAgent.isStopped = false;
     }

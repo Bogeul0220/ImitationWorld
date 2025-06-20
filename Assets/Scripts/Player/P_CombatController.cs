@@ -24,8 +24,10 @@ public class P_CombatController : MonoBehaviour
     private bool prevFireHeld;
     public GameObject WeaponParent;
     private bool prevThrowBallHeld;
+    private bool prevSpawnAllyHeld;
     public GameObject BallParent;
     public BallObject[] BallObjects;
+    public SpawnAllyObject SpawnAllyObject;
 
     [Header("상태")]
     public UnitStats unitStats;
@@ -44,6 +46,7 @@ public class P_CombatController : MonoBehaviour
     {
         bool fireHeld = InputManager.Instance.FireHeld;
         bool throwBallHeld = InputManager.Instance.ThrowBallHeld;
+        bool spawnAllyHeld = InputManager.Instance.SpawnAllyHeld;
         animator.SetBool("HaveMelee", PlayerManager.Instance.WeaponEquiped);
 
         //FireRateCalc();
@@ -59,6 +62,7 @@ public class P_CombatController : MonoBehaviour
             animator.SetBool("FireHeld", fireHeld);
             prevFireHeld = fireHeld;
         }
+
         if (throwBallHeld != prevThrowBallHeld)
         {
             if (throwBallHeld == true)
@@ -75,7 +79,28 @@ public class P_CombatController : MonoBehaviour
                 else
                     BallParent.transform.GetChild(i).gameObject.SetActive(false);
             }
+
+            SpawnAllyObject.gameObject.SetActive(false);
+
             prevThrowBallHeld = throwBallHeld;
+        }
+
+        if (spawnAllyHeld != prevSpawnAllyHeld)
+        {
+            if (spawnAllyHeld == true)
+            {
+                WeaponParent.SetActive(false);
+                BallParent.SetActive(true);
+            }
+            animator.SetBool("SpawnAllyHeld", spawnAllyHeld);
+
+            for (int i = 0; i < BallParent.transform.childCount; i++)
+                BallParent.transform.GetChild(i).gameObject.SetActive(false);
+
+            BallParent.transform.GetChild(BallParent.transform.childCount - 1).gameObject.SetActive(true);
+            SpawnAllyObject.gameObject.SetActive(true);
+
+            prevSpawnAllyHeld = spawnAllyHeld;
         }
 
         CamZoomIn();
@@ -216,5 +241,12 @@ public class P_CombatController : MonoBehaviour
         var setBall = ObjectPoolManager.Get<BallObject>(BallObjects[InputManager.Instance.SelectedBallIndex].gameObject);
         setBall.transform.position = BallParent.transform.position;
         setBall.Init(Camera.main.transform);
+    }
+
+    public void SpawnAlly()
+    {
+        var setSpawnAlly = ObjectPoolManager.Get<SpawnAllyObject>(SpawnAllyObject.gameObject);
+        setSpawnAlly.transform.position = BallParent.transform.position;
+        setSpawnAlly.Init(Camera.main.transform);
     }
 }

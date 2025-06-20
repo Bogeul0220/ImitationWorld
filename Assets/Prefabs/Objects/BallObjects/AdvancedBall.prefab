@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 5318295887975839305}
   - component: {fileID: 981579781680762425}
   m_Layer: 0
-  m_Name: Lv2Ball
+  m_Name: AdvancedBall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

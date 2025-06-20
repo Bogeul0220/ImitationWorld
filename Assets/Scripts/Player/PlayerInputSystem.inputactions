@@ -124,7 +124,7 @@
                 },
                 {
                     "name": "SpawnAlly",
-                    "type": "PassThrough",
+                    "type": "Button",
                     "id": "71ec264b-3a39-4965-8ee7-dbb7f362c179",
                     "expectedControlType": "",
                     "processors": "",

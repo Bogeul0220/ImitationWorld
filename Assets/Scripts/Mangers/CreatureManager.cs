@@ -65,4 +65,25 @@ public class CreatureManager : MonoBehaviour
             yield return new WaitForSeconds(SpawnInterval);
         }
     }
+
+    public void SpawnAllyCreature(Vector3 spawnPos)
+    {
+        if (SpawnedTamedCreatures.Count <= 0 || InputManager.Instance.SelectedAllyCreature == -1)
+            return;
+
+        if (CurrentTakeOutCreature != null)
+            return;
+
+        CurrentTakeOutCreature = SpawnedTamedCreatures[InputManager.Instance.SelectedAllyCreature];
+        Debug.Log("SpawnAllyCreature : " + CurrentTakeOutCreature.CreatureName);
+
+        var spawnedCreature = ObjectPoolManager.Get<Creature>(CurrentTakeOutCreature.gameObject);
+        var allyParent = new GameObject();
+        allyParent.name = "AllyCreatureParent";
+        allyParent.transform.parent = this.transform;
+
+        spawnedCreature.transform.SetParent(allyParent.transform);
+        spawnedCreature.InitCreature(true);
+        StartCoroutine(spawnedCreature.CreatrueSizeUp(spawnPos));
+    }
 }
