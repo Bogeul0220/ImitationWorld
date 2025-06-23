@@ -155,11 +155,35 @@ public class BallObject : MonoBehaviour
     }
 
     private void CaptureSuccess(Creature target)
-    {
+    {   
         if (CreatureManager.Instance.SpawnedWildCreatures.Contains(target))
             CreatureManager.Instance.SpawnedWildCreatures.Remove(target);
 
-        CreatureManager.Instance.SpawnedTamedCreatures.Add(target);
+        // 중복 체크 후 안전하게 추가
+        if (!CreatureManager.Instance.SpawnedTamedKey.Contains(target.CreatureIndex) && !CreatureManager.Instance.SpawnedTamedCreatures.ContainsKey(target.CreatureIndex))
+        {
+            CreatureManager.Instance.SpawnedTamedKey.Add(target.CreatureIndex);
+            CreatureManager.Instance.SpawnedTamedCreatures.Add(target.CreatureIndex, target);
+        }
+        else
+        {
+            int newIndex = -1;
+            while(true)
+            {
+                newIndex = (int)UnityEngine.Random.Range(1000000000, 10000000000);
+                if(newIndex != target.CreatureIndex)
+                {
+                    target.CreatureIndex = newIndex;
+                    CreatureManager.Instance.SpawnedTamedKey.Add(target.CreatureIndex);
+                    CreatureManager.Instance.SpawnedTamedCreatures.Add(target.CreatureIndex, target);
+                    break;
+                }
+            }
+        }
+        
+        // 디버그 로그 추가
+        Debug.Log($"CaptureSuccess: Creature {target.CreatureName} with Index {target.CreatureIndex}");
+        
         target.gameObject.SetActive(false);
         ReturnObject();
     }

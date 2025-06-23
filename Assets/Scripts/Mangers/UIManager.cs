@@ -103,6 +103,8 @@ public class UIManager : MonoBehaviour
         pauseDisplay.SetActive(false);
         inventoryDisplay.SetActive(false);
         craftingPanelDisplay.SetActive(false);
+        
+        playerStatusUI.gameObject.SetActive(true);
     }
 
     public void BallTargetUpdate(int currentNum)

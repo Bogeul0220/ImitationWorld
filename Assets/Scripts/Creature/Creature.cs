@@ -32,6 +32,7 @@ public class Creature : MonoBehaviour
     public bool AllyEnemyConversion;
     public bool BattleBegin;
     public Belligerent Belligerent;
+    public int CreatureIndex = -1;
 
     [Header("크리쳐 이동 세팅")]
     public float MoveSpeed; // 이동 속도
@@ -81,15 +82,19 @@ public class Creature : MonoBehaviour
     // 크리쳐 초기화 메소드 (Belligerent는 기본적으로 NonAggressive로 설정)
     public virtual void InitCreature(bool isAlly, Belligerent belligerent = Belligerent.NonAggressive)
     {
-        if(navMeshAgent == null)
+        if (navMeshAgent == null)
             navMeshAgent = GetComponent<NavMeshAgent>();
 
-        if (navMeshAgent.isStopped)
-            navMeshAgent.isStopped = false;
+        // NavMeshAgent가 활성화되어 있고 유효한지 확인
+        if (navMeshAgent != null && navMeshAgent.isActiveAndEnabled)
+        {
+            if (navMeshAgent.isStopped)
+                navMeshAgent.isStopped = false;
+        }
 
         if (Unitstat == null)
             Unitstat = GetComponent<UnitStats>();
-        
+
         Unitstat?.Init();
 
         if (creaturePrefab != null)
@@ -133,6 +138,15 @@ public class Creature : MonoBehaviour
         currentState = CreatureState.Idle;
         AddedSkillInList();
         Unitstat.OnDamaged += ConversionBattleBegin;
+
+        // InitCreature가 호출될 때마다 새로운 Index 생성
+        // System.Random을 사용하여 더 강력한 랜덤 생성
+        if (CreatureIndex == -1)
+        {
+            System.Random random = new System.Random();
+            CreatureIndex = random.Next(100000000, 999999999); // 9자리 숫자로 안전하게 생성
+            Debug.Log($"{CreatureIndex} : {CreatureName}");
+        }
     }
 
     public void ChangeTagInChildren(Transform parent, string newTag)
@@ -324,7 +338,7 @@ public class Creature : MonoBehaviour
             return;
         }
 
-        if(BattleBegin)
+        if (BattleBegin)
         {
             Target = PlayerManager.Instance.Player;
             escapePoint = null;
@@ -665,39 +679,43 @@ public class Creature : MonoBehaviour
 
     public IEnumerator CreatureSizeDown()
     {
-        navMeshAgent.isStopped = true;
-        
-        float duration = 1f;
-        Vector3 prevScale = this.transform.localScale;
-        Vector3 targetScale = Vector3.zero;
+        // NavMeshAgent가 활성화되어 있고 유효한지 확인
+        if (navMeshAgent != null && navMeshAgent.isActiveAndEnabled)
+        {
+            navMeshAgent.isStopped = true;
+        }
 
+        float duration = 1f;
         float elapsed = 0f;
         BeingCaptured = true;
         while (elapsed < duration)
         {
-            transform.localScale = Vector3.Lerp(prevScale, targetScale, elapsed / duration);
+            transform.localScale = Vector3.Lerp(Vector3.one, Vector3.zero, elapsed / duration);
             elapsed += Time.deltaTime;
             yield return null;
         }
-        transform.localScale = targetScale;
+        transform.localScale = Vector3.zero;
     }
 
     public IEnumerator CreatrueSizeUp(Vector3 spawnPosition)
     {
-        Vector3 prevScale = transform.localScale;
-        Vector3 targetScale = Vector3.one;
         float duration = 0.5f;
         float elapsed = 0f;
         while (elapsed < duration)
         {
-            transform.localScale = Vector3.Lerp(prevScale, targetScale, elapsed / duration);
+            transform.localScale = Vector3.Lerp(Vector3.zero, Vector3.one, elapsed / duration);
             elapsed += Time.deltaTime;
             yield return null;
         }
-        transform.localScale = targetScale;
+        transform.localScale = Vector3.one;
         transform.position = spawnPosition;
         BeingCaptured = false;
-        navMeshAgent.isStopped = false;
+
+        // NavMeshAgent가 활성화되어 있고 유효한지 확인
+        if (navMeshAgent != null && navMeshAgent.isActiveAndEnabled)
+        {
+            navMeshAgent.isStopped = false;
+        }
     }
 
 

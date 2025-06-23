@@ -40,6 +40,7 @@ public class P_CombatController : MonoBehaviour
             unitStats = GetComponent<UnitStats>();
 
         unitStats.Init();
+        InputManager.Instance.CallInAllyPressed += CallInAlly;
     }
 
     void Update()
@@ -245,8 +246,17 @@ public class P_CombatController : MonoBehaviour
 
     public void SpawnAlly()
     {
+        WeaponParent.SetActive(true);
+        BallParent.SetActive(false);
         var setSpawnAlly = ObjectPoolManager.Get<SpawnAllyObject>(SpawnAllyObject.gameObject);
         setSpawnAlly.transform.position = BallParent.transform.position;
         setSpawnAlly.Init(Camera.main.transform);
+    }
+
+    public void CallInAlly()
+    {
+        WeaponParent.SetActive(true);
+        BallParent.SetActive(false);
+        animator.SetTrigger("CallInAlly");
     }
 }

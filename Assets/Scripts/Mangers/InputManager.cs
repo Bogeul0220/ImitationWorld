@@ -1,4 +1,6 @@
 using System;
+using System.Net.WebSockets;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -23,6 +25,7 @@ public class InputManager : MonoBehaviour
     public bool SpawnedTamedCreature { get; set; }
     public int SelectedAllyCreature { get; set; }
     public bool SpawnAllyHeld { get; set; }
+    public Action CallInAllyPressed { get; set; }
 
     [SerializeField] private InputActionAsset inputActions;
 
@@ -82,6 +85,8 @@ public class InputManager : MonoBehaviour
 
     private void Update()
     {
+        var creatureList = CreatureManager.Instance.SpawnedTamedKey;
+
         MoveInput = m_moveAction.ReadValue<Vector2>();
         LookInput = m_lookAction.ReadValue<Vector2>();
         JumpPressed = m_jumpAction.WasPressedThisFrame();
@@ -92,20 +97,28 @@ public class InputManager : MonoBehaviour
         if (InventoryManager.Instance.HasEnoughBall())
             ThrowBallHeld = m_throwBallAction.IsPressed();
 
-        if (CreatureManager.Instance.SpawnedTamedCreatures.Count > 0 && SelectedAllyCreature != -1)
-            SpawnAllyHeld = m_spawnAlly.IsPressed();
+        if (creatureList.Count > 0 && SelectedAllyCreature != -1)
+        {
+            if (m_spawnAlly.WasPressedThisFrame() && CreatureManager.Instance.CurrentTakeOutCreature != null)
+            {
+                CallInAllyPressed?.Invoke();
+                return;
+            }
 
-        if (CreatureManager.Instance.SpawnedTamedCreatures.Count > 0 && m_selectAlly.WasPerformedThisFrame())
+            SpawnAllyHeld = m_spawnAlly.IsPressed();
+        }
+
+        if (CreatureManager.Instance.SpawnedTamedKey.Count > 0 && m_selectAlly.WasPerformedThisFrame())
         {
             float allySelectValue = m_selectAlly.ReadValue<float>();
 
-            if (CreatureManager.Instance.SpawnedTamedCreatures.Count <= 0)
+            if (CreatureManager.Instance.SpawnedTamedKey.Count <= 0)
                 return;
 
             if (allySelectValue > 0f)  // C키 입력
             {
                 SelectedAllyCreature++;
-                if (SelectedAllyCreature >= CreatureManager.Instance.SpawnedTamedCreatures.Count)
+                if (SelectedAllyCreature >= CreatureManager.Instance.SpawnedTamedKey.Count)
                     SelectedAllyCreature = -1;
 
                 Debug.Log("C키 입력");
@@ -114,15 +127,11 @@ public class InputManager : MonoBehaviour
             {
                 SelectedAllyCreature--;
                 if (SelectedAllyCreature < -1)
-                    SelectedAllyCreature = CreatureManager.Instance.SpawnedTamedCreatures.Count - 1;
+                    SelectedAllyCreature = CreatureManager.Instance.SpawnedTamedKey.Count - 1;
 
                 Debug.Log("Z키 입력");
             }
         }
-
-
-
-        //ZoomInHeld = m_zoomInAction.IsPressed();
 
         if (m_zoomInAction.WasPressedThisFrame())
             ZoomInHeld = true;

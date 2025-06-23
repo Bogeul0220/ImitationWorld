@@ -7372,7 +7372,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hpSlider: {fileID: 338917823}
   hpText: {fileID: 468656876}
-  staminaSlider: {fileID: 0}
+  staminaSlider: {fileID: 554502207}
 --- !u!1 &1097322705
 GameObject:
   m_ObjectHideFlags: 0
