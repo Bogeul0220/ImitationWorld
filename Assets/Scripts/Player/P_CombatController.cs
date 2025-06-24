@@ -19,7 +19,6 @@ public class P_CombatController : MonoBehaviour
     [Header("무기")]
     public Weapon[] Hands;
     public Weapon CurrentWeapon;
-    [SerializeField] private List<Weapon> weaponList;
     [SerializeField] private float currentFireRate;
     private bool prevFireHeld;
     public GameObject WeaponParent;
@@ -40,6 +39,7 @@ public class P_CombatController : MonoBehaviour
             unitStats = GetComponent<UnitStats>();
 
         unitStats.Init();
+        GetComponent<Damageable>().InitDamageable(unitStats);
         InputManager.Instance.CallInAllyPressed += CallInAlly;
     }
 
@@ -209,14 +209,28 @@ public class P_CombatController : MonoBehaviour
 
     public void EnableHandCollider()
     {
-        foreach (MeleeWeapon hand in Hands)
-            hand.weaponCollider.enabled = true;
+        if (CurrentWeapon == null)
+        {
+            foreach (MeleeWeapon hand in Hands)
+                hand.StartAttack();
+        }
+        else
+        {
+            (CurrentWeapon as MeleeWeapon).StartAttack();
+        }
     }
 
     public void DisableHandCollider()
     {
-        foreach (MeleeWeapon hand in Hands)
-            hand.weaponCollider.enabled = false;
+        if (CurrentWeapon == null)
+        {
+            foreach (MeleeWeapon hand in Hands)
+                hand.EndAttack();
+        }
+        else
+        {
+            (CurrentWeapon as MeleeWeapon).EndAttack();
+        }
     }
 
     // 공격 애니메이션 실행 시 무기 Collider를 켜고 꺼서 공격 로직 실행

@@ -14,5 +14,6 @@ public class Damageable : MonoBehaviour
     public void TakeDamage(int damage, UsePurpose usePurpose = UsePurpose.None)
     {
         unitStats.TakeDamage(damage, usePurpose);
+        UIManager.Instance.DisplayDamageFloating(damage, transform.position + Vector3.up * 1.5f);
     }
 }

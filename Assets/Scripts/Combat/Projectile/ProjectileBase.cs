@@ -81,7 +81,7 @@ public class ProjectileBase : MonoBehaviour
     {
         if (!isFired) return;
 
-        UnitStats otherStats = other.GetComponent<UnitStats>();
+        Damageable otherStats = other.GetComponent<Damageable>();
 
         if (otherStats != null && otherStats != caster.Unitstat)
         {

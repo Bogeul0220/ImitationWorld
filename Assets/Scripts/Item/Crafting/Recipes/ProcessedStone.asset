@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5ad69cd46d277548aacbbb59cd3c54e, type: 3}
   m_Name: ProcessedStone
   m_EditorClassIdentifier: 
-  recipeName: "[\uAC00\uACF5\uB41C \uB3CC]"
-  description: "[\uAC00\uACF5\uB41C \uB3CC]\uC744 \uC81C\uC791\uD569\uB2C8\uB2E4."
+  recipeName: "\uAC00\uACF5\uB41C \uB3CC"
+  description: "\uAC00\uACF5\uB41C \uB3CC\uC744 \uC81C\uC791\uD569\uB2C8\uB2E4."
   requiredMaterials:
   - ItemData: {fileID: 11400000, guid: b549606785d34d34b84ce622e49a21b6, type: 2}
     NeedCraftCount: 3

@@ -105,18 +105,35 @@ public class PlayerManager : MonoBehaviour
 
         var meleeType = (InventoryManager.Instance.CurrentWeapon.ItemData as WeaponItemData).meleeWeaponType;
 
-        foreach (var prefab in MeleeWeaponPrefabs)
+        // foreach (var prefab in MeleeWeaponPrefabs)
+        // {
+        //     PlayerCombatController.CurrentWeapon = null;
+        //     prefab.gameObject.SetActive(false);
+
+        //     if (WeaponEquiped == false)
+        //         break;
+
+        //     if (prefab.meleeWeaponType == meleeType)
+        //     {
+        //         PlayerCombatController.CurrentWeapon = prefab;
+        //         prefab.gameObject.SetActive(true);
+        //     }
+        //     else
+        //     {
+        //         continue;
+        //     }
+        // }
+
+        for (int i = 0; i < MeleeWeaponPrefabs.Count; i++)
         {
-            PlayerCombatController.CurrentWeapon = null;
-            prefab.gameObject.SetActive(false);
-
-            if (WeaponEquiped == false)
-                break;
-
-            if (prefab.meleeWeaponType == meleeType)
+            if (MeleeWeaponPrefabs[i].meleeWeaponType == meleeType)
             {
-                PlayerCombatController.CurrentWeapon = prefab;
-                prefab.gameObject.SetActive(true);
+                PlayerCombatController.CurrentWeapon = MeleeWeaponPrefabs[i];
+                MeleeWeaponPrefabs[i].gameObject.SetActive(true);
+            }
+            else if (MeleeWeaponPrefabs[i].meleeWeaponType != meleeType)
+            {
+                MeleeWeaponPrefabs[i].gameObject.SetActive(false);
             }
         }
     }

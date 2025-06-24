@@ -35,6 +35,9 @@ public class UIManager : MonoBehaviour
     private Canvas subCanvas;
     public GameObject craftingPanelDisplay;
 
+    [Header("Field UI")]
+    [SerializeField] private GameObject damageFloatingPrefab;
+
     public bool DisplayOpened
     {
         get
@@ -122,5 +125,12 @@ public class UIManager : MonoBehaviour
                 ballQuickSlots[i].BackgroundImage.sprite = otherBallBackground;
             }
         }
+    }
+    
+    public void DisplayDamageFloating(int damage, Vector3 position)
+    {
+        var floating = ObjectPoolManager.Get<DamageFloating>(damageFloatingPrefab);
+        floating.transform.position = position;
+        floating.SetDamage(damage);
     }
 }

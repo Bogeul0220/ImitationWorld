@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5ad69cd46d277548aacbbb59cd3c54e, type: 3}
   m_Name: ProcessedWood
   m_EditorClassIdentifier: 
-  recipeName: "[\uAC00\uACF5\uB41C \uB098\uBB34]"
-  description: "[\uAC00\uACF5\uB41C \uB098\uBB34]\uB97C \uC81C\uC791\uD569\uB2C8\uB2E4."
+  recipeName: "\uAC00\uACF5\uB41C \uB098\uBB34"
+  description: "\uAC00\uACF5\uB41C \uB098\uBB34\uB97C \uC81C\uC791\uD569\uB2C8\uB2E4."
   requiredMaterials:
   - ItemData: {fileID: 11400000, guid: fbd527d420c925c4faf375c490d139fa, type: 2}
     NeedCraftCount: 3

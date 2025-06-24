@@ -16,6 +16,7 @@ public enum MeleeWeaponType
     None,
     Sword,
     Axe,
+    Pickaxe,
 }
 
 public class MeleeWeapon : Weapon
@@ -32,6 +33,12 @@ public class MeleeWeapon : Weapon
 
     private float recordInterval = 0.05f;
     private float recordTimer = 0f;
+
+    private void OnEnable()
+    {
+        if (weaponCollider != null && weaponCollider.enabled)
+            weaponCollider.enabled = false;
+    }
 
     void Update()
     {
