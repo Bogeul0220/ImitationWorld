@@ -61,7 +61,8 @@ MonoBehaviour:
   DistanceToTarget: 0
   DetectionRange: 10
   Unitstat: {fileID: 0}
-  creatureInfoUI: {fileID: 0}
+  creatureInfoUI: {fileID: 3577710793051892804}
+  creatureInfoUIPosY: 5
   AttackRange: 8
   AttackSpeed: 1
   AttackBaseDamage: 1
@@ -683,3 +684,14 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 5631823294880812395, guid: 0957cad377c12da46a4578c44c76fa55, type: 3}
   m_PrefabInstance: {fileID: 7060810269722011061}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3577710793051892804 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5790393841257646577, guid: 0957cad377c12da46a4578c44c76fa55, type: 3}
+  m_PrefabInstance: {fileID: 7060810269722011061}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 313aef69ceb495e4da94781627f2920d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

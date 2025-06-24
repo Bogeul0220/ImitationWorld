@@ -46,6 +46,7 @@ public class Creature : MonoBehaviour
     [Header("크리쳐 스탯 세팅")]
     public UnitStats Unitstat;
     public CreatureInfoUI creatureInfoUI;
+    [SerializeField] private float creatureInfoUIPosY;
     public float AttackRange; // 공격 범위
     public float AttackSpeed = 1f; // 공격 속도
     public float AttackBaseDamage = 1f; // 공격력
@@ -140,11 +141,8 @@ public class Creature : MonoBehaviour
 
         currentState = CreatureState.Idle;
 
-        if (creatureInfoUI == null)
-            creatureInfoUI = GetComponentInChildren<CreatureInfoUI>();
-
         creatureInfoUI.SetCreature(this);
-        creatureInfoUI.transform.position = (navMeshAgent.height * Vector3.up) + transform.position + new Vector3(0f, 1f, 0f);
+        creatureInfoUI.GetComponent<RectTransform>().position = this.transform.position + new Vector3(0f, creatureInfoUIPosY, 0f);
         AddedSkillInList();
         Unitstat.OnDamaged += ConversionBattleBegin;
 
