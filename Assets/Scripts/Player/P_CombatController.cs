@@ -50,9 +50,6 @@ public class P_CombatController : MonoBehaviour
         bool spawnAllyHeld = InputManager.Instance.SpawnAllyHeld;
         animator.SetBool("HaveMelee", PlayerManager.Instance.WeaponEquiped);
 
-        //FireRateCalc();
-        //TryFire();
-
         if (fireHeld != prevFireHeld)
         {
             if (InputManager.Instance.FireClicked)
