@@ -247,8 +247,7 @@ public class P_CombatController : MonoBehaviour
 
     public void ThrowBallPooling()
     {
-        WeaponParent.SetActive(true);
-        BallParent.SetActive(false);
+        WeaponObjectActive();
         InventoryManager.Instance.RemoveItem(InventoryManager.Instance.CurrentBallCheck[InputManager.Instance.SelectedBallIndex]);
         var setBall = ObjectPoolManager.Get<BallObject>(BallObjects[InputManager.Instance.SelectedBallIndex].gameObject);
         setBall.transform.position = BallParent.transform.position;
@@ -257,8 +256,7 @@ public class P_CombatController : MonoBehaviour
 
     public void SpawnAlly()
     {
-        WeaponParent.SetActive(true);
-        BallParent.SetActive(false);
+        WeaponObjectActive();
         var setSpawnAlly = ObjectPoolManager.Get<SpawnAllyObject>(SpawnAllyObject.gameObject);
         setSpawnAlly.transform.position = BallParent.transform.position;
         setSpawnAlly.Init(Camera.main.transform);
@@ -266,8 +264,13 @@ public class P_CombatController : MonoBehaviour
 
     public void CallInAlly()
     {
+        WeaponObjectActive();
+        animator.SetTrigger("CallInAlly");
+    }
+
+    public void WeaponObjectActive()
+    {
         WeaponParent.SetActive(true);
         BallParent.SetActive(false);
-        animator.SetTrigger("CallInAlly");
     }
 }
