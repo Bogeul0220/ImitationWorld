@@ -4,6 +4,7 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 public enum CreatureState   // 상태
 {
@@ -28,6 +29,7 @@ public class Creature : MonoBehaviour
     [Header("크리쳐 기본 정보")]
     public string CreatureName;
     public int Level;
+    public Sprite CreatureImage;
     public CreatureState currentState;
     public bool AllyEnemyConversion;
     public bool BattleBegin;

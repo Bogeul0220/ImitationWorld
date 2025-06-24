@@ -29,6 +29,9 @@ public class UIManager : MonoBehaviour
     private TMP_Text interactionText;
     [SerializeField]
     private PlayerStatusUI playerStatusUI;
+    [SerializeField] private Image creatureImage;
+    [SerializeField] private Image creatureImageBorder;
+
 
     [Header("Sub Canvas")]
     [SerializeField]
@@ -65,6 +68,7 @@ public class UIManager : MonoBehaviour
     void LateUpdate()
     {
         SetInteractionText();
+        DisplayCreatureImage();
     }
 
     public void SetInteractionText()
@@ -118,11 +122,13 @@ public class UIManager : MonoBehaviour
             {
                 ballQuickSlots[i].Border.gameObject.SetActive(true);
                 ballQuickSlots[i].BackgroundImage.sprite = currentBallBackground;
+                ballQuickSlots[i].GetComponent<RectTransform>().localScale = new Vector3(1f, 1f, 1f);
             }
             else
             {
                 ballQuickSlots[i].Border.gameObject.SetActive(false);
                 ballQuickSlots[i].BackgroundImage.sprite = otherBallBackground;
+                ballQuickSlots[i].GetComponent<RectTransform>().localScale = new Vector3(0.5f, 0.5f, 0.5f);
             }
         }
     }
@@ -132,5 +138,38 @@ public class UIManager : MonoBehaviour
         var floating = ObjectPoolManager.Get<DamageFloating>(damageFloatingPrefab);
         floating.transform.position = position;
         floating.SetDamage(damage);
+    }
+
+    public void DisplayCreatureImage()
+    {
+        if(CreatureManager.Instance.SpawnedTamedCreatures.Count <= 0)
+        {
+            creatureImage.gameObject.SetActive(false);
+            creatureImageBorder.gameObject.SetActive(false);
+            return;
+        }
+        if(InputManager.Instance.SelectedAllyCreature == -1)
+        {
+            creatureImage.gameObject.SetActive(false);
+            creatureImageBorder.gameObject.SetActive(false);
+            return;
+        }
+
+        var key = CreatureManager.Instance.SpawnedTamedKey[InputManager.Instance.SelectedAllyCreature];
+
+        var targetCreature = CreatureManager.Instance.SpawnedTamedCreatures[key];
+
+        if(CreatureManager.Instance.CurrentTakeOutCreature != null && CreatureManager.Instance.CurrentTakeOutCreature.CreatureIndex == targetCreature.CreatureIndex)
+        {
+            creatureImage.gameObject.SetActive(true);
+            creatureImage.sprite = targetCreature.CreatureImage;
+            creatureImageBorder.gameObject.SetActive(true);
+        }
+        else
+        {
+            creatureImage.gameObject.SetActive(true);
+            creatureImage.sprite = targetCreature.CreatureImage;
+            creatureImageBorder.gameObject.SetActive(false);
+        }
     }
 }

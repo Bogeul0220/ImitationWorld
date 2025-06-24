@@ -50,6 +50,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CreatureName: "\uD14C\uB77C\uB4DC\uB798\uACE4"
   Level: 1
+  CreatureImage: {fileID: 21300000, guid: a6e8bbdb6cd83f84fb8dbeb0c1201774, type: 3}
   currentState: 0
   AllyEnemyConversion: 0
   BattleBegin: 0
