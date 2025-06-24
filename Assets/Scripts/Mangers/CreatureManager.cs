@@ -176,6 +176,7 @@ public class CreatureManager : MonoBehaviour
         // 한 프레임 대기하여 오브젝트가 완전히 활성화되도록 함
         yield return null;
         
+        creature.transform.localScale = Vector3.one;
         // 크리처 초기화
         creature.InitCreature(true);
         

@@ -6210,7 +6210,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!65 &772011820
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6312,6 +6312,7 @@ MonoBehaviour:
   itemDatas:
   - {fileID: 11400000, guid: b549606785d34d34b84ce622e49a21b6, type: 2}
   - {fileID: 11400000, guid: fbd527d420c925c4faf375c490d139fa, type: 2}
+  - {fileID: 11400000, guid: 48771c58089f626468cf65adbe42aa78, type: 2}
 --- !u!1 &773265521
 GameObject:
   m_ObjectHideFlags: 0
