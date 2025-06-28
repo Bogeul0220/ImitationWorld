@@ -137,7 +137,6 @@ public class Creature : MonoBehaviour
         }
 
         BattleBegin = false;
-        IsDead = false;
 
         currentState = CreatureState.Idle;
 
@@ -213,6 +212,12 @@ public class Creature : MonoBehaviour
 
     protected virtual void IdleState()
     {
+        if (Unitstat.isDead)
+        {
+            StartCoroutine(CreatureDead(5f));
+            return;
+        }
+
         switch (AllyEnemyConversion)
         {
             case true:
@@ -288,6 +293,12 @@ public class Creature : MonoBehaviour
     }
     protected virtual void PatrolState()
     {
+        if (Unitstat.isDead)
+        {
+            StartCoroutine(CreatureDead(5f));
+            return;
+        }
+
         if (!AllyEnemyConversion)
         {
             // 적군일 때의 순찰 행동
@@ -335,6 +346,12 @@ public class Creature : MonoBehaviour
 
     protected virtual void EscapeState()
     {
+        if (Unitstat.isDead)
+        {
+            StartCoroutine(CreatureDead(5f));
+            return;
+        }
+
         // 도망 상태
         // 타겟이 없거나 타겟이 죽었을 때 Idle 상태로 전환
         if (Target == null || (Target.GetComponent<UnitStats>()?.isDead ?? true))
@@ -381,10 +398,17 @@ public class Creature : MonoBehaviour
 
     protected virtual void StandOffState()
     {
+        if (Unitstat.isDead)
+        {
+            StartCoroutine(CreatureDead(5f));
+            return;
+        }
+
         if (Target != null)
         {
             float distance = Vector3.Distance(transform.position, Target.transform.position);
             DistanceToTarget = distance;
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(Target.transform.position - transform.position), 360f * Time.deltaTime);
 
             if (Target.GetComponent<UnitStats>()?.isDead ?? true)
             {
@@ -443,10 +467,17 @@ public class Creature : MonoBehaviour
 
     protected virtual void BattleState()
     {
+        if (Unitstat.isDead)
+        {
+            StartCoroutine(CreatureDead(5f));
+            return;
+        }
+
         if (Target != null && Target.GetComponent<UnitStats>() != null)
         {
             float distance = Vector3.Distance(transform.position, Target.transform.position);
             DistanceToTarget = distance;
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(Target.transform.position - transform.position), 360f * Time.deltaTime);
 
             if (Target.GetComponent<UnitStats>()?.isDead ?? true)
             {
@@ -490,6 +521,8 @@ public class Creature : MonoBehaviour
 
                     if (skill != null && !IsUsingSkill)
                     {
+                        if (navMeshAgent.destination != null)
+                            navMeshAgent.SetDestination(this.transform.position);
                         IsAttacking = true;
                         SkillCastCoroutine = skill.ActivateSkill(this, Target.GetComponent<UnitStats>());
                         StartCoroutine(SkillCastCoroutine);
@@ -512,6 +545,12 @@ public class Creature : MonoBehaviour
     }
     protected virtual void TakeHitState()
     {
+        if (Unitstat.isDead)
+        {
+            StartCoroutine(CreatureDead(5f));
+            return;
+        }
+
         // 큰 공격을 받았을 때의 행동
         // 타격 애니메이션 재생 및 상태 전환
         if (SkillCastCoroutine != null)
@@ -533,9 +572,7 @@ public class Creature : MonoBehaviour
             IsUsingSkill = false; // 스킬 캐스팅 중지
         }
 
-        animator.SetTrigger("Die");
         navMeshAgent.isStopped = true; // 네비메시 에이전트 정지
-        skinnedMeshRenderer.enabled = false; // 메쉬 렌더러 비활성화
         gameObject.layer = LayerMask.NameToLayer("Dead"); // 레이어 변경
     }
 
@@ -725,11 +762,25 @@ public class Creature : MonoBehaviour
         }
     }
 
-
     public void AttackIsDone()
     {
         IsAttacking = false;
         IsUsingSkill = false;
+    }
+
+    private IEnumerator CreatureDead(float delay = 0f)
+    {
+        currentState = CreatureState.Died;
+        animator.SetTrigger("IsDead");
+
+        yield return new WaitForSeconds(delay);
+
+        if (gameObject.activeInHierarchy)
+        {
+            ObjectPoolManager.Return(gameObject);
+            if(CreatureManager.Instance.SpawnedWildCreatures.Contains(this))
+                CreatureManager.Instance.SpawnedWildCreatures.Remove(this);
+        }
     }
 
     private void ConversionBattleBegin() => BattleBegin = true;

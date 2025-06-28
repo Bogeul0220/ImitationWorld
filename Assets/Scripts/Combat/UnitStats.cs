@@ -19,6 +19,8 @@ public class UnitStats : MonoBehaviour
 
     public void Init()
     {
+        isDead = false;
+
         if (statusSO != null)
         {
             maxHealth = statusSO.MaxHp;
@@ -31,6 +33,8 @@ public class UnitStats : MonoBehaviour
 
     public void TakeDamage(int damage, UsePurpose usePurpose = UsePurpose.None)
     {
+        if (isDead) return;
+
         if (this.usePurpose == usePurpose)
             damage *= 2;
         
@@ -40,6 +44,7 @@ public class UnitStats : MonoBehaviour
 
         if (currentHealth <= 0)
         {
+            isDead = true;
             currentHealth = 0;
             OnDied?.Invoke();
         }
@@ -47,6 +52,8 @@ public class UnitStats : MonoBehaviour
 
     public void RestoreHealth(int amount)
     {
+        if (isDead) return;
+
         currentHealth += amount;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
     }
