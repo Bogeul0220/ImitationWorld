@@ -10222,6 +10222,9 @@ MonoBehaviour:
   - {fileID: 4284106056320722820, guid: 1228c76e32f3759468b59a354793b97b, type: 3}
   - {fileID: 7167463273948852763, guid: dc82b3ea52ebebe4b8e9a426ff9c524c, type: 3}
   - {fileID: 1833892146605841386, guid: e2150dd5cd6df8d4c8410dd26035a86d, type: 3}
+  - {fileID: 1833892146605841386, guid: 9369d36005f942f4ebc3a42e7a460544, type: 3}
+  - {fileID: 1833892146605841386, guid: 99b92b0d168deeb44873e8d6cedda1b8, type: 3}
+  - {fileID: 1833892146605841386, guid: 8cbb683f931458444975a9d9e1563c4c, type: 3}
   SpawnedTamedKey: 
   CurrentTakeOutCreature: {fileID: 0}
   MaxTamedCreatures: 5

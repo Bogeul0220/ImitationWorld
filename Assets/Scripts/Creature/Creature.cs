@@ -370,6 +370,9 @@ public class Creature : MonoBehaviour
             return;
         }
 
+        if (navMeshAgent.isStopped)
+            navMeshAgent.isStopped = false;
+
         // 타겟과의 거리 계산
         float distance = Vector3.Distance(transform.position, Target.transform.position);
         DistanceToTarget = distance;
@@ -420,31 +423,39 @@ public class Creature : MonoBehaviour
 
             if (distance > AttackRange)
             {
-                if (distance > 25f)
+                if (IsUsingSkill)
                 {
-                    // 타겟이 멀어지면 Idle 상태로 전환
-                    currentState = CreatureState.Idle;
-                    Target = null;
-                    return;
+                    if (!navMeshAgent.isStopped)
+                        navMeshAgent.isStopped = true;
+                    animator.SetFloat("MoveSpeed", 0f);
                 }
+                else
+                {
+                    if (distance > 25f)
+                    {
+                        // 타겟이 멀어지면 Idle 상태로 전환
+                        currentState = CreatureState.Idle;
+                        Target = null;
+                        return;
+                    }
 
-                // 타겟과의 거리가 공격 범위보다 멀면 타겟에게 이동
-                if (navMeshAgent.isStopped)
-                    navMeshAgent.isStopped = false; // 네비메시 에이전트 활성화
+                    if (navMeshAgent.isStopped)
+                        navMeshAgent.isStopped = false; // 네비메시 에이전트 활성화
 
-                Vector3 directionToTarget = (Target.transform.position - transform.position).normalized; // 타겟 방향 계산
-                Vector3 destination = Target.transform.position - directionToTarget * (AttackRange - 0.2f); // 타겟에게 공격이 닿는 거리까지 이동할 위치 계산
+                    Vector3 directionToTarget = (Target.transform.position - transform.position).normalized; // 타겟 방향 계산
+                    Vector3 destination = Target.transform.position - directionToTarget * (AttackRange - 0.2f); // 타겟에게 공격이 닿는 거리까지 이동할 위치 계산
 
-                animator.SetFloat("MoveSpeed", navMeshAgent.velocity.magnitude); // 이동 애니메이션 재생
-                navMeshAgent.speed = MoveSpeed;
-                navMeshAgent.SetDestination(destination); // 타겟에게 공격이 닿는 거리까지 이동
+                    animator.SetFloat("MoveSpeed", navMeshAgent.velocity.magnitude); // 이동 애니메이션 재생
+                    navMeshAgent.speed = MoveSpeed;
+                    navMeshAgent.SetDestination(destination); // 타겟에게 공격이 닿는 거리까지 이동
+                }
             }
             else
             {
                 if (attackCooldownTimer > 0f)
                 {
                     Quaternion targetRotation = Quaternion.LookRotation(Target.transform.position - transform.position); // 타겟을 바라보고 회전
-                    transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, 360f * Time.deltaTime); // 타겟 방향으로 회전
+                    transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, 90f * Time.deltaTime); // 타겟 방향으로 회전
 
                     if (navMeshAgent.isStopped)
                         navMeshAgent.isStopped = false; // 네비메시 에이전트 활성화
@@ -477,7 +488,7 @@ public class Creature : MonoBehaviour
         {
             float distance = Vector3.Distance(transform.position, Target.transform.position);
             DistanceToTarget = distance;
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(Target.transform.position - transform.position), 360f * Time.deltaTime);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(Target.transform.position - transform.position), 90f * Time.deltaTime);
 
             if (Target.GetComponent<UnitStats>()?.isDead ?? true)
             {
@@ -489,23 +500,32 @@ public class Creature : MonoBehaviour
 
             if (distance > AttackRange)
             {
-                if (distance > 25f)
+                if (IsUsingSkill)
                 {
-                    // 타겟이 멀어지면 Idle 상태로 전환
-                    currentState = CreatureState.Idle;
-                    Target = null;
-                    return;
+                    if (!navMeshAgent.isStopped)
+                        navMeshAgent.isStopped = true;
+                    animator.SetFloat("MoveSpeed", 0f);
                 }
+                else
+                {
+                    if (distance > 25f)
+                    {
+                        // 타겟이 멀어지면 Idle 상태로 전환
+                        currentState = CreatureState.Idle;
+                        Target = null;
+                        return;
+                    }
 
-                // 타겟과의 거리가 공격 범위보다 멀면 타겟에게 이동
-                if (navMeshAgent.isStopped)
-                    navMeshAgent.isStopped = false; // 네비메시 에이전트 활성화
+                    // 타겟과의 거리가 공격 범위보다 멀면 타겟에게 이동
+                    if (navMeshAgent.isStopped)
+                        navMeshAgent.isStopped = false; // 네비메시 에이전트 활성화
 
-                Vector3 directionToTarget = (Target.transform.position - transform.position).normalized; // 타겟 방향 계산
-                Vector3 destination = Target.transform.position - directionToTarget * (AttackRange - 0.1f); // 타겟에게 공격이 닿는 거리까지 이동할 위치 계산
+                    Vector3 directionToTarget = (Target.transform.position - transform.position).normalized; // 타겟 방향 계산
+                    Vector3 destination = Target.transform.position - directionToTarget * (AttackRange - 0.1f); // 타겟에게 공격이 닿는 거리까지 이동할 위치 계산
 
-                animator.SetFloat("MoveSpeed", navMeshAgent.velocity.magnitude); // 이동 애니메이션 재생
-                navMeshAgent.SetDestination(destination); // 타겟에게 공격이 닿는 거리까지 이동
+                    animator.SetFloat("MoveSpeed", navMeshAgent.velocity.magnitude); // 이동 애니메이션 재생
+                    navMeshAgent.SetDestination(destination); // 타겟에게 공격이 닿는 거리까지 이동
+                }
             }
             else
             {
@@ -521,13 +541,12 @@ public class Creature : MonoBehaviour
 
                     if (skill != null && !IsUsingSkill)
                     {
-                        if (navMeshAgent.destination != null)
-                            navMeshAgent.SetDestination(this.transform.position);
+                        if (!navMeshAgent.isStopped)
+                            navMeshAgent.isStopped = true;
                         IsAttacking = true;
                         SkillCastCoroutine = skill.ActivateSkill(this, Target.GetComponent<UnitStats>());
                         StartCoroutine(SkillCastCoroutine);
                         animator.SetFloat("MoveSpeed", 0f); // 이동 애니메이션 재생
-                        animator.SetTrigger("BaseAttack");
                         SkillsCooldownDict[skill] = skill.setSkillCooldown;
                     }
                 }
@@ -766,6 +785,9 @@ public class Creature : MonoBehaviour
     {
         IsAttacking = false;
         IsUsingSkill = false;
+        if (navMeshAgent.isStopped)
+            navMeshAgent.isStopped = false;
+        animator.SetTrigger("BaseAttack");
     }
 
     private IEnumerator CreatureDead(float delay = 0f)
@@ -778,7 +800,7 @@ public class Creature : MonoBehaviour
         if (gameObject.activeInHierarchy)
         {
             ObjectPoolManager.Return(gameObject);
-            if(CreatureManager.Instance.SpawnedWildCreatures.Contains(this))
+            if (CreatureManager.Instance.SpawnedWildCreatures.Contains(this))
                 CreatureManager.Instance.SpawnedWildCreatures.Remove(this);
         }
     }

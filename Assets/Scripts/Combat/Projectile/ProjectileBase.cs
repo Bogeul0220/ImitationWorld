@@ -10,7 +10,7 @@ public class ProjectileBase : MonoBehaviour
     [SerializeField] protected float projectileSpeed;
     [SerializeField] protected float gravity;
     [SerializeField] protected float lifeTime;
-
+    [SerializeField] protected float spinSpeed;
     protected Creature caster;
     protected UnitStats target;
     protected Vector3 direction;
@@ -20,7 +20,7 @@ public class ProjectileBase : MonoBehaviour
 
     protected bool isFired = false;
 
-    public void InitProjectile(Creature caster, UnitStats target, float speed, int damage, float gravityForce, float lifeTime)
+    public void InitProjectile(Creature caster, UnitStats target, float speed, int damage, float gravityForce, float lifeTime, float spinSpeed)
     {
         this.caster = caster;
         this.target = target;
@@ -28,6 +28,7 @@ public class ProjectileBase : MonoBehaviour
         this.damage = damage;
         this.gravity = gravityForce;
         this.lifeTime = lifeTime;
+        this.spinSpeed = spinSpeed;
 
         timer = 0f;
 
@@ -53,6 +54,7 @@ public class ProjectileBase : MonoBehaviour
             if (target == null) break;
 
             transform.position += direction * projectileSpeed * Time.deltaTime;
+            transform.Rotate(Vector3.forward * spinSpeed * Time.deltaTime);
             timer += Time.deltaTime;
             yield return null;
         }
@@ -70,6 +72,7 @@ public class ProjectileBase : MonoBehaviour
             velocity.y -= gravity * Time.deltaTime;
             pos += velocity * Time.deltaTime;
             transform.position = pos;
+            transform.Rotate(Vector3.forward * spinSpeed * Time.deltaTime);
             timer += Time.deltaTime;
             yield return null;
         }

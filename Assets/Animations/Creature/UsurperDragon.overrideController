@@ -8,4 +8,16 @@ AnimatorOverrideController:
   m_PrefabAsset: {fileID: 0}
   m_Name: UsurperDragon
   m_Controller: {fileID: 9100000, guid: 42fac7d8faaff3c4ba8f631fc3fccfac, type: 2}
-  m_Clips: []
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: 601b9e9a8720f834fb218a15d9f3ae63, type: 3}
+    m_OverrideClip: {fileID: 7400000, guid: f3c4af16992f14c43a050675b9be2f68, type: 3}
+  - m_OriginalClip: {fileID: 7400000, guid: 49d0a594e1ca9d54ca3e17fb24d28f5c, type: 3}
+    m_OverrideClip: {fileID: 7400000, guid: 347d2e064d3a3f946b17655dcc998386, type: 3}
+  - m_OriginalClip: {fileID: 7400000, guid: 9700edab3a23d7d408e78a7cb99cf41d, type: 3}
+    m_OverrideClip: {fileID: 7400000, guid: 239b8825753a9e04ab2528df8f251b8b, type: 3}
+  - m_OriginalClip: {fileID: 7400000, guid: ac9b8cd5f91eeef44a25fce0f31885c1, type: 3}
+    m_OverrideClip: {fileID: 7400000, guid: 9f159f6b3339be1409c27761d89f18bd, type: 3}
+  - m_OriginalClip: {fileID: 7400000, guid: 2f381863b81afe445bb3bbd18f1e90cc, type: 3}
+    m_OverrideClip: {fileID: 7400000, guid: f862cf09513abb14cbba0e94da9a410f, type: 3}
+  - m_OriginalClip: {fileID: 7400000, guid: 01f3cd440df370b4796840c93effc251, type: 3}
+    m_OverrideClip: {fileID: 7400000, guid: 1f674d87cae509644a306408e4fecfc1, type: 3}
