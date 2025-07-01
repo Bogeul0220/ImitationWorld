@@ -237,7 +237,7 @@ public class Creature : MonoBehaviour
                     var player = PlayerManager.Instance.Player;
                     if (player != null && player.GetComponent<P_CombatController>().InBattle)
                     {
-                        Target = player.GetComponent<P_CombatController>().unitStats.CurrentBattleTarget;
+                        Target = player.GetComponent<P_CombatController>().PlayerStat.CurrentBattleTarget;
                         currentState = CreatureState.StandOff;
                     }
 
@@ -252,7 +252,7 @@ public class Creature : MonoBehaviour
                     {
                         if (player.GetComponent<P_CombatController>().InBattle)
                         {
-                            Target = player.GetComponent<P_CombatController>().unitStats.CurrentBattleTarget;
+                            Target = player.GetComponent<P_CombatController>().PlayerStat.CurrentBattleTarget;
                             currentState = CreatureState.StandOff; // 플레이어가 전투 중이면 StandOff 상태로 전환
                         }
                         else if (IsDetection()) // 플레이어의 범위에 들어오면 StandOff 상태로 전환
@@ -417,7 +417,7 @@ public class Creature : MonoBehaviour
 
         if (AllyEnemyConversion)
         {
-            Target = PlayerManager.Instance.Player.GetComponent<P_CombatController>().unitStats.CurrentBattleTarget;
+            Target = PlayerManager.Instance.Player.GetComponent<P_CombatController>().PlayerStat.CurrentBattleTarget;
             if (Target.isDead)
             {
                 Target = null;
@@ -440,7 +440,11 @@ public class Creature : MonoBehaviour
         {
             float distance = Vector3.Distance(transform.position, Target.transform.position);
             DistanceToTarget = distance;
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(Target.transform.position - transform.position), 360f * Time.deltaTime);
+            
+            // 부드러운 회전을 위해 회전 속도를 낮춤
+            Vector3 lookDirection = (Target.transform.position - transform.position).normalized;
+            Quaternion lookRotation = Quaternion.LookRotation(lookDirection);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, 5f * Time.deltaTime);
 
             if (Target.GetComponent<UnitStats>()?.isDead ?? true)
             {
@@ -483,8 +487,10 @@ public class Creature : MonoBehaviour
             {
                 if (attackCooldownTimer > 0f)
                 {
-                    Quaternion targetRotation = Quaternion.LookRotation(Target.transform.position - transform.position); // 타겟을 바라보고 회전
-                    transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, 90f * Time.deltaTime); // 타겟 방향으로 회전
+                    // 부드러운 회전을 위해 회전 속도를 낮춤
+                    Vector3 cooldownLookDirection = (Target.transform.position - transform.position).normalized;
+                    Quaternion cooldownLookRotation = Quaternion.LookRotation(cooldownLookDirection);
+                    transform.rotation = Quaternion.Slerp(transform.rotation, cooldownLookRotation, 5f * Time.deltaTime);
 
                     if (navMeshAgent.isStopped)
                         navMeshAgent.isStopped = false; // 네비메시 에이전트 활성화
@@ -515,7 +521,7 @@ public class Creature : MonoBehaviour
 
         if (AllyEnemyConversion)
         {
-            Target = PlayerManager.Instance.Player.GetComponent<P_CombatController>().unitStats.CurrentBattleTarget;
+            Target = PlayerManager.Instance.Player.GetComponent<P_CombatController>().PlayerStat.CurrentBattleTarget;
             if (Target.isDead)
             {
                 Target = null;
@@ -538,7 +544,11 @@ public class Creature : MonoBehaviour
         {
             float distance = Vector3.Distance(transform.position, Target.transform.position);
             DistanceToTarget = distance;
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(Target.transform.position - transform.position), 90f * Time.deltaTime);
+            
+            // 부드러운 회전을 위해 회전 속도를 낮춤
+            Vector3 battleLookDirection = (Target.transform.position - transform.position).normalized;
+            Quaternion battleLookRotation = Quaternion.LookRotation(battleLookDirection);
+            transform.rotation = Quaternion.Slerp(transform.rotation, battleLookRotation, 5f * Time.deltaTime);
 
             if (Target.GetComponent<UnitStats>()?.isDead ?? true)
             {

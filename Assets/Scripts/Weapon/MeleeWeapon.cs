@@ -88,10 +88,18 @@ public class MeleeWeapon : Weapon
                 damagedTargets.Add(hit);
                 _ = StartCoroutine(RemoveFromDamagedTargetAfterDelay(hit, 1f));
 
-                if(hit.gameObject.CompareTag("Enemy"))
+                if(damageable.gameObject.CompareTag("Enemy"))
                 {
-                    PlayerManager.Instance.Player.GetComponent<P_CombatController>().unitStats.CurrentBattleTarget = damageable.GetComponent<UnitStats>();
-                    PlayerManager.Instance.Player.GetComponent<P_CombatController>().StartBattle();
+                    if (!damageable.unitStats.isDead)
+                    {
+                        PlayerManager.Instance.Player.GetComponent<P_CombatController>().PlayerStat.CurrentBattleTarget = damageable.unitStats;
+                        PlayerManager.Instance.Player.GetComponent<P_CombatController>().StartBattle();
+                    }
+                    else
+                    {
+                        PlayerManager.Instance.Player.GetComponent<P_CombatController>().PlayerStat.CurrentBattleTarget = null;
+                        PlayerManager.Instance.Player.GetComponent<P_CombatController>().EndBattle();
+                    }
                 }
             }
         }

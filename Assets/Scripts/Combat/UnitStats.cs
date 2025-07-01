@@ -68,6 +68,8 @@ public class UnitStats : MonoBehaviour
 
         if (currentHealth <= 0)
         {
+            if (CurrentBattleTarget != null)
+                CurrentBattleTarget = null;
             isDead = true;
             currentHealth = 0;
             OnDied?.Invoke();

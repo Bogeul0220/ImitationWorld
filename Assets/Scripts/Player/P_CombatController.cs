@@ -29,18 +29,18 @@ public class P_CombatController : MonoBehaviour
     public SpawnAllyObject SpawnAllyObject;
 
     [Header("상태")]
-    public UnitStats unitStats;
+    public UnitStats PlayerStat;
     public bool IsDied;
     public bool InBattle;
 
     void Start()
     {
-        if (unitStats == null)
-            unitStats = GetComponent<UnitStats>();
+        if (PlayerStat == null)
+            PlayerStat = GetComponent<UnitStats>();
 
-        unitStats.Init();
-        GetComponent<Damageable>().InitDamageable(unitStats);
-        unitStats.OnDamaged += StartBattle;
+        PlayerStat.Init();
+        GetComponent<Damageable>().InitDamageable(PlayerStat);
+        PlayerStat.OnDamaged += StartBattle;
         InputManager.Instance.CallInAllyPressed += CallInAlly;
     }
 

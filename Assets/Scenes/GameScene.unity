@@ -18947,10 +18947,9 @@ MonoBehaviour:
   - {fileID: 5205521374968470738, guid: 2064afdd39d0ddd44bdfc54ece0cbf89, type: 3}
   - {fileID: 4450817197454155137, guid: d975515bd2ed6de48aa32509901443fb, type: 3}
   SpawnAllyObject: {fileID: 1133927413329114704, guid: 13a28341558841c4aa0b88d192ee4a91, type: 3}
-  unitStats: {fileID: 0}
+  PlayerStat: {fileID: 2083577802}
   IsDied: 0
   InBattle: 0
-  CurrentTarget: {fileID: 0}
 --- !u!114 &2083577802
 MonoBehaviour:
   m_ObjectHideFlags: 0
