@@ -164,7 +164,9 @@ public class CreatureManager : MonoBehaviour
         
         // CreatureSizeDown 코루틴 완료 대기
         yield return StartCoroutine(creatureToCallIn.CreatureSizeDown());
-        
+
+        creatureToCallIn.BattleBegin = false;
+        creatureToCallIn.Target = null;
         // 코루틴 완료 후 게임 오브젝트 비활성화
         creatureToCallIn.gameObject.SetActive(false);
         

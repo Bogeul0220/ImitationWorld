@@ -40,6 +40,7 @@ public class P_CombatController : MonoBehaviour
 
         unitStats.Init();
         GetComponent<Damageable>().InitDamageable(unitStats);
+        unitStats.OnDamaged += StartBattle;
         InputManager.Instance.CallInAllyPressed += CallInAlly;
     }
 
@@ -273,4 +274,8 @@ public class P_CombatController : MonoBehaviour
         WeaponParent.SetActive(true);
         BallParent.SetActive(false);
     }
+
+    public void StartBattle() => InBattle = true;
+
+    public void EndBattle() => InBattle = false;
 }

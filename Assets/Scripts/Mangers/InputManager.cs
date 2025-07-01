@@ -80,7 +80,7 @@ public class InputManager : MonoBehaviour
     {
         InteractPressed += InputInteract;
         EscapeDisplayPressed += InputEscapeDisplay;
-        SelectedAllyCreature = -1;
+        SelectedAllyCreature = 0;
     }
 
     private void Update()
@@ -112,23 +112,23 @@ public class InputManager : MonoBehaviour
         {
             float allySelectValue = m_selectAlly.ReadValue<float>();
 
-            if (CreatureManager.Instance.SpawnedTamedKey.Count <= 0)
+            if (CreatureManager.Instance.SpawnedTamedKey.Count <= 1)
                 return;
 
             if (allySelectValue > 0f)  // C키 입력
             {
-                SelectedAllyCreature++;
-                if (SelectedAllyCreature >= CreatureManager.Instance.SpawnedTamedKey.Count)
-                    SelectedAllyCreature = -1;
-
+                if (SelectedAllyCreature >= CreatureManager.Instance.SpawnedTamedKey.Count - 1)
+                    SelectedAllyCreature = 0;
+                else
+                    SelectedAllyCreature++;
                 Debug.Log("C키 입력");
             }
             else if (allySelectValue < 0f) // Z키 입력
             {
-                SelectedAllyCreature--;
-                if (SelectedAllyCreature < -1)
+                if (SelectedAllyCreature <= 0)
                     SelectedAllyCreature = CreatureManager.Instance.SpawnedTamedKey.Count - 1;
-
+                else
+                    SelectedAllyCreature--;
                 Debug.Log("Z키 입력");
             }
         }

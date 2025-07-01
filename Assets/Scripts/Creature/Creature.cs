@@ -51,13 +51,13 @@ public class Creature : MonoBehaviour
     public float AttackSpeed = 1f; // 공격 속도
     public float AttackBaseDamage = 1f; // 공격력
     public float BaseDefecse = 1f; // 방어력
-    public GameObject Target; // 전투 / 작업 시 타겟 오브젝트
+    public UnitStats Target; // 전투 / 작업 시 타겟 오브젝트
 
     [Header("크리쳐 프리팹 세팅")]
     [SerializeField] private GameObject creaturePrefab;
     public Animator animator;
     private SkinnedMeshRenderer skinnedMeshRenderer;
-    public List<Collider> hitColliderList = new List<Collider>();
+    public List<Collider> HitColliderList = new List<Collider>();
 
     [Header("크리쳐 전투 세팅")]
     public List<SkillBaseSO> SkillList = new List<SkillBaseSO>();
@@ -76,12 +76,6 @@ public class Creature : MonoBehaviour
     private float patrolDuration = 5f;
     private Vector3 patrolTarget;
     private float patrolTimer = 0f;
-
-    void Start()
-    {
-        //InitCreature(true);
-        //AddedSkillInList(); // 스킬 리스트에 추가
-    }
 
     // 크리쳐 초기화 메소드 (Belligerent는 기본적으로 NonAggressive로 설정)
     public virtual void InitCreature(bool isAlly, Belligerent belligerent = Belligerent.NonAggressive)
@@ -122,7 +116,7 @@ public class Creature : MonoBehaviour
                 else
                     col.GetComponent<Catchable>()?.InitCatchable(this);
 
-                hitColliderList.Add(col);
+                HitColliderList.Add(col);
             }
         }
 
@@ -218,6 +212,14 @@ public class Creature : MonoBehaviour
             return;
         }
 
+        if (BattleBegin)
+        {
+            Target = Unitstat.CurrentBattleTarget;
+            escapePoint = null;
+            currentState = CreatureState.StandOff;
+            return;
+        }
+
         switch (AllyEnemyConversion)
         {
             case true:
@@ -234,7 +236,10 @@ public class Creature : MonoBehaviour
                     // 플레이어가 데미지를 입거나 공격하면 StandOff 상태로 전환
                     var player = PlayerManager.Instance.Player;
                     if (player != null && player.GetComponent<P_CombatController>().InBattle)
+                    {
+                        Target = player.GetComponent<P_CombatController>().unitStats.CurrentBattleTarget;
                         currentState = CreatureState.StandOff;
+                    }
 
                     FollowPlayer(); // 플레이어를 따라감
                 }
@@ -246,9 +251,14 @@ public class Creature : MonoBehaviour
                     if (player != null)
                     {
                         if (player.GetComponent<P_CombatController>().InBattle)
+                        {
+                            Target = player.GetComponent<P_CombatController>().unitStats.CurrentBattleTarget;
                             currentState = CreatureState.StandOff; // 플레이어가 전투 중이면 StandOff 상태로 전환
-                        else if (IsDetection()) // 플레이어가 범위에 들어오면 StandOff 상태로 전환
+                        }
+                        else if (IsDetection()) // 플레이어의 범위에 들어오면 StandOff 상태로 전환
+                        {
                             currentState = CreatureState.StandOff;
+                        }
                     }
 
                     FollowPlayer(); // 플레이어를 따라감
@@ -267,8 +277,6 @@ public class Creature : MonoBehaviour
 
                     if (IsDetection())  // 플레이어가 범위에 들어오면 Escape 상태로 전환
                         currentState = CreatureState.Escape;
-                    else if (BattleBegin)   // 데미지를 입으면 StandOff 상태로 전환
-                        currentState = CreatureState.StandOff;
                 }
                 else if (Belligerent == Belligerent.Aggressive)
                 {
@@ -361,10 +369,10 @@ public class Creature : MonoBehaviour
             currentState = CreatureState.Idle;
             return;
         }
-
+        
         if (BattleBegin)
         {
-            Target = PlayerManager.Instance.Player;
+            Target = Unitstat.CurrentBattleTarget;
             escapePoint = null;
             currentState = CreatureState.StandOff;
             return;
@@ -405,6 +413,27 @@ public class Creature : MonoBehaviour
         {
             StartCoroutine(CreatureDead(5f));
             return;
+        }
+
+        if (AllyEnemyConversion)
+        {
+            Target = PlayerManager.Instance.Player.GetComponent<P_CombatController>().unitStats.CurrentBattleTarget;
+            if (Target.isDead)
+            {
+                Target = null;
+                currentState = CreatureState.Idle;
+                return;
+            }
+        }
+        else
+        {
+            Target = Unitstat.CurrentBattleTarget;
+            if (Target.isDead)
+            {
+                Target = null;
+                currentState = CreatureState.Idle;
+                return;
+            }
         }
 
         if (Target != null)
@@ -482,6 +511,27 @@ public class Creature : MonoBehaviour
         {
             StartCoroutine(CreatureDead(5f));
             return;
+        }
+
+        if (AllyEnemyConversion)
+        {
+            Target = PlayerManager.Instance.Player.GetComponent<P_CombatController>().unitStats.CurrentBattleTarget;
+            if (Target.isDead)
+            {
+                Target = null;
+                currentState = CreatureState.Idle;
+                return;
+            }
+        }
+        else
+        {
+            Target = Unitstat.CurrentBattleTarget;
+            if (Target.isDead)
+            {
+                Target = null;
+                currentState = CreatureState.Idle;
+                return;
+            }
         }
 
         if (Target != null && Target.GetComponent<UnitStats>() != null)
@@ -680,7 +730,7 @@ public class Creature : MonoBehaviour
                     float distance = Vector3.Distance(transform.position, enemy.transform.position);
                     if (distance <= DetectionRange)
                     {
-                        Target = enemy.gameObject;
+                        Target = enemy.Unitstat;
                         return true;
                     }
                 }
@@ -693,9 +743,21 @@ public class Creature : MonoBehaviour
             if (PlayerManager.Instance.Player != null)
             {
                 float distance = Vector3.Distance(transform.position, PlayerManager.Instance.Player.transform.position);
-                if (distance <= DetectionRange)
+                if (CreatureManager.Instance.CurrentTakeOutCreature != null)
                 {
-                    Target = PlayerManager.Instance.Player.gameObject;
+                    float distanceToTakeOutCreature = Vector3.Distance(transform.position, CreatureManager.Instance.CurrentTakeOutCreature.transform.position);
+                    if (distanceToTakeOutCreature <= DetectionRange)
+                    {
+                        if (distanceToTakeOutCreature < distance)
+                            Target = CreatureManager.Instance.CurrentTakeOutCreature.Unitstat;
+                        else
+                            Target = PlayerManager.Instance.Player.GetComponent<UnitStats>();
+                        return true;
+                    }
+                }
+                else if (distance <= DetectionRange)
+                {
+                    Target = PlayerManager.Instance.Player.GetComponent<UnitStats>();
                     return true;
                 }
             }

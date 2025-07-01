@@ -11,11 +11,11 @@ public class Damageable : MonoBehaviour
         this.unitStats = unitStats;
     }
 
-    public void TakeDamage(int damage, UsePurpose usePurpose = UsePurpose.None)
+    public void TakeDamage(int damage, UnitStats damagedTarget, UsePurpose usePurpose = UsePurpose.None)
     {
         if(unitStats.isDead) return;
         
-        unitStats.TakeDamage(damage, usePurpose);
+        unitStats.TakeDamage(damage, damagedTarget, usePurpose);
         UIManager.Instance.DisplayDamageFloating(damage, transform.position + Vector3.up * 1.5f);
     }
 }

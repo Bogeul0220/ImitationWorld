@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: -202602829782689606}
   m_Layer: 11
   m_Name: Rock
-  m_TagString: Untagged
+  m_TagString: Breakable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -73,6 +73,7 @@ MonoBehaviour:
   currentStamina: 0
   maxStamina: 0
   isDead: 0
+  CurrentBattleTarget: {fileID: 0}
   usePurpose: 0
 --- !u!114 &1520164078613572026
 MonoBehaviour:
@@ -139,6 +140,10 @@ PrefabInstance:
     - target: {fileID: 7056460441880482784, guid: 5848e10a7efba6146960e4473986cf9f, type: 3}
       propertyPath: m_Layer
       value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 7056460441880482784, guid: 5848e10a7efba6146960e4473986cf9f, type: 3}
+      propertyPath: m_TagString
+      value: Breakable
       objectReference: {fileID: 0}
     - target: {fileID: 7684906565275584858, guid: 5848e10a7efba6146960e4473986cf9f, type: 3}
       propertyPath: m_LocalScale.x

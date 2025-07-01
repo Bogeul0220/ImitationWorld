@@ -16,9 +16,6 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public Sprite currentBallBackground;
-    public Sprite otherBallBackground;
-
     public BallQuickSlot[] ballQuickSlots = new BallQuickSlot[3];
 
     [SerializeField]
@@ -30,7 +27,10 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private PlayerStatusUI playerStatusUI;
     [SerializeField] private Image creatureImage;
+    [SerializeField] private TMP_Text creatureNameText;
     [SerializeField] private Image creatureImageBorder;
+    [SerializeField] private Image prevCreatureImage;
+    [SerializeField] private Image nextCreatureImage;
 
 
     [Header("Sub Canvas")]
@@ -110,7 +110,7 @@ public class UIManager : MonoBehaviour
         pauseDisplay.SetActive(false);
         inventoryDisplay.SetActive(false);
         craftingPanelDisplay.SetActive(false);
-        
+
         playerStatusUI.gameObject.SetActive(true);
     }
 
@@ -120,19 +120,16 @@ public class UIManager : MonoBehaviour
         {
             if (i == currentNum)
             {
-                ballQuickSlots[i].Border.gameObject.SetActive(true);
-                ballQuickSlots[i].BackgroundImage.sprite = currentBallBackground;
+                ballQuickSlots[i].gameObject.SetActive(true);
                 ballQuickSlots[i].GetComponent<RectTransform>().localScale = new Vector3(1f, 1f, 1f);
             }
             else
             {
-                ballQuickSlots[i].Border.gameObject.SetActive(false);
-                ballQuickSlots[i].BackgroundImage.sprite = otherBallBackground;
-                ballQuickSlots[i].GetComponent<RectTransform>().localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                ballQuickSlots[i].gameObject.SetActive(false);
             }
         }
     }
-    
+
     public void DisplayDamageFloating(int damage, Vector3 position)
     {
         var floating = ObjectPoolManager.Get<DamageFloating>(damageFloatingPrefab);
@@ -142,34 +139,111 @@ public class UIManager : MonoBehaviour
 
     public void DisplayCreatureImage()
     {
-        if(CreatureManager.Instance.SpawnedTamedCreatures.Count <= 0)
+        if (CreatureManager.Instance.SpawnedTamedCreatures.Count <= 0)
         {
             creatureImage.gameObject.SetActive(false);
             creatureImageBorder.gameObject.SetActive(false);
-            return;
-        }
-        if(InputManager.Instance.SelectedAllyCreature == -1)
-        {
-            creatureImage.gameObject.SetActive(false);
-            creatureImageBorder.gameObject.SetActive(false);
+            prevCreatureImage.gameObject.SetActive(false);
+            nextCreatureImage.gameObject.SetActive(false);
+            creatureNameText.text = "";
             return;
         }
 
-        var key = CreatureManager.Instance.SpawnedTamedKey[InputManager.Instance.SelectedAllyCreature];
+        var currentKey = CreatureManager.Instance.SpawnedTamedKey[InputManager.Instance.SelectedAllyCreature];
+        var currentCreature = CreatureManager.Instance.SpawnedTamedCreatures[currentKey];
 
-        var targetCreature = CreatureManager.Instance.SpawnedTamedCreatures[key];
-
-        if(CreatureManager.Instance.CurrentTakeOutCreature != null && CreatureManager.Instance.CurrentTakeOutCreature.CreatureIndex == targetCreature.CreatureIndex)
+        if (currentCreature != null)
         {
             creatureImage.gameObject.SetActive(true);
-            creatureImage.sprite = targetCreature.CreatureImage;
-            creatureImageBorder.gameObject.SetActive(true);
-        }
-        else
-        {
-            creatureImage.gameObject.SetActive(true);
-            creatureImage.sprite = targetCreature.CreatureImage;
-            creatureImageBorder.gameObject.SetActive(false);
+            creatureNameText.text = currentCreature.CreatureName;
+            creatureImage.sprite = currentCreature.CreatureImage;
+            if (CreatureManager.Instance.CurrentTakeOutCreature != null && CreatureManager.Instance.CurrentTakeOutCreature.CreatureIndex == currentCreature.CreatureIndex)
+                creatureImageBorder.gameObject.SetActive(true);
+            else
+                creatureImageBorder.gameObject.SetActive(false);
+
+            if (CreatureManager.Instance.SpawnedTamedKey.Count > 1)
+            {
+                int totalCount = CreatureManager.Instance.SpawnedTamedKey.Count;
+                int currentIndex = InputManager.Instance.SelectedAllyCreature;
+
+                // 이전 크리쳐 인덱스
+                int prevIndex = (currentIndex - 1 + totalCount) % totalCount;
+                var prevKey = CreatureManager.Instance.SpawnedTamedKey[prevIndex];
+                var prevCreature = CreatureManager.Instance.SpawnedTamedCreatures[prevKey];
+
+                // 다음 크리쳐 인덱스
+                int nextIndex = (currentIndex + 1) % totalCount;
+                var nextKey = CreatureManager.Instance.SpawnedTamedKey[nextIndex];
+                var nextCreature = CreatureManager.Instance.SpawnedTamedCreatures[nextKey];
+
+                if(totalCount == 2)
+                {
+                    if(currentIndex == 0)
+                    {
+                        prevCreatureImage.gameObject.SetActive(false);
+                        nextCreatureImage.gameObject.SetActive(true);
+                        nextCreatureImage.sprite = nextCreature.CreatureImage;
+                    }
+                    else
+                    {
+                        prevCreatureImage.gameObject.SetActive(true);
+                        prevCreatureImage.sprite = prevCreature.CreatureImage;
+                        nextCreatureImage.gameObject.SetActive(false);
+                    }
+                }
+                else
+                {
+                    prevCreatureImage.gameObject.SetActive(true);
+                    prevCreatureImage.sprite = prevCreature.CreatureImage;
+                    nextCreatureImage.gameObject.SetActive(true);
+                    nextCreatureImage.sprite = nextCreature.CreatureImage;
+                }
+            }
+            else
+            {
+                prevCreatureImage.gameObject.SetActive(false);
+                nextCreatureImage.gameObject.SetActive(false);
+            }
+
+            // if(CreatureManager.Instance.CurrentTakeOutCreature != null && CreatureManager.Instance.CurrentTakeOutCreature.CreatureIndex == targetCreature.CreatureIndex)
+            // {
+            //     creatureImage.gameObject.SetActive(true);
+            //     creatureImage.sprite = targetCreature.CreatureImage;
+            //     creatureImageBorder.gameObject.SetActive(true);
+            //     if(CreatureManager.Instance.SpawnedTamedKey.Count > 1)
+            //     {
+            //         var prevKey = CreatureManager.Instance.SpawnedTamedKey[InputManager.Instance.SelectedAllyCreature - 1];
+            //         var prevCreature = CreatureManager.Instance.SpawnedTamedCreatures[prevKey];
+            //         if(prevCreature != null)
+            //         {
+            //             prevCreatureImage.gameObject.SetActive(true);
+            //             prevCreatureImage.sprite = prevCreature.CreatureImage;
+            //         }
+            //         else
+            //         {
+            //             prevCreatureImage.gameObject.SetActive(false);
+            //         }
+
+            //         var nextKey = CreatureManager.Instance.SpawnedTamedKey[InputManager.Instance.SelectedAllyCreature + 1];
+            //         var nextCreature = CreatureManager.Instance.SpawnedTamedCreatures[nextKey];
+            //         if(nextCreature != null)
+            //         {
+            //             nextCreatureImage.gameObject.SetActive(true);
+            //             nextCreatureImage.sprite = nextCreature.CreatureImage;
+            //         }
+            //         else
+            //         {
+            //             nextCreatureImage.gameObject.SetActive(false);
+            //         }
+            //     }
+            // }
+            // else
+            // {
+            //     creatureImage.gameObject.SetActive(true);
+            //     creatureImage.sprite = targetCreature.CreatureImage;
+            //     creatureImageBorder.gameObject.SetActive(false);
+            // }
         }
     }
 }

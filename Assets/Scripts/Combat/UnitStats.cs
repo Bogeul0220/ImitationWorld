@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class UnitStats : MonoBehaviour
@@ -14,6 +15,8 @@ public class UnitStats : MonoBehaviour
 
     public event Action OnDamaged;
     public event Action OnDied;
+    public UnitStats CurrentBattleTarget;
+    public Dictionary<UnitStats, int> DamagedTargetDict = new Dictionary<UnitStats, int>();
 
     public UsePurpose usePurpose;
 
@@ -31,13 +34,34 @@ public class UnitStats : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int damage, UsePurpose usePurpose = UsePurpose.None)
+    public void TakeDamage(int damage, UnitStats damagedTarget, UsePurpose usePurpose = UsePurpose.None)
     {
         if (isDead) return;
 
+        if (DamagedTargetDict.ContainsKey(damagedTarget))
+        {
+            DamagedTargetDict[damagedTarget] += damage;
+        }
+        else
+        {
+            DamagedTargetDict.Add(damagedTarget, damage);
+        }
+
+        for (int i = 0; i < DamagedTargetDict.Count; i++)
+        {
+            if (CurrentBattleTarget == null)
+            {
+                CurrentBattleTarget = DamagedTargetDict.Keys.ElementAt(i);
+            }
+            else if (DamagedTargetDict.Values.ElementAt(i) > DamagedTargetDict[CurrentBattleTarget])
+            {
+                CurrentBattleTarget = DamagedTargetDict.Keys.ElementAt(i);
+            }
+        }
+
         if (this.usePurpose == usePurpose)
             damage *= 2;
-        
+
         currentHealth -= damage;
 
         OnDamaged?.Invoke();

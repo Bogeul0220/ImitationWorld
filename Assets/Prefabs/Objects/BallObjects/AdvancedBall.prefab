@@ -50,12 +50,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MaxBounce: 3
-  GatchaValue: 0
   groundLayer:
     serializedVersion: 2
     m_Bits: 7168
-  throwForce: 10
-  upwardForce: 5
+  throwForce: 17
+  upwardForce: 3
 --- !u!111 &1256244495593789075
 Animation:
   m_ObjectHideFlags: 0

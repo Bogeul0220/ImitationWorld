@@ -8,7 +8,6 @@ public class BallQuickSlot : MonoBehaviour
 {
     public BallType checkingBall;
     public Image BackgroundImage;
-    public Image Border;
     public Image BallIcon;
     public TMP_Text BallCount;
 

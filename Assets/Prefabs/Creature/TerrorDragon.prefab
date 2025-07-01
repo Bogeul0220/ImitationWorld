@@ -70,7 +70,7 @@ MonoBehaviour:
   Target: {fileID: 0}
   creaturePrefab: {fileID: 993826823401058389}
   animator: {fileID: 0}
-  hitColliderList: []
+  HitColliderList: []
   SkillList:
   - {fileID: 11400000, guid: 77bef9efe135f8244a9db30a6f5b7b39, type: 2}
   - {fileID: 11400000, guid: 2a6aa795febcab3469324267ac2a2233, type: 2}
@@ -95,6 +95,7 @@ MonoBehaviour:
   currentStamina: 0
   maxStamina: 0
   isDead: 0
+  DamagedTarget: {fileID: 0}
   usePurpose: 0
 --- !u!195 &3148010061210413676
 NavMeshAgent:
@@ -128,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5856384351030030554}
   - component: {fileID: 4561467572316358479}
+  - component: {fileID: 987028700847856090}
   m_Layer: 0
   m_Name: NeckCollider
   m_TagString: Untagged
@@ -173,6 +175,19 @@ CapsuleCollider:
   m_Height: 333.37646
   m_Direction: 1
   m_Center: {x: -1.119699, y: 66.68811, z: 0.000009546595}
+--- !u!114 &987028700847856090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2309814231602840363}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29c37bf6ce86378428905ff8299959c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitStats: {fileID: 1178816045650415251}
 --- !u!1 &6529150517891142529
 GameObject:
   m_ObjectHideFlags: 0
@@ -183,6 +198,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4874582806150643089}
   - component: {fileID: 8605443881246277994}
+  - component: {fileID: 368718029819787851}
   m_Layer: 0
   m_Name: HeadCollider
   m_TagString: Untagged
@@ -228,6 +244,19 @@ CapsuleCollider:
   m_Height: 120
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &368718029819787851
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6529150517891142529}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29c37bf6ce86378428905ff8299959c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitStats: {fileID: 1178816045650415251}
 --- !u!1 &6553315559978402454
 GameObject:
   m_ObjectHideFlags: 0
@@ -238,6 +267,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7983053384835112332}
   - component: {fileID: 2361338918002333312}
+  - component: {fileID: 6037489633352999429}
   m_Layer: 0
   m_Name: WingCollider_L
   m_TagString: Untagged
@@ -281,6 +311,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 428.8875, y: 100, z: 362.04938}
   m_Center: {x: -81.83369, y: 0.00071312796, z: -17.665314}
+--- !u!114 &6037489633352999429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6553315559978402454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29c37bf6ce86378428905ff8299959c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitStats: {fileID: 1178816045650415251}
 --- !u!1 &7723553923968685018
 GameObject:
   m_ObjectHideFlags: 0
@@ -291,6 +334,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1036256701664101054}
   - component: {fileID: 4750249033467160887}
+  - component: {fileID: 8915736796409422276}
   m_Layer: 0
   m_Name: WingCollider_R
   m_TagString: Untagged
@@ -334,6 +378,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 364.015, y: 100.00001, z: 442.22382}
   m_Center: {x: -43.88469, y: 0.000043035587, z: 44.007835}
+--- !u!114 &8915736796409422276
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7723553923968685018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29c37bf6ce86378428905ff8299959c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitStats: {fileID: 1178816045650415251}
 --- !u!1 &8700934512152300301
 GameObject:
   m_ObjectHideFlags: 0
@@ -344,6 +401,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8735664793482175641}
   - component: {fileID: 1959835079220135382}
+  - component: {fileID: 7803366353774898204}
   m_Layer: 0
   m_Name: BodyCollider
   m_TagString: Untagged
@@ -387,6 +445,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 473.89615, y: 305.2524, z: 297.20728}
   m_Center: {x: -34.495644, y: -81.264175, z: -5.5675225}
+--- !u!114 &7803366353774898204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8700934512152300301}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29c37bf6ce86378428905ff8299959c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitStats: {fileID: 1178816045650415251}
 --- !u!1 &9048314754215546970
 GameObject:
   m_ObjectHideFlags: 0
@@ -397,6 +468,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4448165478158323400}
   - component: {fileID: 3901796605471150729}
+  - component: {fileID: 8331440973294740506}
   m_Layer: 0
   m_Name: TailCollider
   m_TagString: Untagged
@@ -440,6 +512,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 522.47754, y: 57.58831, z: 100}
   m_Center: {x: -196.42458, y: 7.2372503, z: -0.00008916422}
+--- !u!114 &8331440973294740506
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9048314754215546970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29c37bf6ce86378428905ff8299959c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitStats: {fileID: 1178816045650415251}
 --- !u!1001 &993826823401020549
 PrefabInstance:
   m_ObjectHideFlags: 0

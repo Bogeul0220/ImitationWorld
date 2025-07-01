@@ -70,7 +70,7 @@ MonoBehaviour:
   Target: {fileID: 0}
   creaturePrefab: {fileID: 8235747370583640182}
   animator: {fileID: 0}
-  hitColliderList: []
+  HitColliderList: []
   SkillList:
   - {fileID: 11400000, guid: 77bef9efe135f8244a9db30a6f5b7b39, type: 2}
   - {fileID: 11400000, guid: 2a6aa795febcab3469324267ac2a2233, type: 2}
@@ -95,6 +95,7 @@ MonoBehaviour:
   currentStamina: 0
   maxStamina: 0
   isDead: 0
+  DamagedTarget: {fileID: 0}
   usePurpose: 0
 --- !u!195 &3024952381462314005
 NavMeshAgent:
@@ -128,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5943534068446584807}
   - component: {fileID: 1201632023485769513}
+  - component: {fileID: 6276355943298018206}
   m_Layer: 0
   m_Name: RightArmCollider
   m_TagString: Untagged
@@ -173,6 +175,19 @@ CapsuleCollider:
   m_Height: 0.7
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &6276355943298018206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4292762090468194800}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29c37bf6ce86378428905ff8299959c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitStats: {fileID: 8683407834438305209}
 --- !u!1 &8685853602552765730
 GameObject:
   m_ObjectHideFlags: 0
@@ -183,6 +198,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8282503457588759577}
   - component: {fileID: 3669151822102389782}
+  - component: {fileID: 4383353698329175822}
   m_Layer: 0
   m_Name: LeftArmCollider
   m_TagString: Untagged
@@ -228,6 +244,19 @@ CapsuleCollider:
   m_Height: 0.7
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4383353698329175822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8685853602552765730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29c37bf6ce86378428905ff8299959c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitStats: {fileID: 8683407834438305209}
 --- !u!1 &8722112488700517433
 GameObject:
   m_ObjectHideFlags: 0
@@ -238,6 +267,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4270647293302208632}
   - component: {fileID: 4517465858647105400}
+  - component: {fileID: 1015955968442226184}
   m_Layer: 0
   m_Name: BodyCollider
   m_TagString: Untagged
@@ -283,6 +313,19 @@ CapsuleCollider:
   m_Height: 1.4
   m_Direction: 1
   m_Center: {x: 0.000000034364177, y: 0.21369976, z: -0.000000049821217}
+--- !u!114 &1015955968442226184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8722112488700517433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29c37bf6ce86378428905ff8299959c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitStats: {fileID: 8683407834438305209}
 --- !u!1001 &1538261907848411877
 PrefabInstance:
   m_ObjectHideFlags: 0

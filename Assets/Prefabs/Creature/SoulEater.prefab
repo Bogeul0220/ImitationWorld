@@ -50,7 +50,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CreatureName: "\uC18C\uC6B8\uC774\uD130"
   Level: 1
-  CreatureImage: {fileID: 21300000, guid: a6e8bbdb6cd83f84fb8dbeb0c1201774, type: 3}
+  CreatureImage: {fileID: 21300000, guid: f93a464c999b98546aa4e12d4a38b057, type: 3}
   currentState: 0
   AllyEnemyConversion: 0
   BattleBegin: 0
@@ -70,7 +70,7 @@ MonoBehaviour:
   Target: {fileID: 0}
   creaturePrefab: {fileID: 3533702363920482428}
   animator: {fileID: 0}
-  hitColliderList: []
+  HitColliderList: []
   SkillList:
   - {fileID: 11400000, guid: 77bef9efe135f8244a9db30a6f5b7b39, type: 2}
   - {fileID: 11400000, guid: 2a6aa795febcab3469324267ac2a2233, type: 2}
@@ -95,6 +95,7 @@ MonoBehaviour:
   currentStamina: 0
   maxStamina: 0
   isDead: 0
+  DamagedTarget: {fileID: 0}
   usePurpose: 0
 --- !u!195 &3148010061210413676
 NavMeshAgent:
@@ -128,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 214905025602787928}
   - component: {fileID: 2324003962488144594}
+  - component: {fileID: 4287075754760369715}
   m_Layer: 0
   m_Name: HeadCollider
   m_TagString: Untagged
@@ -165,12 +167,25 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 176.64836, y: 161.50436, z: 135.9182}
   m_Center: {x: -38.324284, y: -53.18582, z: -5.892482}
+--- !u!114 &4287075754760369715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3733748886482501941}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29c37bf6ce86378428905ff8299959c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitStats: {fileID: 1178816045650415251}
 --- !u!1 &7792804916676968486
 GameObject:
   m_ObjectHideFlags: 0
@@ -181,6 +196,8 @@ GameObject:
   m_Component:
   - component: {fileID: 190245456664425820}
   - component: {fileID: 3968102919413991072}
+  - component: {fileID: 788970793019460655}
+  - component: {fileID: 5289366436135802848}
   m_Layer: 0
   m_Name: BodyCollider
   m_TagString: Untagged
@@ -224,6 +241,40 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 236.11487
   m_Center: {x: -39.313995, y: -40.819096, z: -1.5228378e-15}
+--- !u!114 &788970793019460655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7792804916676968486}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29c37bf6ce86378428905ff8299959c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitStats: {fileID: 1178816045650415251}
+--- !u!135 &5289366436135802848
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7792804916676968486}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 236.11487
+  m_Center: {x: -39.313995, y: -40.819096, z: -1.5228378e-15}
 --- !u!1 &8022638283769111389
 GameObject:
   m_ObjectHideFlags: 0
@@ -234,6 +285,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7809439780952626323}
   - component: {fileID: 643351080108538803}
+  - component: {fileID: 6747409541070088019}
   m_Layer: 0
   m_Name: TailCollider
   m_TagString: Untagged
@@ -271,12 +323,25 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 339.09552, y: 94.483574, z: 134.68872}
   m_Center: {x: -10.333846, y: 7.540233, z: -1.6604307}
+--- !u!114 &6747409541070088019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8022638283769111389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29c37bf6ce86378428905ff8299959c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitStats: {fileID: 1178816045650415251}
 --- !u!1001 &3533702363920652566
 PrefabInstance:
   m_ObjectHideFlags: 0

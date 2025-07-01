@@ -8,7 +8,7 @@ using UnityEngine.Video;
 public class InventoryItemInfoPanel : MonoBehaviour
 {
     [SerializeField] private Image itemIconImage;
-    [SerializeField] private TMP_Text itemNameText, itemDescriptionText, itemInfoText, itemPriceText;
+    [SerializeField] private TMP_Text itemNameText, itemDescriptionText, itemInfoText;
 
     void Awake()
     {

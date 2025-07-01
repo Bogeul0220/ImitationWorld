@@ -184,6 +184,7 @@ public class BallObject : MonoBehaviour
         // 디버그 로그 추가
         Debug.Log($"CaptureSuccess: Creature {target.CreatureName} with Index {target.CreatureIndex}");
         
+        target.HitColliderList.Clear();
         target.gameObject.SetActive(false);
         ReturnObject();
     }

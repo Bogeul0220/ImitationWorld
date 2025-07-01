@@ -50,8 +50,8 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 7168
-  throwForce: 10
-  upwardForce: 5
+  throwForce: 17
+  upwardForce: 3
 --- !u!135 &3214047760593059905
 SphereCollider:
   m_ObjectHideFlags: 0
