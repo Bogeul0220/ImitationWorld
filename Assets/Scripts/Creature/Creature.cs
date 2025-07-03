@@ -151,6 +151,8 @@ public class Creature : MonoBehaviour
         CreatureHeathUI.GetComponent<RectTransform>().position = this.transform.position + new Vector3(0f, navMeshAgent.height <= 1f ? 1.5f : navMeshAgent.height, 0f);
         CreatureHeathUI.UpdateHealthSlider();
         AddedSkillInList();
+        
+        CreatureStat.OnDamaged -= ConversionBattleBegin;
         CreatureStat.OnDamaged += ConversionBattleBegin;
 
         // InitCreature가 호출될 때마다 새로운 Index 생성

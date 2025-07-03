@@ -143,10 +143,10 @@ public class CreatureManager : MonoBehaviour
         else
         {
             //없다면 포획에 성공하여 WildCreatureParents에 비활성화된 크리쳐가 있는지 확인
-            for(int i = 0; i < WildCreaturesParent.transform.childCount; i++)
+            for (int i = 0; i < WildCreaturesParent.transform.childCount; i++)
             {
                 Transform child = WildCreaturesParent.transform.GetChild(i);
-                if(child.TryGetComponent<Creature>(out var creature) &&
+                if (child.TryGetComponent<Creature>(out var creature) &&
                     creature.CreatureIndex == CreatureKey)
                 {
                     creature.transform.SetParent(allyParent.transform);
@@ -157,10 +157,10 @@ public class CreatureManager : MonoBehaviour
                     break;
                 }
             }
-
-            // 크리처가 완전히 활성화된 후 초기화
-            StartCoroutine(InitializeCreatureSafely(targetCreature, spawnPos));
         }
+
+        // 크리처가 완전히 활성화된 후 초기화
+        StartCoroutine(InitializeCreatureSafely(targetCreature, spawnPos));
     }
 
     public void CallInAllyCreature()
@@ -194,17 +194,17 @@ public class CreatureManager : MonoBehaviour
         CurrentTakeOutCreature = null;
     }
 
-    private IEnumerator InitializeCreatureSafely(Creature creature, Vector3 spawnPos)
+    private IEnumerator InitializeCreatureSafely(Creature allyCreature, Vector3 spawnPos)
     {
         // 한 프레임 대기하여 오브젝트가 완전히 활성화되도록 함
         yield return null;
 
-        creature.transform.localScale = Vector3.one;
+        allyCreature.transform.localScale = Vector3.one;
         // 크리처 초기화
-        creature.InitCreature(true);
+        allyCreature.InitCreature(true);
 
         // 크기 변화 애니메이션 시작 (중복 호출 방지)
-        StartCoroutine(creature.CreatrueSizeUp(spawnPos));
+        StartCoroutine(allyCreature.CreatrueSizeUp(spawnPos));
     }
 
     private IEnumerator RetireAllyReviveCoroutine(int creatureIndex)
@@ -232,7 +232,7 @@ public class CreatureManager : MonoBehaviour
             StopCoroutine(RetireAllyReviveTimer[creatureIndex]);
             RetireAllyReviveTimer.Remove(creatureIndex);
         }
-        
+
         if (RetireAllyReviveProgress.ContainsKey(creatureIndex))
         {
             RetireAllyReviveProgress.Remove(creatureIndex);
@@ -242,7 +242,7 @@ public class CreatureManager : MonoBehaviour
         RetireAllyReviveTimer[creatureIndex] = StartCoroutine(RetireAllyReviveCoroutine(creatureIndex));
         RetireAllyReviveProgress[creatureIndex] = 0f;
 
-        foreach(var item in TamedCreatures.Values)
+        foreach (var item in TamedCreatures.Values)
         {
             item.CreatureStat.isDead = false;
             item.CreatureStat.RestoreHealth(item.CreatureStat.maxHealth);
