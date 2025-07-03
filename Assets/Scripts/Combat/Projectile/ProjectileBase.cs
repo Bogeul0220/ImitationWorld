@@ -32,7 +32,11 @@ public class ProjectileBase : MonoBehaviour
 
         timer = 0f;
 
-        direction = (target.transform.position + Vector3.up * 2f - transform.position).normalized;
+        if (target.GetComponent<Creature>() != null)
+            direction = (target.transform.position + Vector3.up * (float)(target.GetComponent<Creature>().navMeshAgent.height / 2) - transform.position).normalized;
+        else
+            direction = (target.transform.position + Vector3.up * 1f - transform.position).normalized;
+
         transform.forward = direction; // 발사체의 방향 설정
 
         isFired = true;
@@ -86,30 +90,28 @@ public class ProjectileBase : MonoBehaviour
 
         Damageable damagedTarget = other.GetComponent<Damageable>();
 
-        if (damagedTarget != null && damagedTarget != caster.Unitstat)
+        if (damagedTarget != null && damagedTarget != caster.CreatureStat)
         {
             if (caster.AllyEnemyConversion && damagedTarget.gameObject.CompareTag("Enemy")) // 아군 크리쳐 스킬 사용 시
             {
                 // 적에게 충돌 시
-                damagedTarget.TakeDamage(damage, caster.Unitstat);
+                damagedTarget.TakeDamage(damage, caster.CreatureStat);
                 ObjectPoolManager.Return(gameObject); // 오브젝트 풀로 반환
-                Debug.Log($"{caster.gameObject.name}이 {damagedTarget.gameObject.name}에게 {damage}의 피해를 입혔습니다.");
             }
             else if (caster.AllyEnemyConversion == false) // 적 크리쳐 스킬 사용 시
             {
                 if (damagedTarget.gameObject.CompareTag("Ally") || damagedTarget.gameObject.CompareTag("Player"))
                 {
                     // 아군에게 충돌 시
-                    damagedTarget.TakeDamage(damage, caster.Unitstat);
+                    damagedTarget.TakeDamage(damage, caster.CreatureStat);
                     ObjectPoolManager.Return(gameObject); // 오브젝트 풀로 반환 
-                    Debug.Log($"{caster.gameObject.name}이 {damagedTarget.gameObject.name}에게 {damage}의 피해를 입혔습니다.");
                 }
             }
 
             // 환경물(돌, 나무)에 충돌 시
             if (other.CompareTag("Breakable"))
             {
-                damagedTarget.TakeDamage(damage, caster.Unitstat);
+                damagedTarget.TakeDamage(damage, caster.CreatureStat);
                 ObjectPoolManager.Return(gameObject); // 오브젝트 풀로 반환
             }
         }

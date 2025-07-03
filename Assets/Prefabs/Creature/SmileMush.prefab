@@ -60,8 +60,8 @@ MonoBehaviour:
   navMeshAgent: {fileID: 0}
   DistanceToTarget: 0
   DetectionRange: 10
-  Unitstat: {fileID: 0}
-  creatureInfoUI: {fileID: 5913977172778796163}
+  CreatureStat: {fileID: 0}
+  creatureHeathUI: {fileID: 0}
   creatureInfoUIPosY: 2
   AttackRange: 8
   AttackSpeed: 1
@@ -89,13 +89,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f7d43f72a968d147b55b6a0a99e5ac0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  statusSO: {fileID: 11400000, guid: 203c270f792028643a068d10427f21c9, type: 2}
+  statusSO: {fileID: 11400000, guid: bba9f817abe9d7140b3ab44280d7501f, type: 2}
   currentHealth: 0
   maxHealth: 0
   currentStamina: 0
   maxStamina: 0
   isDead: 0
-  DamagedTarget: {fileID: 0}
+  CurrentBattleTarget: {fileID: 0}
   usePurpose: 0
 --- !u!195 &2343556156461278217
 NavMeshAgent:
@@ -306,17 +306,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 5631823294880812395, guid: 0957cad377c12da46a4578c44c76fa55, type: 3}
   m_PrefabInstance: {fileID: 164722658611187058}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &5913977172778796163 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5790393841257646577, guid: 0957cad377c12da46a4578c44c76fa55, type: 3}
-  m_PrefabInstance: {fileID: 164722658611187058}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 313aef69ceb495e4da94781627f2920d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &2483446876167510656
 PrefabInstance:
   m_ObjectHideFlags: 0

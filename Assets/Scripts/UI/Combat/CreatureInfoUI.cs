@@ -12,11 +12,11 @@ public class CreatureInfoUI : MonoBehaviour
     {
         this.creature = creature;
         nameText.text = creature.CreatureName;
-        creature.Unitstat.OnDamaged += UpdateHealthSlider;
+        creature.CreatureStat.OnDamaged += UpdateHealthSlider;
     }
 
     public void UpdateHealthSlider()
     {
-        healthSlider.value = (float)creature.Unitstat.currentHealth / creature.Unitstat.maxHealth;
+        healthSlider.value = (float)creature.CreatureStat.currentHealth / creature.CreatureStat.maxHealth;
     }
 }

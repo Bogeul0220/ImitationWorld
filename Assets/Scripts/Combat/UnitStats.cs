@@ -20,6 +20,29 @@ public class UnitStats : MonoBehaviour
 
     public UsePurpose usePurpose;
 
+    void Update()
+    {
+        if(DamagedTargetDict.Count > 0)
+        {
+            List<UnitStats> damagedTargetList = new List<UnitStats>();
+            if(DamagedTargetDict.Count > 0)
+            {
+                foreach(var item in DamagedTargetDict)
+                {
+                    if(item.Key.isDead || Vector3.Distance(item.Key.transform.position, transform.position) > 25f) damagedTargetList.Add(item.Key);
+                }
+            }
+
+            foreach(var item in damagedTargetList)
+            {
+                if(CurrentBattleTarget == item)
+                    CurrentBattleTarget = null;
+                    
+                DamagedTargetDict.Remove(item);
+            }
+        }
+    }
+
     public void Init()
     {
         isDead = false;

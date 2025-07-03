@@ -139,7 +139,7 @@ public class UIManager : MonoBehaviour
 
     public void DisplayCreatureImage()
     {
-        if (CreatureManager.Instance.SpawnedTamedCreatures.Count <= 0)
+        if (CreatureManager.Instance.TamedCreatures.Count <= 0)
         {
             creatureImage.gameObject.SetActive(false);
             creatureImageBorder.gameObject.SetActive(false);
@@ -150,13 +150,26 @@ public class UIManager : MonoBehaviour
         }
 
         var currentKey = CreatureManager.Instance.SpawnedTamedKey[InputManager.Instance.SelectedAllyCreature];
-        var currentCreature = CreatureManager.Instance.SpawnedTamedCreatures[currentKey];
+        var currentCreature = CreatureManager.Instance.TamedCreatures[currentKey];
 
         if (currentCreature != null)
         {
             creatureImage.gameObject.SetActive(true);
             creatureNameText.text = currentCreature.CreatureName;
             creatureImage.sprite = currentCreature.CreatureImage;
+
+            if (CreatureManager.Instance.RetireAllyReviveProgress.ContainsKey(currentKey))
+            {
+                creatureImageBorder.color = Color.red;
+                creatureImage.fillAmount = CreatureManager.Instance.RetireAllyReviveProgress[currentKey];
+            }
+            else
+            {
+                creatureImageBorder.color = Color.white;
+                creatureImage.fillAmount = 1f;
+            }
+
+
             if (CreatureManager.Instance.CurrentTakeOutCreature != null && CreatureManager.Instance.CurrentTakeOutCreature.CreatureIndex == currentCreature.CreatureIndex)
                 creatureImageBorder.gameObject.SetActive(true);
             else
@@ -170,34 +183,69 @@ public class UIManager : MonoBehaviour
                 // 이전 크리쳐 인덱스
                 int prevIndex = (currentIndex - 1 + totalCount) % totalCount;
                 var prevKey = CreatureManager.Instance.SpawnedTamedKey[prevIndex];
-                var prevCreature = CreatureManager.Instance.SpawnedTamedCreatures[prevKey];
+                var prevCreature = CreatureManager.Instance.TamedCreatures[prevKey];
 
                 // 다음 크리쳐 인덱스
                 int nextIndex = (currentIndex + 1) % totalCount;
                 var nextKey = CreatureManager.Instance.SpawnedTamedKey[nextIndex];
-                var nextCreature = CreatureManager.Instance.SpawnedTamedCreatures[nextKey];
+                var nextCreature = CreatureManager.Instance.TamedCreatures[nextKey];
 
-                if(totalCount == 2)
+                if (totalCount == 2)
                 {
-                    if(currentIndex == 0)
+                    if (currentIndex == 0)
                     {
                         prevCreatureImage.gameObject.SetActive(false);
                         nextCreatureImage.gameObject.SetActive(true);
                         nextCreatureImage.sprite = nextCreature.CreatureImage;
+                        if (CreatureManager.Instance.RetireAllyReviveProgress.ContainsKey(nextKey))
+                        {
+                            nextCreatureImage.color = Color.red;
+                            nextCreatureImage.fillAmount = CreatureManager.Instance.RetireAllyReviveProgress[nextKey];
+                        }
+                        else
+                            nextCreatureImage.color = Color.white;
                     }
                     else
                     {
                         prevCreatureImage.gameObject.SetActive(true);
                         prevCreatureImage.sprite = prevCreature.CreatureImage;
                         nextCreatureImage.gameObject.SetActive(false);
+                        if (CreatureManager.Instance.RetireAllyReviveProgress.ContainsKey(prevKey))
+                        {
+                            prevCreatureImage.color = Color.red;
+                            prevCreatureImage.fillAmount = CreatureManager.Instance.RetireAllyReviveProgress[prevKey];
+                        }
+                        else
+                            prevCreatureImage.color = Color.white;
                     }
                 }
                 else
                 {
                     prevCreatureImage.gameObject.SetActive(true);
                     prevCreatureImage.sprite = prevCreature.CreatureImage;
+                    if (CreatureManager.Instance.RetireAllyReviveProgress.ContainsKey(prevKey))
+                    {
+                        prevCreatureImage.color = Color.red;
+                        prevCreatureImage.fillAmount = CreatureManager.Instance.RetireAllyReviveProgress[prevKey];
+                    }
+                    else
+                    {
+                        prevCreatureImage.color = Color.white;
+                        prevCreatureImage.fillAmount = 1f;
+                    }
+
                     nextCreatureImage.gameObject.SetActive(true);
                     nextCreatureImage.sprite = nextCreature.CreatureImage;
+                    if (CreatureManager.Instance.RetireAllyReviveProgress.ContainsKey(nextKey))
+                    {
+                        nextCreatureImage.color = Color.red;
+                        nextCreatureImage.fillAmount = CreatureManager.Instance.RetireAllyReviveProgress[nextKey];
+                    }
+                    else
+                    {
+                        nextCreatureImage.color = Color.white;
+                        nextCreatureImage.fillAmount = 1f;
+                    }
                 }
             }
             else
@@ -205,45 +253,6 @@ public class UIManager : MonoBehaviour
                 prevCreatureImage.gameObject.SetActive(false);
                 nextCreatureImage.gameObject.SetActive(false);
             }
-
-            // if(CreatureManager.Instance.CurrentTakeOutCreature != null && CreatureManager.Instance.CurrentTakeOutCreature.CreatureIndex == targetCreature.CreatureIndex)
-            // {
-            //     creatureImage.gameObject.SetActive(true);
-            //     creatureImage.sprite = targetCreature.CreatureImage;
-            //     creatureImageBorder.gameObject.SetActive(true);
-            //     if(CreatureManager.Instance.SpawnedTamedKey.Count > 1)
-            //     {
-            //         var prevKey = CreatureManager.Instance.SpawnedTamedKey[InputManager.Instance.SelectedAllyCreature - 1];
-            //         var prevCreature = CreatureManager.Instance.SpawnedTamedCreatures[prevKey];
-            //         if(prevCreature != null)
-            //         {
-            //             prevCreatureImage.gameObject.SetActive(true);
-            //             prevCreatureImage.sprite = prevCreature.CreatureImage;
-            //         }
-            //         else
-            //         {
-            //             prevCreatureImage.gameObject.SetActive(false);
-            //         }
-
-            //         var nextKey = CreatureManager.Instance.SpawnedTamedKey[InputManager.Instance.SelectedAllyCreature + 1];
-            //         var nextCreature = CreatureManager.Instance.SpawnedTamedCreatures[nextKey];
-            //         if(nextCreature != null)
-            //         {
-            //             nextCreatureImage.gameObject.SetActive(true);
-            //             nextCreatureImage.sprite = nextCreature.CreatureImage;
-            //         }
-            //         else
-            //         {
-            //             nextCreatureImage.gameObject.SetActive(false);
-            //         }
-            //     }
-            // }
-            // else
-            // {
-            //     creatureImage.gameObject.SetActive(true);
-            //     creatureImage.sprite = targetCreature.CreatureImage;
-            //     creatureImageBorder.gameObject.SetActive(false);
-            // }
         }
     }
 }

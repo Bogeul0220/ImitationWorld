@@ -254,7 +254,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   smoothRotation: 1
   rotationSpeed: 3
-  maxDistance: 15
+  maxDistance: 50
   useDistanceFade: 0
   fadeStartDistance: 13
 --- !u!114 &6909387726284025747

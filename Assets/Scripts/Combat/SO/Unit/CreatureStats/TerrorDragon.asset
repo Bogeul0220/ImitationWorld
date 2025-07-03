@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57c5be6783fdb6646be2f5f6a230018a, type: 3}
   m_Name: TerrorDragon
   m_EditorClassIdentifier: 
-  MaxHp: 1000
-  MaxStamina: 1000
+  MaxHp: 350
+  MaxStamina: 500

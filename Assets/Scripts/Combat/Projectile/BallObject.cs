@@ -95,8 +95,8 @@ public class BallObject : MonoBehaviour
         }
 
         // 2. 체력 기반 보너스 (최대 30점)
-        float healthPercentage = target.Unitstat.maxHealth > 0 ? 
-            target.Unitstat.currentHealth / target.Unitstat.maxHealth : 1f;
+        float healthPercentage = target.CreatureStat.maxHealth > 0 ? 
+            target.CreatureStat.currentHealth / target.CreatureStat.maxHealth : 1f;
         float healthBonus = (1f - healthPercentage) * 30f;
         totalScore += healthBonus;
 
@@ -160,10 +160,10 @@ public class BallObject : MonoBehaviour
             CreatureManager.Instance.SpawnedWildCreatures.Remove(target);
 
         // 중복 체크 후 안전하게 추가
-        if (!CreatureManager.Instance.SpawnedTamedKey.Contains(target.CreatureIndex) && !CreatureManager.Instance.SpawnedTamedCreatures.ContainsKey(target.CreatureIndex))
+        if (!CreatureManager.Instance.SpawnedTamedKey.Contains(target.CreatureIndex) && !CreatureManager.Instance.TamedCreatures.ContainsKey(target.CreatureIndex))
         {
             CreatureManager.Instance.SpawnedTamedKey.Add(target.CreatureIndex);
-            CreatureManager.Instance.SpawnedTamedCreatures.Add(target.CreatureIndex, target);
+            CreatureManager.Instance.TamedCreatures.Add(target.CreatureIndex, target);
         }
         else
         {
@@ -175,14 +175,11 @@ public class BallObject : MonoBehaviour
                 {
                     target.CreatureIndex = newIndex;
                     CreatureManager.Instance.SpawnedTamedKey.Add(target.CreatureIndex);
-                    CreatureManager.Instance.SpawnedTamedCreatures.Add(target.CreatureIndex, target);
+                    CreatureManager.Instance.TamedCreatures.Add(target.CreatureIndex, target);
                     break;
                 }
             }
         }
-        
-        // 디버그 로그 추가
-        Debug.Log($"CaptureSuccess: Creature {target.CreatureName} with Index {target.CreatureIndex}");
         
         target.HitColliderList.Clear();
         target.gameObject.SetActive(false);

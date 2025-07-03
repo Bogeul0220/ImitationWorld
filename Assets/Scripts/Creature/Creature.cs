@@ -44,9 +44,8 @@ public class Creature : MonoBehaviour
     private Vector3? escapePoint; // 도망 시 타겟의 반대 방향으로 이동할 위치
 
     [Header("크리쳐 스탯 세팅")]
-    public UnitStats Unitstat;
-    public CreatureInfoUI creatureInfoUI;
-    [SerializeField] private float creatureInfoUIPosY;
+    public UnitStats CreatureStat;
+    public CreatureInfoUI CreatureHeathUI;
     public float AttackRange; // 공격 범위
     public float AttackSpeed = 1f; // 공격 속도
     public float AttackBaseDamage = 1f; // 공격력
@@ -83,17 +82,17 @@ public class Creature : MonoBehaviour
         if (navMeshAgent == null)
             navMeshAgent = GetComponent<NavMeshAgent>();
 
-        // NavMeshAgent가 활성화되어 있고 유효한지 확인
-        if (navMeshAgent != null && navMeshAgent.isActiveAndEnabled)
+        // NavMeshAgent가 활성화되어 있고 NavMesh 위에 있는지 확인
+        if (navMeshAgent != null && navMeshAgent.isActiveAndEnabled && navMeshAgent.isOnNavMesh)
         {
             if (navMeshAgent.isStopped)
                 navMeshAgent.isStopped = false;
         }
 
-        if (Unitstat == null)
-            Unitstat = GetComponent<UnitStats>();
+        if (CreatureStat == null)
+            CreatureStat = GetComponent<UnitStats>();
 
-        Unitstat?.Init();
+        CreatureStat?.Init();
 
         if (creaturePrefab != null)
         {
@@ -107,9 +106,9 @@ public class Creature : MonoBehaviour
             if (col != null)
             {
                 if (!col.GetComponent<Damageable>())
-                    col.AddComponent<Damageable>().InitDamageable(Unitstat);
+                    col.AddComponent<Damageable>().InitDamageable(CreatureStat);
                 else
-                    col.GetComponent<Damageable>()?.InitDamageable(Unitstat);
+                    col.GetComponent<Damageable>()?.InitDamageable(CreatureStat);
 
                 if (!col.GetComponent<Catchable>())
                     col.AddComponent<Catchable>().InitCatchable(this);
@@ -131,13 +130,28 @@ public class Creature : MonoBehaviour
         }
 
         BattleBegin = false;
-
+        if (CreatureStat.isDead)
+            CreatureStat.isDead = false;
         currentState = CreatureState.Idle;
+        CreatureStat.CurrentBattleTarget = null;
+        CreatureStat.DamagedTargetDict.Clear();
 
-        creatureInfoUI.SetCreature(this);
-        creatureInfoUI.GetComponent<RectTransform>().position = this.transform.position + new Vector3(0f, creatureInfoUIPosY, 0f);
+        IsAttacking = false;
+        IsUsingSkill = false;
+        if (SkillCastCoroutine != null)
+        {
+            StopCoroutine(SkillCastCoroutine);
+            SkillCastCoroutine = null;
+        }
+
+
+        if (CreatureHeathUI == null)
+            CreatureHeathUI = transform.GetComponentInChildren<CreatureInfoUI>();
+        CreatureHeathUI.SetCreature(this);
+        CreatureHeathUI.GetComponent<RectTransform>().position = this.transform.position + new Vector3(0f, navMeshAgent.height <= 1f ? 1.5f : navMeshAgent.height, 0f);
+        CreatureHeathUI.UpdateHealthSlider();
         AddedSkillInList();
-        Unitstat.OnDamaged += ConversionBattleBegin;
+        CreatureStat.OnDamaged += ConversionBattleBegin;
 
         // InitCreature가 호출될 때마다 새로운 Index 생성
         // System.Random을 사용하여 더 강력한 랜덤 생성
@@ -145,8 +159,9 @@ public class Creature : MonoBehaviour
         {
             System.Random random = new System.Random();
             CreatureIndex = random.Next(100000000, 999999999); // 9자리 숫자로 안전하게 생성
-            Debug.Log($"{CreatureIndex} : {CreatureName}");
         }
+
+        Debug.Log($"{CreatureIndex} : {CreatureName} Init 완료");
     }
 
     public void ChangeTagInChildren(Transform parent, string newTag)
@@ -168,7 +183,10 @@ public class Creature : MonoBehaviour
     {
         foreach (var skill in SkillList)
         {
-            SkillsCooldownDict.Add(skill, 0f);
+            if(!SkillsCooldownDict.ContainsKey(skill))
+                SkillsCooldownDict.Add(skill, 0f);
+            else
+                SkillsCooldownDict[skill] = 0f;
         }
     }
 
@@ -206,15 +224,15 @@ public class Creature : MonoBehaviour
 
     protected virtual void IdleState()
     {
-        if (Unitstat.isDead)
+        if (CreatureStat.isDead)
         {
             StartCoroutine(CreatureDead(5f));
             return;
         }
 
-        if (BattleBegin)
+        if (BattleBegin && CreatureStat.CurrentBattleTarget != null)
         {
-            Target = Unitstat.CurrentBattleTarget;
+            Target = CreatureStat.CurrentBattleTarget;
             escapePoint = null;
             currentState = CreatureState.StandOff;
             return;
@@ -301,7 +319,7 @@ public class Creature : MonoBehaviour
     }
     protected virtual void PatrolState()
     {
-        if (Unitstat.isDead)
+        if (CreatureStat.isDead)
         {
             StartCoroutine(CreatureDead(5f));
             return;
@@ -343,18 +361,18 @@ public class Creature : MonoBehaviour
 
                 patrolTarget = new Vector3(targetX, heigth, targetZ); // 순찰 타겟 위치 설정
             }
-            animator.SetFloat("MoveSpeed", navMeshAgent.velocity.magnitude, 0.1f, Time.deltaTime);
-
-            if (navMeshAgent.isStopped)
-                navMeshAgent.isStopped = false; // 네비메시 에이전트 활성화
-
-            navMeshAgent.SetDestination(patrolTarget); // 순찰 타겟 위치로 이동
+            if (IsNavMeshAgentValid())
+            {
+                animator.SetFloat("MoveSpeed", navMeshAgent.velocity.magnitude, 0.1f, Time.deltaTime);
+                SafeResumeNavMeshAgent();
+                SafeSetDestination(patrolTarget); // 순찰 타겟 위치로 이동
+            }
         }
     }
 
     protected virtual void EscapeState()
     {
-        if (Unitstat.isDead)
+        if (CreatureStat.isDead)
         {
             StartCoroutine(CreatureDead(5f));
             return;
@@ -364,22 +382,24 @@ public class Creature : MonoBehaviour
         // 타겟이 없거나 타겟이 죽었을 때 Idle 상태로 전환
         if (Target == null || (Target.GetComponent<UnitStats>()?.isDead ?? true))
         {
+            CreatureStat.DamagedTargetDict.Remove(Target);
+            CreatureStat.CurrentBattleTarget = null;
+            BattleBegin = false;
             Target = null; // 타겟을 null로 설정
             escapePoint = null; // 도망 위치 초기화
             currentState = CreatureState.Idle;
             return;
         }
-        
-        if (BattleBegin)
+
+        if (BattleBegin && CreatureStat.CurrentBattleTarget != null)
         {
-            Target = Unitstat.CurrentBattleTarget;
+            Target = CreatureStat.CurrentBattleTarget;
             escapePoint = null;
             currentState = CreatureState.StandOff;
             return;
         }
 
-        if (navMeshAgent.isStopped)
-            navMeshAgent.isStopped = false;
+        SafeResumeNavMeshAgent();
 
         // 타겟과의 거리 계산
         float distance = Vector3.Distance(transform.position, Target.transform.position);
@@ -400,16 +420,15 @@ public class Creature : MonoBehaviour
             // 도망 위치를 계산
             escapePoint = transform.position + escapeDirection * DetectionRange * 3f; // 탐지 범위의 세 배 거리로 도망 위치 설정
 
-            if (navMeshAgent.isStopped)
-                navMeshAgent.isStopped = false; // 네비메시 에이전트 활성화
+            SafeResumeNavMeshAgent(); // 네비메시 에이전트 활성화
             animator.SetFloat("MoveSpeed", 1f, 0.1f, Time.deltaTime);
-            navMeshAgent.SetDestination(escapePoint.Value); // 도망 위치로 이동
+            SafeSetDestination(escapePoint.Value); // 도망 위치로 이동
         }
     }
 
     protected virtual void StandOffState()
     {
-        if (Unitstat.isDead)
+        if (CreatureStat.isDead)
         {
             StartCoroutine(CreatureDead(5f));
             return;
@@ -417,22 +436,63 @@ public class Creature : MonoBehaviour
 
         if (AllyEnemyConversion)
         {
-            Target = PlayerManager.Instance.Player.GetComponent<P_CombatController>().PlayerStat.CurrentBattleTarget;
-            if (Target.isDead)
+            if (PlayerManager.Instance.Player.GetComponent<P_CombatController>().PlayerStat.CurrentBattleTarget != null)
             {
-                Target = null;
+                Target = PlayerManager.Instance.Player.GetComponent<P_CombatController>().PlayerStat.CurrentBattleTarget;
+                if (Target.isDead)
+                {
+                    CreatureStat.CurrentBattleTarget = null;
+                    BattleBegin = false;
+                    currentState = CreatureState.Idle;
+                    return;
+                }
+            }
+            else
+            {
+                CreatureStat.CurrentBattleTarget = null;
+                BattleBegin = false;
                 currentState = CreatureState.Idle;
                 return;
             }
         }
         else
         {
-            Target = Unitstat.CurrentBattleTarget;
-            if (Target.isDead)
+            if (CreatureStat.CurrentBattleTarget != null)
+                Target = CreatureStat.CurrentBattleTarget;
+            else
             {
-                Target = null;
+                CreatureStat.CurrentBattleTarget = null;
+                BattleBegin = false;
                 currentState = CreatureState.Idle;
                 return;
+            }
+
+            if (Target.isDead)
+            {
+                // 타겟이 죽을 경우 Idle 상태로 전환
+                CreatureStat.DamagedTargetDict.Remove(Target);
+                Target = null;
+                if (CreatureStat.DamagedTargetDict.Count > 0)
+                {
+                    int maxDamage = 0;
+                    foreach (var target in CreatureStat.DamagedTargetDict.Keys)
+                    {
+                        if (CreatureStat.DamagedTargetDict[target] > maxDamage)
+                        {
+                            maxDamage = CreatureStat.DamagedTargetDict[target];
+                            CreatureStat.CurrentBattleTarget = target;
+                            Target = CreatureStat.CurrentBattleTarget;
+                        }
+                    }
+                }
+                else
+                {
+                    CreatureStat.CurrentBattleTarget = null;
+                    BattleBegin = false;
+                    Target = null;
+                    currentState = CreatureState.Idle;
+                    return;
+                }
             }
         }
 
@@ -440,26 +500,17 @@ public class Creature : MonoBehaviour
         {
             float distance = Vector3.Distance(transform.position, Target.transform.position);
             DistanceToTarget = distance;
-            
+
             // 부드러운 회전을 위해 회전 속도를 낮춤
             Vector3 lookDirection = (Target.transform.position - transform.position).normalized;
             Quaternion lookRotation = Quaternion.LookRotation(lookDirection);
             transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, 5f * Time.deltaTime);
 
-            if (Target.GetComponent<UnitStats>()?.isDead ?? true)
-            {
-                // 타겟이 죽을 경우 Idle 상태로 전환
-                currentState = CreatureState.Idle;
-                Target = null;
-                return;
-            }
-
             if (distance > AttackRange)
             {
                 if (IsUsingSkill)
                 {
-                    if (!navMeshAgent.isStopped)
-                        navMeshAgent.isStopped = true;
+                    SafeStopNavMeshAgent();
                     animator.SetFloat("MoveSpeed", 0f);
                 }
                 else
@@ -472,15 +523,17 @@ public class Creature : MonoBehaviour
                         return;
                     }
 
-                    if (navMeshAgent.isStopped)
-                        navMeshAgent.isStopped = false; // 네비메시 에이전트 활성화
+                    SafeResumeNavMeshAgent(); // 네비메시 에이전트 활성화
 
                     Vector3 directionToTarget = (Target.transform.position - transform.position).normalized; // 타겟 방향 계산
                     Vector3 destination = Target.transform.position - directionToTarget * (AttackRange - 0.2f); // 타겟에게 공격이 닿는 거리까지 이동할 위치 계산
 
-                    animator.SetFloat("MoveSpeed", navMeshAgent.velocity.magnitude); // 이동 애니메이션 재생
-                    navMeshAgent.speed = MoveSpeed;
-                    navMeshAgent.SetDestination(destination); // 타겟에게 공격이 닿는 거리까지 이동
+                    if (IsNavMeshAgentValid())
+                    {
+                        animator.SetFloat("MoveSpeed", navMeshAgent.velocity.magnitude); // 이동 애니메이션 재생
+                    }
+                    SafeSetSpeed(MoveSpeed);
+                    SafeSetDestination(destination); // 타겟에게 공격이 닿는 거리까지 이동
                 }
             }
             else
@@ -492,8 +545,7 @@ public class Creature : MonoBehaviour
                     Quaternion cooldownLookRotation = Quaternion.LookRotation(cooldownLookDirection);
                     transform.rotation = Quaternion.Slerp(transform.rotation, cooldownLookRotation, 5f * Time.deltaTime);
 
-                    if (navMeshAgent.isStopped)
-                        navMeshAgent.isStopped = false; // 네비메시 에이전트 활성화
+                    SafeResumeNavMeshAgent(); // 네비메시 에이전트 활성화
 
                     animator.SetFloat("MoveSpeed", 0);
                     attackCooldownTimer -= Time.deltaTime; // 공격 쿨타임 감소
@@ -513,7 +565,7 @@ public class Creature : MonoBehaviour
 
     protected virtual void BattleState()
     {
-        if (Unitstat.isDead)
+        if (CreatureStat.isDead)
         {
             StartCoroutine(CreatureDead(5f));
             return;
@@ -521,22 +573,63 @@ public class Creature : MonoBehaviour
 
         if (AllyEnemyConversion)
         {
-            Target = PlayerManager.Instance.Player.GetComponent<P_CombatController>().PlayerStat.CurrentBattleTarget;
-            if (Target.isDead)
+            if (PlayerManager.Instance.Player.GetComponent<P_CombatController>().PlayerStat.CurrentBattleTarget != null)
             {
-                Target = null;
+                Target = PlayerManager.Instance.Player.GetComponent<P_CombatController>().PlayerStat.CurrentBattleTarget;
+                if (Target.isDead)
+                {
+                    CreatureStat.CurrentBattleTarget = null;
+                    BattleBegin = false;
+                    currentState = CreatureState.Idle;
+                    return;
+                }
+            }
+            else
+            {
+                CreatureStat.CurrentBattleTarget = null;
+                BattleBegin = false;
                 currentState = CreatureState.Idle;
                 return;
             }
         }
         else
         {
-            Target = Unitstat.CurrentBattleTarget;
-            if (Target.isDead)
+            if (CreatureStat.CurrentBattleTarget != null)
+                Target = CreatureStat.CurrentBattleTarget;
+            else
             {
-                Target = null;
+                CreatureStat.CurrentBattleTarget = null;
+                BattleBegin = false;
                 currentState = CreatureState.Idle;
                 return;
+            }
+
+            if (Target.isDead)
+            {
+                // 타겟이 죽을 경우 Idle 상태로 전환
+                CreatureStat.DamagedTargetDict.Remove(Target);
+                Target = null;
+                if (CreatureStat.DamagedTargetDict.Count > 0)
+                {
+                    int maxDamage = 0;
+                    foreach (var target in CreatureStat.DamagedTargetDict.Keys)
+                    {
+                        if (CreatureStat.DamagedTargetDict[target] > maxDamage)
+                        {
+                            maxDamage = CreatureStat.DamagedTargetDict[target];
+                            CreatureStat.CurrentBattleTarget = target;
+                            Target = CreatureStat.CurrentBattleTarget;
+                        }
+                    }
+                }
+                else
+                {
+                    CreatureStat.CurrentBattleTarget = null;
+                    BattleBegin = false;
+                    Target = null;
+                    currentState = CreatureState.Idle;
+                    return;
+                }
             }
         }
 
@@ -544,19 +637,11 @@ public class Creature : MonoBehaviour
         {
             float distance = Vector3.Distance(transform.position, Target.transform.position);
             DistanceToTarget = distance;
-            
+
             // 부드러운 회전을 위해 회전 속도를 낮춤
             Vector3 battleLookDirection = (Target.transform.position - transform.position).normalized;
             Quaternion battleLookRotation = Quaternion.LookRotation(battleLookDirection);
             transform.rotation = Quaternion.Slerp(transform.rotation, battleLookRotation, 5f * Time.deltaTime);
-
-            if (Target.GetComponent<UnitStats>()?.isDead ?? true)
-            {
-                // 타겟이 죽거나 멀어질 경우 Idle 상태로 전환
-                currentState = CreatureState.Idle;
-                Target = null;
-                return;
-            }
 
             if (distance > AttackRange)
             {
@@ -595,7 +680,10 @@ public class Creature : MonoBehaviour
                 if (!IsAttacking)
                 {
                     if (SkillCastCoroutine != null)
+                    {
                         StopCoroutine(SkillCastCoroutine);
+                        SkillCastCoroutine = null;
+                    }
 
                     SkillBaseSO skill = SelletedSkill();
 
@@ -624,7 +712,7 @@ public class Creature : MonoBehaviour
     }
     protected virtual void TakeHitState()
     {
-        if (Unitstat.isDead)
+        if (CreatureStat.isDead)
         {
             StartCoroutine(CreatureDead(5f));
             return;
@@ -675,6 +763,12 @@ public class Creature : MonoBehaviour
 
     private void FollowPlayer()
     {
+        // NavMeshAgent 안전성 체크
+        if (navMeshAgent == null || !navMeshAgent.isActiveAndEnabled || !navMeshAgent.isOnNavMesh)
+        {
+            return;
+        }
+
         if (navMeshAgent.isStopped)
             navMeshAgent.isStopped = false; // 네비메시 에이전트 활성화
 
@@ -687,7 +781,7 @@ public class Creature : MonoBehaviour
         {
             if (distance < 7f)
             {
-                navMeshAgent.ResetPath();
+                SafeResetPath();
                 animator.SetFloat("MoveSpeed", 0f);
                 return;
             }
@@ -700,9 +794,12 @@ public class Creature : MonoBehaviour
                 float t = Mathf.InverseLerp(7f, 20f, distance); // t = 0 ~ 1
                 float _speed = Mathf.Lerp(1f, 5f, t);    // 거리에 따라(t) 이동속도 변경
 
-                navMeshAgent.speed = MoveSpeed * _speed; // 기본 이동 속도 설정
-                navMeshAgent.SetDestination(followTarget); // 플레이어에게 이동
-                animator.SetFloat("MoveSpeed", navMeshAgent.velocity.magnitude);
+                SafeSetSpeed(MoveSpeed * _speed); // 기본 이동 속도 설정
+                SafeSetDestination(followTarget); // 플레이어에게 이동
+                if (IsNavMeshAgentValid())
+                {
+                    animator.SetFloat("MoveSpeed", navMeshAgent.velocity.magnitude);
+                }
                 return;
             }
 
@@ -715,11 +812,11 @@ public class Creature : MonoBehaviour
                 NavMeshHit hit;
                 if (NavMesh.SamplePosition(teleportPos, out hit, 5f, NavMesh.AllAreas))
                 {
-                    navMeshAgent.Warp(hit.position);
+                    SafeWarp(hit.position);
                 }
                 else
                 {
-                    navMeshAgent.Warp(playerPos);
+                    SafeWarp(playerPos);
                 }
 
                 animator.SetFloat("MoveSpeed", 0f);
@@ -740,7 +837,7 @@ public class Creature : MonoBehaviour
                     float distance = Vector3.Distance(transform.position, enemy.transform.position);
                     if (distance <= DetectionRange)
                     {
-                        Target = enemy.Unitstat;
+                        Target = enemy.CreatureStat;
                         return true;
                     }
                 }
@@ -759,7 +856,7 @@ public class Creature : MonoBehaviour
                     if (distanceToTakeOutCreature <= DetectionRange)
                     {
                         if (distanceToTakeOutCreature < distance)
-                            Target = CreatureManager.Instance.CurrentTakeOutCreature.Unitstat;
+                            Target = CreatureManager.Instance.CurrentTakeOutCreature.CreatureStat;
                         else
                             Target = PlayerManager.Instance.Player.GetComponent<UnitStats>();
                         return true;
@@ -814,11 +911,8 @@ public class Creature : MonoBehaviour
 
     public IEnumerator CreatureSizeDown()
     {
-        // NavMeshAgent가 활성화되어 있고 유효한지 확인
-        if (navMeshAgent != null && navMeshAgent.isActiveAndEnabled)
-        {
-            navMeshAgent.isStopped = true;
-        }
+        // NavMeshAgent가 활성화되어 있고 NavMesh 위에 있는지 확인
+        SafeStopNavMeshAgent();
 
         float duration = 1f;
         float elapsed = 0f;
@@ -834,6 +928,8 @@ public class Creature : MonoBehaviour
 
     public IEnumerator CreatrueSizeUp(Vector3 spawnPosition)
     {
+        transform.position = spawnPosition;
+
         float duration = 0.5f;
         float elapsed = 0f;
         while (elapsed < duration)
@@ -843,11 +939,11 @@ public class Creature : MonoBehaviour
             yield return null;
         }
         transform.localScale = Vector3.one;
-        transform.position = spawnPosition;
+
         BeingCaptured = false;
 
-        // NavMeshAgent가 활성화되어 있고 유효한지 확인
-        if (navMeshAgent != null && navMeshAgent.isActiveAndEnabled)
+        // NavMeshAgent가 활성화되어 있고 NavMesh 위에 있는지 확인
+        if (navMeshAgent != null && navMeshAgent.isActiveAndEnabled && navMeshAgent.isOnNavMesh)
         {
             navMeshAgent.isStopped = false;
         }
@@ -857,8 +953,13 @@ public class Creature : MonoBehaviour
     {
         IsAttacking = false;
         IsUsingSkill = false;
-        if (navMeshAgent.isStopped)
+
+        // NavMeshAgent 안전성 체크
+        if (navMeshAgent != null && navMeshAgent.isActiveAndEnabled && navMeshAgent.isOnNavMesh && navMeshAgent.isStopped)
+        {
             navMeshAgent.isStopped = false;
+        }
+
         animator.SetTrigger("BaseAttack");
     }
 
@@ -867,15 +968,81 @@ public class Creature : MonoBehaviour
         currentState = CreatureState.Died;
         animator.SetTrigger("IsDead");
 
-        yield return new WaitForSeconds(delay);
+        if (AllyEnemyConversion)
+        {
+            CreatureManager.Instance.CallInAllyCreature();
+            CreatureManager.Instance.AllyCreatureDead(CreatureIndex);
+        }
 
         if (gameObject.activeInHierarchy)
         {
-            ObjectPoolManager.Return(gameObject);
+            yield return new WaitForSeconds(delay);
+
             if (CreatureManager.Instance.SpawnedWildCreatures.Contains(this))
                 CreatureManager.Instance.SpawnedWildCreatures.Remove(this);
+            ObjectPoolManager.Return(gameObject);
         }
     }
 
     private void ConversionBattleBegin() => BattleBegin = true;
+
+    // NavMeshAgent 안전성 체크 헬퍼 메서드
+    private bool IsNavMeshAgentValid()
+    {
+        return navMeshAgent != null && navMeshAgent.isActiveAndEnabled && navMeshAgent.isOnNavMesh;
+    }
+
+    // NavMeshAgent 안전하게 정지
+    private void SafeStopNavMeshAgent()
+    {
+        if (IsNavMeshAgentValid() && !navMeshAgent.isStopped)
+        {
+            navMeshAgent.isStopped = true;
+        }
+    }
+
+    // NavMeshAgent 안전하게 재시작
+    private void SafeResumeNavMeshAgent()
+    {
+        if (IsNavMeshAgentValid() && navMeshAgent.isStopped)
+        {
+            navMeshAgent.isStopped = false;
+        }
+    }
+
+    // NavMeshAgent 안전하게 목적지 설정
+    private void SafeSetDestination(Vector3 destination)
+    {
+        if (IsNavMeshAgentValid())
+        {
+            navMeshAgent.SetDestination(destination);
+        }
+    }
+
+    // NavMeshAgent 안전하게 속도 설정
+    private void SafeSetSpeed(float speed)
+    {
+        if (IsNavMeshAgentValid())
+        {
+            navMeshAgent.speed = speed;
+        }
+    }
+
+    // NavMeshAgent 안전하게 경로 초기화
+    private void SafeResetPath()
+    {
+        if (IsNavMeshAgentValid())
+        {
+            navMeshAgent.ResetPath();
+        }
+    }
+
+    // NavMeshAgent 안전하게 워프
+    private void SafeWarp(Vector3 position)
+    {
+        if (IsNavMeshAgentValid())
+        {
+            navMeshAgent.Warp(position);
+        }
+    }
 }

@@ -357,13 +357,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f7d43f72a968d147b55b6a0a99e5ac0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  statusSO: {fileID: 11400000, guid: 203c270f792028643a068d10427f21c9, type: 2}
+  statusSO: {fileID: 11400000, guid: e6660771ef4d5514eaae5c9fb9d037ec, type: 2}
   currentHealth: 0
   maxHealth: 0
   currentStamina: 0
   maxStamina: 0
   isDead: 0
-  DamagedTarget: {fileID: 0}
+  CurrentBattleTarget: {fileID: 0}
   usePurpose: 0
 --- !u!195 &3148010061210413676
 NavMeshAgent:

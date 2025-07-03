@@ -7837,10 +7837,10 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: a6e8bbdb6cd83f84fb8dbeb0c1201774, type: 3}
-  m_Type: 0
+  m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
-  m_FillMethod: 4
+  m_FillMethod: 1
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
@@ -10100,10 +10100,10 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: a6e8bbdb6cd83f84fb8dbeb0c1201774, type: 3}
-  m_Type: 0
+  m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
-  m_FillMethod: 4
+  m_FillMethod: 1
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
@@ -11284,6 +11284,7 @@ MonoBehaviour:
   - {fileID: 1833892146605841386, guid: 8cbb683f931458444975a9d9e1563c4c, type: 3}
   SpawnedTamedKey: 
   CurrentTakeOutCreature: {fileID: 0}
+  CurrentAllyBelligerent: 0
   MaxTamedCreatures: 5
   SpawnedWildCreatures: []
   MaxWildCreatures: 5
@@ -15192,10 +15193,10 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: a6e8bbdb6cd83f84fb8dbeb0c1201774, type: 3}
-  m_Type: 0
+  m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
-  m_FillMethod: 4
+  m_FillMethod: 1
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
@@ -20373,8 +20374,8 @@ SceneRoots:
   - {fileID: 1589245845}
   - {fileID: 981011000}
   - {fileID: 447880112}
-  - {fileID: 55260190}
   - {fileID: 278629212}
+  - {fileID: 55260190}
   - {fileID: 1976543385}
   - {fileID: 772011823}
   - {fileID: 430738198}

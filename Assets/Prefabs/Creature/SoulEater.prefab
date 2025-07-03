@@ -89,13 +89,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f7d43f72a968d147b55b6a0a99e5ac0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  statusSO: {fileID: 11400000, guid: 203c270f792028643a068d10427f21c9, type: 2}
+  statusSO: {fileID: 11400000, guid: ef3c6730845efdf4fbea56421e8dc951, type: 2}
   currentHealth: 0
   maxHealth: 0
   currentStamina: 0
   maxStamina: 0
   isDead: 0
-  DamagedTarget: {fileID: 0}
+  CurrentBattleTarget: {fileID: 0}
   usePurpose: 0
 --- !u!195 &3148010061210413676
 NavMeshAgent:
@@ -115,7 +115,7 @@ NavMeshAgent:
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 0
   m_AutoRepath: 1
-  m_Height: 4
+  m_Height: 3
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
