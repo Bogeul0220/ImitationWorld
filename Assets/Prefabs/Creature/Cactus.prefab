@@ -61,8 +61,7 @@ MonoBehaviour:
   DistanceToTarget: 0
   DetectionRange: 10
   CreatureStat: {fileID: 0}
-  creatureHeathUI: {fileID: 2209695638864374260}
-  creatureInfoUIPosY: 2
+  CreatureHeathUI: {fileID: 0}
   AttackRange: 8
   AttackSpeed: 1
   AttackBaseDamage: 1
@@ -75,6 +74,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 77bef9efe135f8244a9db30a6f5b7b39, type: 2}
   - {fileID: 11400000, guid: 2a6aa795febcab3469324267ac2a2233, type: 2}
   - {fileID: 11400000, guid: e35c0b429a3d9884aa8faed5a99a2824, type: 2}
+  - {fileID: 11400000, guid: e8cdf7bf7a4f7b247b0dab2c485b1780, type: 2}
   IsAttacking: 0
   IsUsingSkill: 0
 --- !u!114 &8683407834438305209
@@ -539,14 +539,3 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 5631823294880812395, guid: 0957cad377c12da46a4578c44c76fa55, type: 3}
   m_PrefabInstance: {fileID: 5688599370597408773}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2209695638864374260 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5790393841257646577, guid: 0957cad377c12da46a4578c44c76fa55, type: 3}
-  m_PrefabInstance: {fileID: 5688599370597408773}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 313aef69ceb495e4da94781627f2920d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

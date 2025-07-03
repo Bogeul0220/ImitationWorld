@@ -13,7 +13,7 @@ public class ProjectileSkillSO : SkillBaseSO
     public float CastTime;
     public float projectileGravity;
     public float projectileLifeTime;
-    public bool isStartFromCasterFront;
+    public bool StartCasterFront;
 
     public override IEnumerator ActivateSkill(Creature caster, UnitStats target)
     {
@@ -26,19 +26,14 @@ public class ProjectileSkillSO : SkillBaseSO
             yield break;
         }
         projectile.transform.localScale = Vector3.zero;
-        // if (isStartFromCasterFront)
-        // {
-        //     projectile.transform.position = caster.transform.position + caster.transform.forward * 3f + (Vector3.up * caster.navMeshAgent.height / 2f); // 캐스터의 앞에서 시작
-        // }
-        // else
-        // {
-        //     projectile.transform.position = caster.transform.position + (Vector3.up * (caster.navMeshAgent.height + 2f)); // 캐스터 위치에서 약간 위로 시작
-        // }
         projectile.transform.forward = caster.transform.forward; // 캐스터의 방향으로 설정
         var passedTime = 0f;
         while (passedTime < CastTime)
         {
-            if (caster.currentState == CreatureState.TakeHit || caster.currentState == CreatureState.Died || caster.transform.localScale.x <= 0.1f)
+            if (caster.currentState == CreatureState.TakeHit
+            || caster.currentState == CreatureState.Died
+            || caster.transform.localScale.x <= 0.1f
+            || caster.gameObject.activeSelf == false)
             {   // 캐스터가 사망 또는 타격, 볼에 잡힌 상태일 때 발사체 반환 후 스킬 종료
                 ObjectPoolManager.Return(projectile.gameObject);
                 caster.IsUsingSkill = false;
@@ -46,7 +41,7 @@ public class ProjectileSkillSO : SkillBaseSO
             }
             passedTime += Time.deltaTime;
             projectile.transform.localScale = Vector3.one * Mathf.Lerp(0f, 1f, passedTime / CastTime);
-            if (isStartFromCasterFront)
+            if (StartCasterFront)
             {
                 projectile.transform.position = caster.transform.position + caster.transform.forward * 3f + (Vector3.up * caster.navMeshAgent.height / 2f); // 캐스터의 앞에서 시작
             }

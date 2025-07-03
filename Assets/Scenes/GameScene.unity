@@ -648,6 +648,10 @@ PrefabInstance:
       value: pickaxe01
       objectReference: {fileID: 0}
     - target: {fileID: 1392316285209212, guid: 869385138ceeb3c4e9ed5f72da8d50d7, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1392316285209212, guid: 869385138ceeb3c4e9ed5f72da8d50d7, type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
@@ -1853,8 +1857,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 236321837}
+  - component: {fileID: 236321838}
   m_Layer: 0
-  m_Name: GameManager
+  m_Name: EffectManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1875,6 +1880,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 447880112}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &236321838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 236321836}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c3612f71c078d94ba1b39364ca4cf0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DamagedEffect: {fileID: 8993395216250681934, guid: 5f8e6f9cd034bc045854540c59b960e2, type: 3}
 --- !u!1 &238297173
 GameObject:
   m_ObjectHideFlags: 0
@@ -3289,14 +3307,14 @@ Transform:
   m_GameObject: {fileID: 430738194}
   serializedVersion: 2
   m_LocalRotation: {x: 0.03398708, y: 0.80000377, z: 0.043195017, w: 0.59747225}
-  m_LocalPosition: {x: 65.80799, y: 4.163506, z: 60.632854}
+  m_LocalPosition: {x: 16.307537, y: 0.30350614, z: -1.7471466}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 889484318}
   - {fileID: 1077204018}
   - {fileID: 479001071}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 452591149}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &430738199
 MonoBehaviour:
@@ -3409,7 +3427,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &452591149
 Transform:
   m_ObjectHideFlags: 0
@@ -3424,6 +3442,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1074911160}
+  - {fileID: 430738198}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &463977973
@@ -4212,7 +4231,7 @@ GameObject:
   m_Component:
   - component: {fileID: 529964293}
   - component: {fileID: 529964294}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: AttackPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5231,6 +5250,10 @@ PrefabInstance:
     - target: {fileID: 1878273237308662, guid: 0031543705b8c024c916caa648809017, type: 3}
       propertyPath: m_Name
       value: axe01
+      objectReference: {fileID: 0}
+    - target: {fileID: 1878273237308662, guid: 0031543705b8c024c916caa648809017, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 1878273237308662, guid: 0031543705b8c024c916caa648809017, type: 3}
       propertyPath: m_IsActive
@@ -12488,7 +12511,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1529881274}
   - component: {fileID: 1529881275}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: AttackPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18194,7 +18217,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1958645405}
   - component: {fileID: 1958645406}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: AttackPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18248,7 +18271,7 @@ GameObject:
   - component: {fileID: 1961307310}
   - component: {fileID: 1961307312}
   - component: {fileID: 1961307311}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: RightHand
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -18558,6 +18581,10 @@ PrefabInstance:
     - target: {fileID: 8169743795888241496, guid: 7c04a47b0ad329f4496bf7d441cfbb30, type: 3}
       propertyPath: m_Name
       value: free_one_handed_sword_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8169743795888241496, guid: 7c04a47b0ad329f4496bf7d441cfbb30, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8169743795888241496, guid: 7c04a47b0ad329f4496bf7d441cfbb30, type: 3}
       propertyPath: m_IsActive
@@ -20378,5 +20405,4 @@ SceneRoots:
   - {fileID: 55260190}
   - {fileID: 1976543385}
   - {fileID: 772011823}
-  - {fileID: 430738198}
   - {fileID: 452591149}

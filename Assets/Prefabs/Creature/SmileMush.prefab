@@ -61,8 +61,7 @@ MonoBehaviour:
   DistanceToTarget: 0
   DetectionRange: 10
   CreatureStat: {fileID: 0}
-  creatureHeathUI: {fileID: 0}
-  creatureInfoUIPosY: 2
+  CreatureHeathUI: {fileID: 0}
   AttackRange: 8
   AttackSpeed: 1
   AttackBaseDamage: 1
@@ -75,6 +74,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 77bef9efe135f8244a9db30a6f5b7b39, type: 2}
   - {fileID: 11400000, guid: 2a6aa795febcab3469324267ac2a2233, type: 2}
   - {fileID: 11400000, guid: e35c0b429a3d9884aa8faed5a99a2824, type: 2}
+  - {fileID: 11400000, guid: e8cdf7bf7a4f7b247b0dab2c485b1780, type: 2}
   IsAttacking: 0
   IsUsingSkill: 0
 --- !u!114 &4768341778650629306
