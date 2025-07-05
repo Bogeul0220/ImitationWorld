@@ -73,6 +73,7 @@ MonoBehaviour:
   SkillList:
   - {fileID: 11400000, guid: 77bef9efe135f8244a9db30a6f5b7b39, type: 2}
   - {fileID: 11400000, guid: 5070ab231ec2684488827bf253538441, type: 2}
+  - {fileID: 11400000, guid: 73760e60b17478b48b3df5dcf5ba2238, type: 2}
   IsAttacking: 0
   IsUsingSkill: 0
 --- !u!114 &1178816045650415251

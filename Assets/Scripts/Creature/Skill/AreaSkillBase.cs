@@ -62,7 +62,7 @@ public class AreaSkillBase : MonoBehaviour
         float moveDuration = 3f;
         float scaleDuration = 1f;
         Vector3 startPos = transform.position;
-        Vector3 endPos = target.transform.position + Vector3.up * 5f;
+        Vector3 endPos = chaseTarget ? target.transform.position + Vector3.up * 6f : target.transform.position + Vector3.up * 10f;
 
         float t = 0f;
         while (t < moveDuration)

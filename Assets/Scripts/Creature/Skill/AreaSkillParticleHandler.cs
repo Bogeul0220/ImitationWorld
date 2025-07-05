@@ -25,7 +25,7 @@ public class AreaSkillParticleHandler : MonoBehaviour
             collision.enabled = true;
             collision.type = ParticleSystemCollisionType.World;
             collision.mode = ParticleSystemCollisionMode.Collision3D;
-            
+
             if(caster.AllyEnemyConversion)
             {
                 collision.collidesWith = LayerMask.GetMask("Enemy");
@@ -35,11 +35,21 @@ public class AreaSkillParticleHandler : MonoBehaviour
                 collision.collidesWith = LayerMask.GetMask("Ally", "Player");
             }
         }
+        else
+        {
+            Debug.LogError("파티클 시스템을 찾을 수 없습니다. from InitAreaSkillParticleHandler");
+        }
     }
 
     // 파티클이 무언가와 충돌할 때 호출됨
     private void OnParticleCollision(GameObject other)
     {
+        if(particle == null)
+        {
+            Debug.LogError("파티클 시스템을 찾을 수 없습니다. from OnParticleCollision");
+            return;
+        }
+
         int numCollisionEvents = particle.GetCollisionEvents(other, collisionEvents);
         for (int i = 0; i < numCollisionEvents; i++)
         {

@@ -10,16 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 18f5550455746f149995a5236d6be2be, type: 3}
-  m_Name: AcidRain_AreaSkill
+  m_Name: Meteor_AreaSkill
   m_EditorClassIdentifier: 
-  skillName: AcidRain
+  skillName: Meteor
   skillIcon: {fileID: 0}
-  skillDescription: "\uC0B0\uC131\uBE44\uB97C \uB0B4\uB824 \uACF5\uACA9\uD55C\uB2E4."
-  setSkillCooldown: 15
-  Damage: 1
-  DamageInterval: 0.2
-  DamageDuration: 5
-  CastTime: 4
-  AreaSkillPrefab: {fileID: 6556628358968859451, guid: 3401b13ece068ef4094662120203a97a, type: 3}
+  skillDescription: "\uBA54\uD14C\uC624\uB97C \uC18C\uD658\uD558\uC5EC \uB370\uBBF8\uC9C0\uB97C
+    \uC785\uD78C\uB2E4."
+  setSkillCooldown: 30
+  Damage: 20
+  DamageInterval: 10
+  DamageDuration: 3
+  CastTime: 6
+  AreaSkillPrefab: {fileID: 86790967985404019, guid: 212ffe4a5b9c9ed40a801e7d537d9fa3, type: 3}
   AreaSkillType: 1
-  ChaseTarget: 1
+  ChaseTarget: 0
