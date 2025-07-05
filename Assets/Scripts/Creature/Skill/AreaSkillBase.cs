@@ -7,8 +7,6 @@ public enum AreaSkillType
 {
     Throwing,
     Falling,
-    GroundTarget,
-    PointBlank,
 }
 
 public class AreaSkillBase : MonoBehaviour
@@ -39,12 +37,6 @@ public class AreaSkillBase : MonoBehaviour
                 break;
             case AreaSkillType.Falling:
                 StartCoroutine(AreaFallingDamage());
-                break;
-            case AreaSkillType.GroundTarget:
-                StartCoroutine(AreaGroundTargetDamage());
-                break;
-            case AreaSkillType.PointBlank:
-                StartCoroutine(AreaPointBlankDamage());
                 break;
         }
     }
@@ -109,16 +101,6 @@ public class AreaSkillBase : MonoBehaviour
         areaSkillParticleHandler.DisableParticle();
         ObjectPoolManager.Return(gameObject);
 
-        yield return null;
-    }
-
-    private IEnumerator AreaGroundTargetDamage()
-    {
-        yield return null;
-    }
-
-    private IEnumerator AreaPointBlankDamage()
-    {
         yield return null;
     }
 }

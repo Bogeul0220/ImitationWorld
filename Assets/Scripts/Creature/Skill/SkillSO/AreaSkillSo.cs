@@ -45,12 +45,6 @@ public class AreaSkillSO : SkillBaseSO
                 case AreaSkillType.Falling:
                     areaSkill.transform.position = caster.transform.position + (Vector3.up * (caster.navMeshAgent.height + 4f)); // 캐스터 위치에서 약간 위로 시작
                     break;
-                case AreaSkillType.GroundTarget:
-                    areaSkill.transform.position = target.transform.position;   // 대상의 발 아래 위치에서 시작
-                    break;
-                case AreaSkillType.PointBlank:
-                    areaSkill.transform.position = caster.transform.position; // 캐스터의 발 아래 위치에서 시작
-                    break;
             }
 
             yield return null;
