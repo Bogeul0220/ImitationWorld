@@ -85,7 +85,7 @@ public class InputManager : MonoBehaviour
 
     private void Update()
     {
-        var creatureList = CreatureManager.Instance.SpawnedTamedKey;
+        var creatureList = CreatureManager.Instance.TamedCreatureKey;
 
         MoveInput = m_moveAction.ReadValue<Vector2>();
         LookInput = m_lookAction.ReadValue<Vector2>();
@@ -97,27 +97,16 @@ public class InputManager : MonoBehaviour
         if (InventoryManager.Instance.HasEnoughBall())
             ThrowBallHeld = m_throwBallAction.IsPressed();
 
-        if (creatureList.Count > 0 && SelectedAllyCreature != -1)
-        {
-            if (m_spawnAlly.WasPressedThisFrame() && CreatureManager.Instance.CurrentTakeOutCreature != null)
-            {
-                CallInAllyPressed?.Invoke();
-                return;
-            }
-
-            SpawnAllyHeld = m_spawnAlly.IsPressed();
-        }
-
-        if (CreatureManager.Instance.SpawnedTamedKey.Count > 0 && m_selectAlly.WasPerformedThisFrame())
+        if (CreatureManager.Instance.TamedCreatureKey.Count > 0 && m_selectAlly.WasPerformedThisFrame())
         {
             float allySelectValue = m_selectAlly.ReadValue<float>();
 
-            if (CreatureManager.Instance.SpawnedTamedKey.Count <= 1)
+            if (CreatureManager.Instance.TamedCreatureKey.Count <= 1)
                 return;
 
             if (allySelectValue > 0f)  // C키 입력
             {
-                if (SelectedAllyCreature >= CreatureManager.Instance.SpawnedTamedKey.Count - 1)
+                if (SelectedAllyCreature >= CreatureManager.Instance.TamedCreatureKey.Count - 1)
                     SelectedAllyCreature = 0;
                 else
                     SelectedAllyCreature++;
@@ -126,11 +115,27 @@ public class InputManager : MonoBehaviour
             else if (allySelectValue < 0f) // Z키 입력
             {
                 if (SelectedAllyCreature <= 0)
-                    SelectedAllyCreature = CreatureManager.Instance.SpawnedTamedKey.Count - 1;
+                    SelectedAllyCreature = CreatureManager.Instance.TamedCreatureKey.Count - 1;
                 else
                     SelectedAllyCreature--;
                 Debug.Log("Z키 입력");
             }
+        }
+
+        if (creatureList.Count > 0 && SelectedAllyCreature != -1)
+        {
+            if (CreatureManager.Instance.RetireAllyReviveProgress.ContainsKey(CreatureManager.Instance.TamedCreatureKey[SelectedAllyCreature]))
+            {
+                return;
+            }
+            
+            if (m_spawnAlly.WasPressedThisFrame() && CreatureManager.Instance.CurrentTakeOutCreature != null)
+            {
+                CallInAllyPressed?.Invoke();
+                return;
+            }
+
+            SpawnAllyHeld = m_spawnAlly.IsPressed();
         }
 
         if (m_zoomInAction.WasPressedThisFrame())

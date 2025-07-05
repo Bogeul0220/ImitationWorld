@@ -7,10 +7,10 @@ using UnityEngine.Analytics;
 public class ProjectileBase : MonoBehaviour
 {
     [Header("Projectile Settings")]
-    [SerializeField] protected float projectileSpeed;
-    [SerializeField] protected float gravity;
-    [SerializeField] protected float lifeTime;
-    [SerializeField] protected float spinSpeed;
+    protected float projectileSpeed;
+    protected float gravity;
+    protected float lifeTime;
+    protected float spinSpeed;
     protected Creature caster;
     protected UnitStats target;
     protected Vector3 direction;

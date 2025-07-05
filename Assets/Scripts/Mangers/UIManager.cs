@@ -149,7 +149,7 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        var currentKey = CreatureManager.Instance.SpawnedTamedKey[InputManager.Instance.SelectedAllyCreature];
+        var currentKey = CreatureManager.Instance.TamedCreatureKey[InputManager.Instance.SelectedAllyCreature];
         var currentCreature = CreatureManager.Instance.TamedCreatures[currentKey];
 
         if (currentCreature != null)
@@ -175,19 +175,19 @@ public class UIManager : MonoBehaviour
             else
                 creatureImageBorder.gameObject.SetActive(false);
 
-            if (CreatureManager.Instance.SpawnedTamedKey.Count > 1)
+            if (CreatureManager.Instance.TamedCreatureKey.Count > 1)
             {
-                int totalCount = CreatureManager.Instance.SpawnedTamedKey.Count;
+                int totalCount = CreatureManager.Instance.TamedCreatureKey.Count;
                 int currentIndex = InputManager.Instance.SelectedAllyCreature;
 
                 // 이전 크리쳐 인덱스
                 int prevIndex = (currentIndex - 1 + totalCount) % totalCount;
-                var prevKey = CreatureManager.Instance.SpawnedTamedKey[prevIndex];
+                var prevKey = CreatureManager.Instance.TamedCreatureKey[prevIndex];
                 var prevCreature = CreatureManager.Instance.TamedCreatures[prevKey];
 
                 // 다음 크리쳐 인덱스
                 int nextIndex = (currentIndex + 1) % totalCount;
-                var nextKey = CreatureManager.Instance.SpawnedTamedKey[nextIndex];
+                var nextKey = CreatureManager.Instance.TamedCreatureKey[nextIndex];
                 var nextCreature = CreatureManager.Instance.TamedCreatures[nextKey];
 
                 if (totalCount == 2)

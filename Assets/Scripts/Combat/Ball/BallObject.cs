@@ -160,9 +160,9 @@ public class BallObject : MonoBehaviour
             CreatureManager.Instance.SpawnedWildCreatures.Remove(target);
 
         // 중복 체크 후 안전하게 추가
-        if (!CreatureManager.Instance.SpawnedTamedKey.Contains(target.CreatureIndex) && !CreatureManager.Instance.TamedCreatures.ContainsKey(target.CreatureIndex))
+        if (!CreatureManager.Instance.TamedCreatureKey.Contains(target.CreatureIndex) && !CreatureManager.Instance.TamedCreatures.ContainsKey(target.CreatureIndex))
         {
-            CreatureManager.Instance.SpawnedTamedKey.Add(target.CreatureIndex);
+            CreatureManager.Instance.TamedCreatureKey.Add(target.CreatureIndex);
             CreatureManager.Instance.TamedCreatures.Add(target.CreatureIndex, target);
         }
         else
@@ -174,14 +174,13 @@ public class BallObject : MonoBehaviour
                 if(newIndex != target.CreatureIndex)
                 {
                     target.CreatureIndex = newIndex;
-                    CreatureManager.Instance.SpawnedTamedKey.Add(target.CreatureIndex);
+                    CreatureManager.Instance.TamedCreatureKey.Add(target.CreatureIndex);
                     CreatureManager.Instance.TamedCreatures.Add(target.CreatureIndex, target);
                     break;
                 }
             }
         }
         
-        target.HitColliderList.Clear();
         target.gameObject.SetActive(false);
         ReturnObject();
     }

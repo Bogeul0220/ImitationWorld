@@ -2,21 +2,21 @@ using System.Collections;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "AreaSkill", menuName = "Creature/CreateSkill/AreaSkill")]
-public abstract class AreaSkillSO : SkillBaseSO
+public class AreaSkillSO : SkillBaseSO
 {
-    public float Damage;
+    public int Damage;
     public float DamageInterval;
     public float DamageDuration;
-    public int DamageCount;
     public float CastTime;
 
     public GameObject AreaSkillPrefab;
-    public bool StartCasterFront;
+    public AreaSkillType AreaSkillType;
     public bool ChaseTarget;
 
     public override IEnumerator ActivateSkill(Creature caster, UnitStats target)
     {
         caster.IsUsingSkill = true;
+
         var areaSkill = ObjectPoolManager.Get<AreaSkillBase>(AreaSkillPrefab);
         if (areaSkill == null)
         {
@@ -36,15 +36,30 @@ public abstract class AreaSkillSO : SkillBaseSO
                 yield break;
             }
             passedTime += Time.deltaTime;
-            if (StartCasterFront)
+
+            switch (AreaSkillType)
             {
-                areaSkill.transform.position = caster.transform.position + caster.transform.forward * 3f + (Vector3.up * caster.navMeshAgent.height / 2f); // 캐스터의 앞에서 시작
+                case AreaSkillType.Throwing:
+                    areaSkill.transform.position = caster.transform.position + caster.transform.forward * 3f + (Vector3.up * caster.navMeshAgent.height / 2f); // 캐스터의 앞에서 시작
+                    break;
+                case AreaSkillType.Falling:
+                    areaSkill.transform.position = caster.transform.position + (Vector3.up * (caster.navMeshAgent.height + 2f)); // 캐스터 위치에서 약간 위로 시작
+                    break;
+                case AreaSkillType.GroundTarget:
+                    areaSkill.transform.position = target.transform.position;   // 대상의 발 아래 위치에서 시작
+                    break;
+                case AreaSkillType.PointBlank:
+                    areaSkill.transform.position = caster.transform.position; // 캐스터의 발 아래 위치에서 시작
+                    break;
             }
-            else
-            {
-                areaSkill.transform.position = caster.transform.position + (Vector3.up * (caster.navMeshAgent.height + 2f)); // 캐스터 위치에서 약간 위로 시작
-            }
+
             yield return null;
         }
+
+        areaSkill.InitAreaSkill(caster, target, Damage, DamageInterval, DamageDuration, ChaseTarget, AreaSkillType);
+
+        yield return new WaitUntil(() => passedTime >= CastTime);
+
+        caster.AttackIsDone();
     }
 }

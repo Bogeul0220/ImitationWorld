@@ -67,7 +67,6 @@ public class Creature : MonoBehaviour
     public bool IsUsingSkill = false; // 스킬 캐스팅 중 여부
     public IEnumerator SkillCastCoroutine; // 스킬 캐스팅 코루틴
     private bool BeingCaptured = false;
-    private bool IsDead = false; // 사망 여부
 
     // 크리쳐 대기 / 순찰
     private float idlePatrolSwitchTimer = 0f;
@@ -98,6 +97,11 @@ public class Creature : MonoBehaviour
         {
             animator = creaturePrefab.GetComponent<Animator>();
             skinnedMeshRenderer = creaturePrefab.GetComponentInChildren<SkinnedMeshRenderer>();
+        }
+        
+        if(HitColliderList.Count > 0)
+        {
+            HitColliderList.Clear();
         }
 
         // 실제 게임 오브젝트의 콜라이더에 Damageable 추가

@@ -11,7 +11,7 @@ public class CreatureManager : MonoBehaviour
     public List<Creature> CreaturePrefabList;   // 크리쳐 프리팹 저장 리스트1
 
     [Header("길들인 크리쳐")]
-    public List<int> SpawnedTamedKey; // 생성된 길들여진 크리쳐 키 리스트
+    public List<int> TamedCreatureKey; // 생성된 길들여진 크리쳐 키 리스트
     public Dictionary<int, Creature> TamedCreatures; // 생성된 길들여진 크리쳐 딕셔너리
     public Dictionary<int, Coroutine> RetireAllyReviveTimer; // 퇴장한 아군 크리쳐 부활 타이머 딕셔너리
     public Dictionary<int, float> RetireAllyReviveProgress; // 퇴장한 아군 크리쳐 부활 진행률 딕셔너리
@@ -24,7 +24,6 @@ public class CreatureManager : MonoBehaviour
     private GameObject WildCreaturesParent;
     public int MaxWildCreatures = 5; // 최대 야생 크리쳐 수
     public float SpawnInterval = 5f; // 크리쳐 생성 간격
-    private float NextSpawnTime = 0f; // 다음 크리쳐 생성 시간
 
     private void Awake()
     {
@@ -32,8 +31,8 @@ public class CreatureManager : MonoBehaviour
             Instance = this;
 
         // 초기화
-        if (SpawnedTamedKey == null)
-            SpawnedTamedKey = new List<int>();
+        if (TamedCreatureKey == null)
+            TamedCreatureKey = new List<int>();
 
         if (TamedCreatures == null)
             TamedCreatures = new Dictionary<int, Creature>();
@@ -88,19 +87,19 @@ public class CreatureManager : MonoBehaviour
 
     public void SpawnAllyCreature(Vector3 spawnPos)
     {
-        if (SpawnedTamedKey.Count <= 0)
+        if (TamedCreatureKey.Count <= 0)
             return;
 
         if (InputManager.Instance.SelectedAllyCreature == -1)
             return;
 
-        if (InputManager.Instance.SelectedAllyCreature >= SpawnedTamedKey.Count)
+        if (InputManager.Instance.SelectedAllyCreature >= TamedCreatureKey.Count)
             return;
 
         if (CurrentTakeOutCreature != null)
             return;
 
-        var CreatureKey = SpawnedTamedKey[InputManager.Instance.SelectedAllyCreature];
+        var CreatureKey = TamedCreatureKey[InputManager.Instance.SelectedAllyCreature];
 
         if (RetireAllyReviveProgress.ContainsKey(CreatureKey))
             return;

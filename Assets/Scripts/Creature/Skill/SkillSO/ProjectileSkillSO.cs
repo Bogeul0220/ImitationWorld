@@ -27,7 +27,7 @@ public class ProjectileSkillSO : SkillBaseSO
         }
         projectile.transform.localScale = Vector3.zero;
         projectile.transform.forward = caster.transform.forward; // 캐스터의 방향으로 설정
-        var passedTime = 0f;
+        float passedTime = 0f;
         while (passedTime < CastTime)
         {
             if (caster.currentState == CreatureState.TakeHit
@@ -64,7 +64,8 @@ public class ProjectileSkillSO : SkillBaseSO
             projectileSpinSpeed
         );
 
-        yield return new WaitUntil(() => passedTime >= (CastTime - 1.5f));
+        yield return new WaitUntil(() => passedTime >= CastTime);
+        
         caster.AttackIsDone();
     }
 }
