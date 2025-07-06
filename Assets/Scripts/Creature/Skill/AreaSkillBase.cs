@@ -17,11 +17,10 @@ public class AreaSkillBase : MonoBehaviour
     private float damageInterval;
     private float damageDuration;
     private bool chaseTarget;
-
     [SerializeField] private AreaSkillParticleHandler areaSkillParticleHandler;
 
     public void InitAreaSkill(Creature caster, UnitStats target, int damage, float damageInterval,
-     float damageDuration, bool chaseTarget, AreaSkillType _areaSkillType)
+     float damageDuration, bool chaseTarget)
     {
         this.caster = caster;
         this.target = target;
@@ -29,25 +28,35 @@ public class AreaSkillBase : MonoBehaviour
         this.damageInterval = damageInterval;
         this.damageDuration = damageDuration;
         this.chaseTarget = chaseTarget;
-
-        switch (_areaSkillType)
-        {
-            case AreaSkillType.Throwing:
-                StartCoroutine(AreaThrowing());
-                break;
-            case AreaSkillType.Falling:
-                StartCoroutine(AreaFallingDamage());
-                break;
-        }
     }
 
-    private IEnumerator AreaThrowing()
+    public IEnumerator AreaThrowing()
     {
         areaSkillParticleHandler.InitAreaSkillParticleHandler(damage, caster, damageInterval);
+
+        var particleDir = target.transform.position - caster.transform.position;
+
+        if (areaSkillParticleHandler.gameObject.activeSelf == false)
+            areaSkillParticleHandler.gameObject.SetActive(true);
+        
+        areaSkillParticleHandler.transform.rotation = Quaternion.LookRotation(particleDir);
+
+        areaSkillParticleHandler.EnableParticle();
+
+        float damageT = 0f;
+        while(damageT < damageDuration)
+        {
+            damageT += Time.deltaTime;
+            yield return null;
+        }
+
+        areaSkillParticleHandler.DisableParticle();
+        ObjectPoolManager.Return(gameObject);
+
         yield return null;
     }
 
-    private IEnumerator AreaFallingDamage()
+    public IEnumerator AreaFallingDamage()
     {
         areaSkillParticleHandler.InitAreaSkillParticleHandler(damage, caster, damageInterval);
 

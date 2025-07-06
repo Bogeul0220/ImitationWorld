@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18f5550455746f149995a5236d6be2be, type: 3}
+  m_Name: ThunderblotThrower_AreaSkill
+  m_EditorClassIdentifier: 
+  skillName: Thunderblot
+  skillIcon: {fileID: 0}
+  skillDescription: "\uC804\uAE30\uB97C \uBC1C\uC0AC\uD558\uC5EC \uB370\uBBF8\uC9C0\uB97C
+    \uC900\uB2E4."
+  setSkillCooldown: 10
+  Damage: 3
+  DamageInterval: 0.5
+  DamageDuration: 3
+  CastTime: 3
+  AreaSkillPrefab: {fileID: 3658653772194312603, guid: 674ee8af62031dc4d9e9b186d84059fb, type: 3}
+  AreaSkillType: 0
+  ChaseTarget: 0

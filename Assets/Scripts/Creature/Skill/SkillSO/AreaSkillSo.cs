@@ -40,7 +40,8 @@ public class AreaSkillSO : SkillBaseSO
             switch (AreaSkillType)
             {
                 case AreaSkillType.Throwing:
-                    areaSkill.transform.position = caster.transform.position + caster.transform.forward * 3f + (Vector3.up * caster.navMeshAgent.height / 2f); // 캐스터의 앞에서 시작
+                    areaSkill.transform.position = caster.transform.position + caster.transform.forward * 3f
+                                    + (Vector3.up * caster.navMeshAgent.height / 2f);
                     break;
                 case AreaSkillType.Falling:
                     areaSkill.transform.position = caster.transform.position + (Vector3.up * (caster.navMeshAgent.height + 4f)); // 캐스터 위치에서 약간 위로 시작
@@ -50,10 +51,22 @@ public class AreaSkillSO : SkillBaseSO
             yield return null;
         }
 
-        areaSkill.InitAreaSkill(caster, target, Damage, DamageInterval, DamageDuration, ChaseTarget, AreaSkillType);
+        areaSkill.InitAreaSkill(caster, target, Damage, DamageInterval, DamageDuration, ChaseTarget);
 
-        yield return new WaitUntil(() => passedTime >= CastTime);
+        Coroutine skillCoroutine = null;
 
+        switch (AreaSkillType)
+        {
+            case AreaSkillType.Throwing:
+                skillCoroutine = areaSkill.StartCoroutine(areaSkill.AreaThrowing());
+                yield return new WaitUntil(() => passedTime >= CastTime);
+                break;
+            case AreaSkillType.Falling:
+                skillCoroutine = areaSkill.StartCoroutine(areaSkill.AreaFallingDamage());
+                yield return new WaitUntil(() => passedTime >= CastTime);
+                break;
+        }
+        
         caster.AttackIsDone();
     }
 }
