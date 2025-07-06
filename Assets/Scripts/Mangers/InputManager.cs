@@ -26,12 +26,13 @@ public class InputManager : MonoBehaviour
     public int SelectedAllyCreature { get; set; }
     public bool SpawnAllyHeld { get; set; }
     public Action CallInAllyPressed { get; set; }
+    public Action<int> BelligerentPressedInt { get; set; }
 
     [SerializeField] private InputActionAsset inputActions;
 
     private InputAction m_moveAction, m_lookAction, m_jumpAction, m_sprintAction, m_pauseActionPlayer,
         m_fireAction, m_zoomInAction, m_inventoryActionPlayer, m_interactAction, m_selectedWeaponInput,
-        m_throwBallAction, m_changeBallAction, m_selectAlly, m_spawnAlly;
+        m_throwBallAction, m_changeBallAction, m_selectAlly, m_spawnAlly, m_allyBelligerent;
 
     private InputAction m_pauseActionUI, m_inventoryActionUI, m_escapeActionUI;
 
@@ -68,6 +69,7 @@ public class InputManager : MonoBehaviour
         m_changeBallAction = playerMap.FindAction("ChangeBallScroll");
         m_selectAlly = playerMap.FindAction("SelectAlly");
         m_spawnAlly = playerMap.FindAction("SpawnAlly");
+        m_allyBelligerent = playerMap.FindAction("AllyBelligerent");
 
         m_pauseActionUI = uiMap.FindAction("Pause");
         m_inventoryActionUI = uiMap.FindAction("Inventory");
@@ -110,7 +112,6 @@ public class InputManager : MonoBehaviour
                     SelectedAllyCreature = 0;
                 else
                     SelectedAllyCreature++;
-                Debug.Log("C키 입력");
             }
             else if (allySelectValue < 0f) // Z키 입력
             {
@@ -118,7 +119,6 @@ public class InputManager : MonoBehaviour
                     SelectedAllyCreature = CreatureManager.Instance.TamedCreatureKey.Count - 1;
                 else
                     SelectedAllyCreature--;
-                Debug.Log("Z키 입력");
             }
         }
 
@@ -128,7 +128,7 @@ public class InputManager : MonoBehaviour
             {
                 return;
             }
-            
+
             if (m_spawnAlly.WasPressedThisFrame() && CreatureManager.Instance.CurrentTakeOutCreature != null)
             {
                 CallInAllyPressed?.Invoke();
@@ -136,6 +136,17 @@ public class InputManager : MonoBehaviour
             }
 
             SpawnAllyHeld = m_spawnAlly.IsPressed();
+        }
+
+        if (m_allyBelligerent.WasPressedThisFrame())
+        {
+            int belligerentIndex = (int)CreatureManager.Instance.CurrentAllyBelligerent;
+            if (belligerentIndex >= 2)
+                belligerentIndex = 0;
+            else
+                belligerentIndex++;
+
+            BelligerentPressedInt?.Invoke(belligerentIndex);
         }
 
         if (m_zoomInAction.WasPressedThisFrame())

@@ -51,6 +51,7 @@ public class CreatureManager : MonoBehaviour
     {
         _ = StartCoroutine(SpawnCreatureCoroutine());
         InputManager.Instance.CallInAllyPressed += CallInAllyCreature;
+        InputManager.Instance.BelligerentPressedInt += ChangeCreatureBelligerent;
     }
 
     public IEnumerator SpawnCreatureCoroutine()
@@ -246,5 +247,12 @@ public class CreatureManager : MonoBehaviour
             item.CreatureStat.isDead = false;
             item.CreatureStat.RestoreHealth(item.CreatureStat.maxHealth);
         }
+    }
+
+    public void ChangeCreatureBelligerent(int belligerentIndex)
+    {
+        CurrentAllyBelligerent = (Belligerent)belligerentIndex;
+        if(CurrentTakeOutCreature != null)
+            CurrentTakeOutCreature.CurrentBelligerent = (Belligerent)belligerentIndex;
     }
 }

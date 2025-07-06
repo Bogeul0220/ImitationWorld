@@ -33,7 +33,7 @@ public class Creature : MonoBehaviour
     public CreatureState currentState;
     public bool AllyEnemyConversion;
     public bool BattleBegin;
-    public Belligerent Belligerent;
+    public Belligerent CurrentBelligerent;
     public int CreatureIndex = -1;
 
     [Header("크리쳐 이동 세팅")]
@@ -50,7 +50,7 @@ public class Creature : MonoBehaviour
     public float AttackSpeed = 1f; // 공격 속도
     public float AttackBaseDamage = 1f; // 공격력
     public float BaseDefecse = 1f; // 방어력
-    public UnitStats Target; // 전투 / 작업 시 타겟 오브젝트
+    public UnitStats Target; // 전투 시 타겟 오브젝트
 
     [Header("크리쳐 프리팹 세팅")]
     [SerializeField] private GameObject creaturePrefab;
@@ -76,7 +76,7 @@ public class Creature : MonoBehaviour
     private float patrolTimer = 0f;
 
     // 크리쳐 초기화 메소드 (Belligerent는 기본적으로 NonAggressive로 설정)
-    public virtual void InitCreature(bool isAlly, Belligerent belligerent = Belligerent.NonAggressive)
+    public virtual void InitCreature(bool isAlly)
     {
         if (navMeshAgent == null)
             navMeshAgent = GetComponent<NavMeshAgent>();
@@ -98,8 +98,8 @@ public class Creature : MonoBehaviour
             animator = creaturePrefab.GetComponent<Animator>();
             skinnedMeshRenderer = creaturePrefab.GetComponentInChildren<SkinnedMeshRenderer>();
         }
-        
-        if(HitColliderList.Count > 0)
+
+        if (HitColliderList.Count > 0)
         {
             HitColliderList.Clear();
         }
@@ -139,6 +139,8 @@ public class Creature : MonoBehaviour
         currentState = CreatureState.Idle;
         CreatureStat.CurrentBattleTarget = null;
         CreatureStat.DamagedTargetDict.Clear();
+        if (isAlly)
+            CurrentBelligerent = CreatureManager.Instance.CurrentAllyBelligerent;
 
         IsAttacking = false;
         IsUsingSkill = false;
@@ -155,7 +157,7 @@ public class Creature : MonoBehaviour
         CreatureHeathUI.GetComponent<RectTransform>().position = this.transform.position + new Vector3(0f, navMeshAgent.height <= 1f ? 1.5f : navMeshAgent.height, 0f);
         CreatureHeathUI.UpdateHealthSlider();
         AddedSkillInList();
-        
+
         CreatureStat.OnDamaged -= ConversionBattleBegin;
         CreatureStat.OnDamaged += ConversionBattleBegin;
 
@@ -189,7 +191,7 @@ public class Creature : MonoBehaviour
     {
         foreach (var skill in SkillList)
         {
-            if(!SkillsCooldownDict.ContainsKey(skill))
+            if (!SkillsCooldownDict.ContainsKey(skill))
                 SkillsCooldownDict.Add(skill, 0f);
             else
                 SkillsCooldownDict[skill] = 0f;
@@ -248,13 +250,13 @@ public class Creature : MonoBehaviour
         {
             case true:
                 // 아군일 때의 행동
-                if (Belligerent == Belligerent.Peaceful)
+                if (CurrentBelligerent == Belligerent.Peaceful)
                 {
                     // 평화 상태일 때의 행동
                     // 공격하지 않음
                     FollowPlayer(); // 플레이어를 따라감
                 }
-                else if (Belligerent == Belligerent.NonAggressive)
+                else if (CurrentBelligerent == Belligerent.NonAggressive)
                 {
                     // 후공 상태일 때의 행동
                     // 플레이어가 데미지를 입거나 공격하면 StandOff 상태로 전환
@@ -267,7 +269,7 @@ public class Creature : MonoBehaviour
 
                     FollowPlayer(); // 플레이어를 따라감
                 }
-                else if (Belligerent == Belligerent.Aggressive)
+                else if (CurrentBelligerent == Belligerent.Aggressive)
                 {
                     // 선공 상태일 때의 행동 (CreatureManager를 만들고 현재 크리쳐와 적군을 관리하는 방식으로 변경 필요)
                     // 범위에 들어오면 StandOff 상태로 전환
@@ -281,33 +283,37 @@ public class Creature : MonoBehaviour
                         }
                         else if (IsDetection()) // 플레이어의 범위에 들어오면 StandOff 상태로 전환
                         {
+                            Target = FindNearTarget();
                             currentState = CreatureState.StandOff;
                         }
+                        else
+                            FollowPlayer(); // 플레이어를 따라감
                     }
-
-                    FollowPlayer(); // 플레이어를 따라감
                 }
                 break;
             case false:
                 // 적군일 때의 행동
-                if (Belligerent == Belligerent.Peaceful)
+                if (CurrentBelligerent == Belligerent.Peaceful)
                 {
                     // 적군은 평화상태를 가지지 않음
-                    Belligerent = Belligerent.NonAggressive;
+                    CurrentBelligerent = Belligerent.NonAggressive;
                 }
-                else if (Belligerent == Belligerent.NonAggressive)
+                else if (CurrentBelligerent == Belligerent.NonAggressive)
                 {
                     // 후공 상태일 때의 행동
 
                     if (IsDetection())  // 플레이어가 범위에 들어오면 Escape 상태로 전환
                         currentState = CreatureState.Escape;
                 }
-                else if (Belligerent == Belligerent.Aggressive)
+                else if (CurrentBelligerent == Belligerent.Aggressive)
                 {
                     // 선공 상태일 때의 행동
                     // 데미지를 입거나 플레이어가 범위에 들어오면 StandOff 상태로 전환
                     if (IsDetection() || BattleBegin)
+                    {
+                        Target = FindNearTarget();
                         currentState = CreatureState.StandOff;
+                    }
                 }
 
                 idlePatrolSwitchTimer += Time.deltaTime;
@@ -337,6 +343,12 @@ public class Creature : MonoBehaviour
             // Patrol 상태에서 타겟을 찾으면 StandOff 상태로 전환
             float distance = Vector3.Distance(transform.position, patrolTarget);
 
+            if (CurrentBelligerent == Belligerent.Aggressive && IsDetection())
+            {
+                Target = FindNearTarget();
+                currentState = CreatureState.StandOff;
+            }
+
             if (patrolTimer >= patrolDuration || distance < 0.5f)
             {
                 patrolTimer = 0f; // 타이머 초기화
@@ -344,12 +356,12 @@ public class Creature : MonoBehaviour
             }
             else if (IsDetection())
             {
-                if (Belligerent == Belligerent.Aggressive)
+                if (CurrentBelligerent == Belligerent.Aggressive)
                 {
                     patrolTimer = 0f; // 타이머 초기화
                     currentState = CreatureState.StandOff;  // 선공 상태일 때는 StandOff 상태로 전환
                 }
-                else if (Belligerent == Belligerent.NonAggressive)
+                else if (CurrentBelligerent == Belligerent.NonAggressive)
                 {
                     patrolTimer = 0f; // 타이머 초기화
                     currentState = CreatureState.Escape; // 후공 상태일 때는 도망
@@ -445,15 +457,20 @@ public class Creature : MonoBehaviour
             if (PlayerManager.Instance.Player.GetComponent<P_CombatController>().PlayerStat.CurrentBattleTarget != null)
             {
                 Target = PlayerManager.Instance.Player.GetComponent<P_CombatController>().PlayerStat.CurrentBattleTarget;
-                if (Target.isDead)
-                {
-                    CreatureStat.CurrentBattleTarget = null;
-                    BattleBegin = false;
-                    currentState = CreatureState.Idle;
-                    return;
-                }
+            }
+            else if (CurrentBelligerent == Belligerent.Aggressive)
+            {
+                Target = FindNearTarget();
             }
             else
+            {
+                CreatureStat.CurrentBattleTarget = null;
+                BattleBegin = false;
+                currentState = CreatureState.Idle;
+                return;
+            }
+            
+            if (Target != null && Target.isDead)
             {
                 CreatureStat.CurrentBattleTarget = null;
                 BattleBegin = false;
@@ -465,6 +482,8 @@ public class Creature : MonoBehaviour
         {
             if (CreatureStat.CurrentBattleTarget != null)
                 Target = CreatureStat.CurrentBattleTarget;
+            else if (CurrentBelligerent == Belligerent.Aggressive)
+                Target = FindNearTarget();
             else
             {
                 CreatureStat.CurrentBattleTarget = null;
@@ -473,7 +492,7 @@ public class Creature : MonoBehaviour
                 return;
             }
 
-            if (Target.isDead)
+            if (Target != null && Target.isDead)
             {
                 // 타겟이 죽을 경우 Idle 상태로 전환
                 CreatureStat.DamagedTargetDict.Remove(Target);
@@ -582,15 +601,20 @@ public class Creature : MonoBehaviour
             if (PlayerManager.Instance.Player.GetComponent<P_CombatController>().PlayerStat.CurrentBattleTarget != null)
             {
                 Target = PlayerManager.Instance.Player.GetComponent<P_CombatController>().PlayerStat.CurrentBattleTarget;
-                if (Target.isDead)
-                {
-                    CreatureStat.CurrentBattleTarget = null;
-                    BattleBegin = false;
-                    currentState = CreatureState.Idle;
-                    return;
-                }
+            }
+            else if (CurrentBelligerent == Belligerent.Aggressive)
+            {
+                Target = FindNearTarget();
             }
             else
+            {
+                CreatureStat.CurrentBattleTarget = null;
+                BattleBegin = false;
+                currentState = CreatureState.Idle;
+                return;
+            }
+
+            if (Target != null && Target.isDead)
             {
                 CreatureStat.CurrentBattleTarget = null;
                 BattleBegin = false;
@@ -601,7 +625,13 @@ public class Creature : MonoBehaviour
         else
         {
             if (CreatureStat.CurrentBattleTarget != null)
+            {
                 Target = CreatureStat.CurrentBattleTarget;
+            }
+            else if (CurrentBelligerent == Belligerent.Aggressive)
+            {
+                Target = FindNearTarget();
+            }
             else
             {
                 CreatureStat.CurrentBattleTarget = null;
@@ -610,7 +640,7 @@ public class Creature : MonoBehaviour
                 return;
             }
 
-            if (Target.isDead)
+            if (Target != null && Target.isDead)
             {
                 // 타겟이 죽을 경우 Idle 상태로 전환
                 CreatureStat.DamagedTargetDict.Remove(Target);
@@ -876,6 +906,52 @@ public class Creature : MonoBehaviour
             }
             return false;
         }
+    }
+
+    private UnitStats FindNearTarget()
+    {
+        if (AllyEnemyConversion)
+        {
+            // 아군일 때의 탐지 로직
+            foreach (var enemy in CreatureManager.Instance.SpawnedWildCreatures)
+            {
+                if (enemy != null && enemy.gameObject.activeInHierarchy)
+                {
+                    float distance = Vector3.Distance(transform.position, enemy.transform.position);
+                    if (distance <= DetectionRange)
+                    {
+                        return enemy.CreatureStat;
+                    }
+                }
+            }
+        }
+        else
+        {
+            // 적군일 때의 탐지 로직
+            if (PlayerManager.Instance.Player != null)
+            {
+                float distance = Vector3.Distance(transform.position, PlayerManager.Instance.Player.transform.position);
+                if (CreatureManager.Instance.CurrentTakeOutCreature != null)
+                {
+                    float distanceToTakeOutCreature = Vector3.Distance(transform.position, CreatureManager.Instance.CurrentTakeOutCreature.transform.position);
+                    if (distanceToTakeOutCreature <= DetectionRange)
+                    {
+                        if (distanceToTakeOutCreature < distance)
+                            Target = CreatureManager.Instance.CurrentTakeOutCreature.CreatureStat;
+                        else
+                            Target = PlayerManager.Instance.Player.GetComponent<UnitStats>();
+                        return Target;
+                    }
+                }
+                else if (distance <= DetectionRange)
+                {
+                    Target = PlayerManager.Instance.Player.GetComponent<UnitStats>();
+                    return PlayerManager.Instance.Player.GetComponent<UnitStats>();
+                }
+            }
+        }
+
+        return null;
     }
 
     private SkillBaseSO SelletedSkill()

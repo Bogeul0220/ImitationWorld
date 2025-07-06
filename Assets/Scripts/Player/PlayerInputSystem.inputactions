@@ -130,6 +130,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "AllyBelligerent",
+                    "type": "Button",
+                    "id": "3224fee9-34ef-448e-8bb9-156353d2439c",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -385,6 +394,17 @@
                     "action": "SelectAlly",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "59f069c0-abe9-4705-a8be-948f0973e41d",
+                    "path": "<Keyboard>/t",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AllyBelligerent",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
