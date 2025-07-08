@@ -1042,6 +1042,7 @@ public class Creature : MonoBehaviour
             navMeshAgent.isStopped = false;
         }
 
+        SoundManager.Instance.PlaySFX($"{CreatureName}Roar");
         animator.SetTrigger("BaseAttack");
     }
 

@@ -22,6 +22,7 @@ public class Damageable : MonoBehaviour
         unitStats.TakeDamage(damage, damagedTarget, usePurpose);
         UIManager.Instance.DisplayDamageFloating(damage, transform.position + Vector3.up * 1.5f);
         EffectManager.Instance.PlayEffect(damagedPos);
+        SoundManager.Instance.PlaySFX("TakeHit");
         _ = StartCoroutine(DamamgedIgnoreCoroutine());
     }
 

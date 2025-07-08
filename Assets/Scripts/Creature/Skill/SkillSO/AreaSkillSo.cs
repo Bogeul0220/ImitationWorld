@@ -66,6 +66,8 @@ public class AreaSkillSO : SkillBaseSO
                 yield return new WaitUntil(() => passedTime >= CastTime);
                 break;
         }
+
+        SoundManager.Instance.PlaySFX($"{skillName}");
         
         caster.AttackIsDone();
     }

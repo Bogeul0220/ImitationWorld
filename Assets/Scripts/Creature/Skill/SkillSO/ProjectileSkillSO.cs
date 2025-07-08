@@ -64,6 +64,8 @@ public class ProjectileSkillSO : SkillBaseSO
             projectileSpinSpeed
         );
 
+        SoundManager.Instance.PlaySFX($"{skillName}");    
+
         yield return new WaitUntil(() => passedTime >= CastTime);
         
         caster.AttackIsDone();

@@ -160,6 +160,7 @@ public class PlayerManager : MonoBehaviour
                 // 무기 비활성화
                 WeaponEquiped = false;
                 InventoryManager.Instance.CurrentWeapon = null;
+                SoundManager.Instance.PlaySFX("UnEquip");
                 ChangeCurrentWeaponPrefab();
             }
             else
@@ -167,6 +168,7 @@ public class PlayerManager : MonoBehaviour
                 // 무기 활성화
                 WeaponEquiped = true;
                 InventoryManager.Instance.SelectedCurrentWeapon(slotIndex);
+                SoundManager.Instance.PlaySFX("Equip");
                 ChangeCurrentWeaponPrefab();
             }
         }

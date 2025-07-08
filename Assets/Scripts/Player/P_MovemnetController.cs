@@ -192,16 +192,11 @@ public class P_MovementController : MonoBehaviour
 
     public void OnFootstep()
     {
-
+        SoundManager.Instance.PlaySFX("Player_Step");
     }
 
     private void OnLand(AnimationEvent animationEvent)
     {
-        /*
-        if (animationEvent.animatorClipInfo.weight > 0.5f)
-        {
-            AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
-        }
-        */
+        SoundManager.Instance.PlaySFX("Player_Land");
     }
 }

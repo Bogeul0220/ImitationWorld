@@ -60,7 +60,6 @@ public class InputManager : MonoBehaviour
         m_sprintAction = playerMap.FindAction("Sprint");
         m_pauseActionPlayer = playerMap.FindAction("Pause");
         m_fireAction = playerMap.FindAction("Fire");
-        m_pauseActionPlayer = playerMap.FindAction("Pause");
         m_zoomInAction = playerMap.FindAction("ZoomIn");
         m_inventoryActionPlayer = playerMap.FindAction("Inventory");
         m_interactAction = playerMap.FindAction("Interact");
@@ -120,6 +119,7 @@ public class InputManager : MonoBehaviour
                 else
                     SelectedAllyCreature--;
             }
+            SoundManager.Instance.PlaySFX("ChangeItem");
         }
 
         if (creatureList.Count > 0 && SelectedAllyCreature != -1)
@@ -146,6 +146,7 @@ public class InputManager : MonoBehaviour
             else
                 belligerentIndex++;
 
+            SoundManager.Instance.PlaySFX("ChangeItem");
             BelligerentPressedInt?.Invoke(belligerentIndex);
         }
 
@@ -168,11 +169,13 @@ public class InputManager : MonoBehaviour
         {
             SelectedBallIndex = (SelectedBallIndex + 1) % 3;
             UIManager.Instance.BallTargetUpdate(SelectedBallIndex);
+            SoundManager.Instance.PlaySFX("ChangeItem");
         }
         else if (scrollValue.y < 0f)
         {
             SelectedBallIndex = (SelectedBallIndex + 2) % 3;
             UIManager.Instance.BallTargetUpdate(SelectedBallIndex);
+            SoundManager.Instance.PlaySFX("ChangeItem");
         }
 
         if (m_selectedWeaponInput.triggered)
@@ -192,6 +195,7 @@ public class InputManager : MonoBehaviour
                     SelectedWeaponNum = newSelectedWeaponNum;
                 }
                 PlayerManager.Instance.ToggleWeapon(newSelectedWeaponNum);
+                SoundManager.Instance.PlaySFX("ChangeItem");
             }
         }
 

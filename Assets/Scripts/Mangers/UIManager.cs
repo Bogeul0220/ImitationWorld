@@ -85,12 +85,22 @@ public class UIManager : MonoBehaviour
 
     private void DisplayPause()
     {
+        if(pauseDisplay.activeSelf)
+            SoundManager.Instance.PlaySFX("CloseUI");
+        else
+            SoundManager.Instance.PlaySFX("OpenUI");
+
         pauseDisplay.SetActive(!pauseDisplay.activeSelf);
         playerStatusUI.gameObject.SetActive(!playerStatusUI.gameObject.activeSelf);
     }
 
     private void DisplayInventory()
     {
+        if(inventoryDisplay.activeSelf)
+            SoundManager.Instance.PlaySFX("CloseUI");
+        else
+            SoundManager.Instance.PlaySFX("OpenUI");
+
         inventoryDisplay.SetActive(!inventoryDisplay.activeSelf);
         playerStatusUI.gameObject.SetActive(!playerStatusUI.gameObject.activeSelf);
     }
@@ -100,13 +110,19 @@ public class UIManager : MonoBehaviour
         if (PlayerManager.Instance.NearInteractionObject == null)
             return;
 
-        Debug.Log("DisplayInteract called");
+        if(craftingPanelDisplay.activeSelf)
+            SoundManager.Instance.PlaySFX("CloseUI");
+        else
+            SoundManager.Instance.PlaySFX("OpenUI");
+
         craftingPanelDisplay.SetActive(!craftingPanelDisplay.activeSelf);
         playerStatusUI.gameObject.SetActive(!playerStatusUI.gameObject.activeSelf);
     }
 
     private void EscapeDisplay()
     {
+        SoundManager.Instance.PlaySFX("CloseUI");
+
         pauseDisplay.SetActive(false);
         inventoryDisplay.SetActive(false);
         craftingPanelDisplay.SetActive(false);

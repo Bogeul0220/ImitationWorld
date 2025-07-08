@@ -12,6 +12,6 @@ public class SkillBaseSO : ScriptableObject
 
     public virtual IEnumerator ActivateSkill(Creature caster, UnitStats target)
     {
-        yield return null; // 기본 구현은 아무것도 하지 않음
+        yield return null;
     }
 }
