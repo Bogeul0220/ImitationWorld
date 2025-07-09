@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: StoneEdge_ProjectileSkill
   m_EditorClassIdentifier: 
   skillName: StoneEdge
-  skillIcon: {fileID: 21300000, guid: 583675a75bcb2a941ac555b9ccd513a9, type: 3}
+  skillIcon: {fileID: 21300000, guid: 0564cc9f44c2a734da3403c2b2771d51, type: 3}
   skillDescription: "\uB0A0\uCE74\uB85C\uC6B4 \uB3CC\uC744 \uB358\uC9C0\uB294 \uACF5\uACA9"
   setSkillCooldown: 10
   projectilePrefab: {fileID: 5530788720763946062, guid: 2b3ffddcaf8199b49861af83e34985fc, type: 3}

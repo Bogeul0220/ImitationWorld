@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SplitBombSkill_Projectile
   m_EditorClassIdentifier: 
   skillName: SplitBomb
-  skillIcon: {fileID: 749509126, guid: 05e0567213a58c840a3ea79a4409bdfd, type: 3}
+  skillIcon: {fileID: 21300000, guid: 656eb5ac8d967e642baaa4474670fc19, type: 3}
   skillDescription: "\uAE30\uC6B4\uC744 \uBAA8\uC544 \uB2F4\uC740 \uAD6C\uC2AC\uC744
     \uB358\uC9C0\uB294 \uAE30\uC220"
   setSkillCooldown: 20

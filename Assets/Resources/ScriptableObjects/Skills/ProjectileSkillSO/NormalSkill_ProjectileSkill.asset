@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: NormalSkill_ProjectileSkill
   m_EditorClassIdentifier: 
   skillName: NormalAttack
-  skillIcon: {fileID: 21300000, guid: 2d089513ae4adfc48a683c362ad9992c, type: 3}
+  skillIcon: {fileID: 21300000, guid: 0b17bac5321b8cc498eef42b19164e70, type: 3}
   skillDescription: "\uAE30\uBCF8 \uACF5\uACA9"
   setSkillCooldown: 3
   projectilePrefab: {fileID: 3915406152303595660, guid: 5d6dc4f5da66349479f8f2ea78f8309e, type: 3}
