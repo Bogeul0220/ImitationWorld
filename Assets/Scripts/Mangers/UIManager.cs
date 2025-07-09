@@ -75,7 +75,7 @@ public class UIManager : MonoBehaviour
     {
         if (PlayerManager.Instance.NearInteractionObject != null && DisplayOpened == false)
         {
-            interactionText.text = $"[E] {PlayerManager.Instance.NearInteractionObject.InteractionObjectName}";
+            interactionText.text = $"[F] {PlayerManager.Instance.NearInteractionObject.InteractionObjectName}";
         }
         else
         {

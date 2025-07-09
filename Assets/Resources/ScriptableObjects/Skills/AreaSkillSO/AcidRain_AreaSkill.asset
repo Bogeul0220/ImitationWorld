@@ -16,7 +16,7 @@ MonoBehaviour:
   skillIcon: {fileID: 0}
   skillDescription: "\uC0B0\uC131\uBE44\uB97C \uB0B4\uB824 \uACF5\uACA9\uD55C\uB2E4."
   setSkillCooldown: 15
-  Damage: 1
+  Damage: 2
   DamageInterval: 0.2
   DamageDuration: 5
   CastTime: 4

@@ -17,7 +17,7 @@ MonoBehaviour:
   skillDescription: "\uBA54\uD14C\uC624\uB97C \uC18C\uD658\uD558\uC5EC \uB370\uBBF8\uC9C0\uB97C
     \uC785\uD78C\uB2E4."
   setSkillCooldown: 30
-  Damage: 20
+  Damage: 40
   DamageInterval: 10
   DamageDuration: 3
   CastTime: 6

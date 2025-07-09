@@ -74,7 +74,7 @@ MonoBehaviour:
   maxStamina: 0
   isDead: 0
   CurrentBattleTarget: {fileID: 0}
-  usePurpose: 0
+  usePurpose: 2
 --- !u!114 &1520164078613572026
 MonoBehaviour:
   m_ObjectHideFlags: 0

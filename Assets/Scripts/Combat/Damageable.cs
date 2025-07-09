@@ -15,12 +15,11 @@ public class Damageable : MonoBehaviour
             creature = unitStats.GetComponent<Creature>();
     }
 
-    public void TakeDamage(int damage, Vector3 damagedPos, UnitStats damagedTarget, UsePurpose usePurpose = UsePurpose.None)
+    public void TakeDamage(int damage, Vector3 damagedPos, UnitStats damagedTarget, UsePurpose fromUsePurpose = UsePurpose.None)
     {
         if (unitStats.isDead || isInvincible) return;
 
-        unitStats.TakeDamage(damage, damagedTarget, usePurpose);
-        UIManager.Instance.DisplayDamageFloating(damage, transform.position + Vector3.up * 1.5f);
+        unitStats.TakeDamage(damage, damagedTarget, fromUsePurpose);
         EffectManager.Instance.PlayEffect(damagedPos);
         SoundManager.Instance.PlaySFX("TakeHit");
         _ = StartCoroutine(DamamgedIgnoreCoroutine());

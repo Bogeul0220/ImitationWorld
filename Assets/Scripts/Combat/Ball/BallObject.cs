@@ -180,6 +180,12 @@ public class BallObject : MonoBehaviour
                 }
             }
         }
+
+        if(PlayerManager.Instance.PlayerStat.DamagedTargetDict.ContainsKey(target.CreatureStat) && PlayerManager.Instance.PlayerStat.CurrentBattleTarget == target.CreatureStat)
+        {
+            PlayerManager.Instance.PlayerStat.CurrentBattleTarget = null;
+            PlayerManager.Instance.PlayerStat.DamagedTargetDict.Remove(target.CreatureStat);
+        }
         
         target.gameObject.SetActive(false);
         ReturnObject();

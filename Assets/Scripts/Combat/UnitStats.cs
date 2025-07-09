@@ -29,7 +29,10 @@ public class UnitStats : MonoBehaviour
             {
                 foreach(var item in DamagedTargetDict)
                 {
-                    if(item.Key.isDead || Vector3.Distance(item.Key.transform.position, transform.position) > 25f) damagedTargetList.Add(item.Key);
+                    if(item.Key.isDead || Vector3.Distance(item.Key.transform.position, transform.position) > 25f || item.Key.gameObject.activeInHierarchy == false)
+                    {
+                        damagedTargetList.Add(item.Key);
+                    }
                 }
             }
 
@@ -57,7 +60,7 @@ public class UnitStats : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int damage, UnitStats damagedTarget, UsePurpose usePurpose = UsePurpose.None)
+    public void TakeDamage(int damage, UnitStats damagedTarget, UsePurpose fromUsePurpose = UsePurpose.None)
     {
         if (isDead) return;
 
@@ -82,9 +85,13 @@ public class UnitStats : MonoBehaviour
             }
         }
 
-        if (this.usePurpose == usePurpose)
+        if (this.usePurpose == fromUsePurpose)
+        {
             damage *= 2;
+            Debug.Log("Double Damage");
+        }
 
+        UIManager.Instance.DisplayDamageFloating(damage, transform.position + Vector3.up * 1.5f);
         currentHealth -= damage;
 
         OnDamaged?.Invoke();

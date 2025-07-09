@@ -153,6 +153,9 @@ public class CreatureManager : MonoBehaviour
                     creature.gameObject.SetActive(true);
                     CurrentTakeOutCreature = creature;
                     StartCoroutine(creature.CreatrueSizeUp(spawnPos));
+                    creature.BattleBegin = false;
+                    creature.Target = null;
+                    creature.CreatureStat.CurrentBattleTarget = null;
                     targetCreature = creature;
                     break;
                 }

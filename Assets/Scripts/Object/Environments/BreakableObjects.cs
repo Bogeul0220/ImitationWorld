@@ -33,6 +33,7 @@ public class BreakableObjects : MonoBehaviour
         showPrefab.SetActive(false);
         _collider.enabled = false;
         StartCoroutine(RespawnBreakableObject());
+        _status.isDead = false;
     }
 
     protected IEnumerator RespawnBreakableObject()
