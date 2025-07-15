@@ -18,14 +18,10 @@ public class UIManager : MonoBehaviour
 
     public BallQuickSlot[] ballQuickSlots = new BallQuickSlot[3];
 
-    [SerializeField]
-    private GameObject pauseDisplay;
-    [SerializeField]
-    private GameObject inventoryDisplay;
-    [SerializeField]
-    private TMP_Text interactionText;
-    [SerializeField]
-    private PlayerStatusUI playerStatusUI;
+    [SerializeField] private GameObject pauseDisplay;
+    [SerializeField] private GameObject inventoryDisplay;
+    [SerializeField] private TMP_Text interactionText;
+    [SerializeField] private PlayerStatusUI playerStatusUI;
     [SerializeField] private Image creatureImage;
     [SerializeField] private TMP_Text creatureNameText;
     [SerializeField] private Image creatureImageBorder;
