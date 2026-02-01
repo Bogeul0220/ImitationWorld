@@ -40,7 +40,7 @@ Assets/Scripts/
 
 ├── Item/ # 아이템 데이터 및 제작 레시피
 
-├── Mangers/ # 싱글톤 매니저 (Inventory, Creature, Environment 등)
+├── Managers/ # 싱글톤 매니저 (Inventory, Creature, Environment 등)
 
 ├── Player/ # 플레이어 이동/전투 컨트롤러
 
