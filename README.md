@@ -81,5 +81,4 @@ Unity 엔진을 사용해 개발한 3D 기반 오픈월드 서바이벌 게임 �
 
 ---
 
-## 🎬 플레이 영상
-[▶ 유튜브에서 보기](https://youtu.be/yFjqhBL_RS8)
+## 🎬 [플레이 영상](https://youtu.be/yFjqhBL_RS8)
