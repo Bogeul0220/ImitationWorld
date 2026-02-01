@@ -33,12 +33,19 @@ Unity 엔진을 사용해 개발한 3D 기반 오픈월드 서바이벌 게임 �
 ## 📁 프로젝트 구조
 
 Assets/Scripts/
+
 ├── Combat/ # 전투 시스템 (데미지, 포획)
+
 ├── Creature/ # 몬스터 AI, 스킬 시스템
+
 ├── Item/ # 아이템 데이터 및 제작 레시피
+
 ├── Mangers/ # 싱글톤 매니저 (Inventory, Creature, Environment 등)
+
 ├── Player/ # 플레이어 이동/전투 컨트롤러
+
 ├── UI/ # 인벤토리, 장비, 제작 UI
+
 └── Weapon/ # 무기 시스템
 
 ---
