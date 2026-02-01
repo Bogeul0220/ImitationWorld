@@ -30,6 +30,19 @@ Unity 엔진을 사용해 개발한 3D 기반 오픈월드 서바이벌 게임 �
 
 ---
 
+## 📁 프로젝트 구조
+
+Assets/Scripts/
+├── Combat/ # 전투 시스템 (데미지, 포획)
+├── Creature/ # 몬스터 AI, 스킬 시스템
+├── Item/ # 아이템 데이터 및 제작 레시피
+├── Mangers/ # 싱글톤 매니저 (Inventory, Creature, Environment 등)
+├── Player/ # 플레이어 이동/전투 컨트롤러
+├── UI/ # 인벤토리, 장비, 제작 UI
+└── Weapon/ # 무기 시스템
+
+---
+
 ## 👨‍💻 담당 역할
 
 - 전체 시스템 설계 및 구현
@@ -39,10 +52,26 @@ Unity 엔진을 사용해 개발한 3D 기반 오픈월드 서바이벌 게임 �
 
 ## ✨ 핵심 구현 내용
 
-- ScriptableObject를 활용한 아이템 데이터 관리 구조 설계
-- Object Pooling을 적용한 몬스터, 아이템, 이펙트 관리
-- FSM(State Machine) 기반 캐릭터 상태 관리
-- 이벤트를 기반으로 한 UI 업데이트
+### 1) ScriptableObject 기반 데이터 관리
+- 아이템 데이터와 제작 레시피를 ScriptableObject로 분리
+- 코드 수정 없이 에디터에서 새 아이템/레시피 추가 가능
+
+### 2) FSM 기반 몬스터 AI
+- Idle/Patrol/Escape/StandOff/Battle/TakeHit/Died 상태 전환 관리
+- 호전성(Belligerent) 시스템: Peaceful/NonAggressive/Aggressive 3단계 행동 분기
+- 아군/적군 전환 시스템으로 포획한 몬스터를 동료로 활용
+
+### 3) 스킬 시스템
+- `SkillBaseSO`를 상속한 투사체/범위 스킬 구현
+- 스킬별 쿨다운을 Dictionary로 관리
+
+### 4) Object Pooling
+- 제네릭 기반 `ObjectPoolManager`로 몬스터, 환경 오브젝트, 이펙트 재사용
+- 런타임 Instantiate/Destroy 최소화
+
+### 5) 이벤트 기반 UI 업데이트
+- `OnInventoryChanged` 이벤트로 데이터-UI 분리
+- 인벤토리 변경 시 구독 UI 자동 갱신
 
 ---
 
